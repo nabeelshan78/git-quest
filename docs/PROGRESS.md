@@ -22,12 +22,12 @@ committed code works; not extended).
 | 0 | Foundation (orchestrator) | main | done | scaffold, contracts, core data layer, harness, CI |
 | 0b | Scope cut (orchestrator) | main | done | contracts, chapters.json (58 levels), strings file, docs |
 | 1 | Engine A | ws/engine-a | **done** | merged to main (50 diff tests, 16 commands) |
-| 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | in progress | batch 2 agent running |
+| 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | in progress | agent running |
 | 3 | Remote (remote, clone, fetch, pull, push, teammates) | ws/remote | **done** | merged to main (13 tests, 5 commands) |
 | 4 | Parser | ws/parser | **done** | merged to main (66 tests) |
 | 5 | UI | ws/ui | **done** | merged to main (50 files, 8033 lines) |
-| 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub-levels | in progress | combined with Level runner |
-| 7 | Level runner | ws/hub-levels | in progress | combined with Mock GitHub |
+| 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub-levels | **done** | merged (hub actions, PR merge, reactToEvents) |
+| 7 | Level runner | ws/hub-levels | **done** | merged (session, setup, goals, errors, scoring, playSolution) |
 | 8a | Content ch 0–4 (32 levels) | ws/content-0-4 | not started | after runner |
 | 8b | Content ch 5–8 (26 levels) | ws/content-5-8 | not started | after runner |
 | 9 | Classroom (progress save, export JSON/CSV, short guide) | ws/classroom | **done** | merged to main (120 tests) |
