@@ -25,9 +25,9 @@ committed code works; not extended).
 | 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | in progress | batch 2 agent running |
 | 3 | Remote (remote, clone, fetch, pull, push, teammates) | ws/remote | in progress | batch 2 agent running |
 | 4 | Parser | ws/parser | **done** | merged to main (66 tests) |
-| 5 | UI | ws/ui | in progress | batch 1 agent still running |
-| 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub | in progress | batch 2 agent running |
-| 7 | Level runner | ws/levels | in progress | batch 2 agent running |
+| 5 | UI | ws/ui | **done** | merged to main (50 files, 8033 lines) |
+| 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub-levels | in progress | combined with Level runner |
+| 7 | Level runner | ws/hub-levels | in progress | combined with Mock GitHub |
 | 8a | Content ch 0–4 (32 levels) | ws/content-0-4 | not started | after runner |
 | 8b | Content ch 5–8 (26 levels) | ws/content-5-8 | not started | after runner |
 | 9 | Classroom (progress save, export JSON/CSV, short guide) | ws/classroom | **done** | merged to main (120 tests) |
@@ -71,3 +71,7 @@ committed code works; not extended).
   commands). 243 total tests on main.
 - Batch 2 launched: Engine B, Remote, Mock GitHub, Level runner. UI still
   running from batch 1.
+- All 5 agents hit rate limit (6:50pm reset). UI merged (8033 lines, 50
+  files). Engine B/Remote/Hub/Levels had no commits (still reading).
+- UI merged to main (282 tests, 24 files). Batch 2 relaunched: Engine B,
+  Remote, Hub+Levels (combined). 3 agents running.
