@@ -75,4 +75,78 @@ export const TID = {
   dashboard: 'professor-dashboard',
   dashboardImport: 'dashboard-import',
   dashboardCsv: 'dashboard-csv',
+
+  // ----- added by the UI workstream -----
+  // app shell / pages
+  homeButton: 'home-button',
+  homePage: 'home-page',
+  continueButton: 'continue-button',
+  dailyButton: 'daily-button',
+  professorLink: 'professor-link',
+  badgeList: 'badge-list',
+  /** Has data-earned="true|false". */
+  badge: (id: string) => `badge-${id}`,
+  levelError: 'level-error',
+  liveRegion: 'live-region',
+  sandboxPreset: (preset: string) => `sandbox-preset-${preset}`,
+  dailyPage: 'daily-page',
+  dailyProgress: 'daily-progress',
+  dailyDone: 'daily-done',
+  challengeTimer: 'challenge-timer',
+  // mission panel extras
+  /** Has data-correct="true|false". */
+  questionFeedback: (id: string) => `question-${id}-feedback`,
+  cheatCard: 'cheat-card',
+  dialogueLine: 'dialogue-line',
+  demoSkip: 'demo-skip',
+  demoCaption: 'demo-caption',
+  parInfo: 'par-info',
+  // predict / win extras
+  /** Has data-correct="true|false". */
+  predictFeedback: 'predict-feedback',
+  winReplay: 'win-replay',
+  winChallenge: 'win-challenge',
+  winHome: 'win-home',
+  winClose: 'win-close',
+  winGlossary: 'win-glossary',
+  levelCompleteBanner: 'level-complete-banner',
+  // world view extras
+  /** Has data-badges="new modified ..." and data-exists. */
+  workingFile: (path: string) => `working-file-${path}`,
+  /** Has data-kind. */
+  stagingFile: (path: string) => `staging-file-${path}`,
+  commitNode: (shortId: string) => `commit-node-${shortId}`,
+  remoteCommitNode: (shortId: string) => `remote-commit-node-${shortId}`,
+  commitSheet: 'commit-sheet',
+  commitSheetClose: 'commit-sheet-close',
+  remoteGraphDescription: 'remote-graph-description',
+  remoteSelect: (name: string) => `remote-select-${name}`,
+  // files + editor extras
+  editorClose: 'file-editor-close',
+  editorReload: 'file-editor-reload',
+  newFileCancel: 'new-file-cancel',
+  // overlays
+  glossaryDrawer: 'glossary-drawer',
+  settingsDrawer: 'settings-drawer',
+  drawerClose: 'drawer-close',
+  // glossary + settings pages
+  glossaryPage: 'glossary-page',
+  glossarySearch: 'glossary-search',
+  glossaryTerm: (id: string) => `glossary-term-${id}`,
+  settingsPage: 'settings-page',
+  settingTheme: 'setting-theme',
+  settingTerminalTheme: 'setting-terminal-theme',
+  settingFontScale: 'setting-font-scale',
+  settingAnimationSpeed: 'setting-animation-speed',
+  settingReducedMotion: 'setting-reduced-motion',
+  settingScreenReader: 'setting-screen-reader',
+  settingLanguage: 'setting-language',
+  settingsExport: 'settings-export',
+  settingsImport: 'settings-import',
+  settingsImportStatus: 'settings-import-status',
+  settingsReset: 'settings-reset',
+  settingsResetConfirm: 'settings-reset-confirm',
+  settingsProfileName: 'settings-profile-name',
+  settingsProfileClassCode: 'settings-profile-class-code',
+  settingsProfileSave: 'settings-profile-save',
 } as const;

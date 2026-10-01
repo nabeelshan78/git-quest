@@ -14,6 +14,8 @@ export interface GraphCommit {
   subject: string;
   timestamp: number;
   author?: string;
+  /** Only reachable from the reflog (shown faded: "lost" but recoverable). */
+  lost?: boolean;
 }
 
 export type GraphHead = { kind: 'branch'; name: string } | { kind: 'detached'; id: string } | { kind: 'none' };
@@ -78,36 +80,46 @@ export function graphFromRepo(repo: RepoState, options: RepoGraphOptions = {}): 
     ...Object.values(branches),
     ...Object.values(remoteBranches),
     ...Object.values(tags),
-    ...(options.extraTips ?? []),
   ];
-  const seen = new Set<string>();
-  const commits: GraphCommit[] = [];
-  const queue = [...tips];
-  // Breadth-first from the tips so a cut-off keeps the newest commits.
-  const all: GraphCommit[] = [];
-  while (queue.length) {
-    const id = queue.shift()!;
-    if (seen.has(id)) continue;
-    seen.add(id);
-    const c = getCommit(repo, id);
-    if (!c) continue;
-    all.push({
-      id,
-      short: shortHash(id),
-      parents: c.parents,
-      subject: subjectOf(c.message),
-      timestamp: c.committer.timestamp,
-      author: c.author.name,
-    });
-    for (const p of c.parents) if (!seen.has(p)) queue.push(p);
-  }
-  all.sort((a, b) => b.timestamp - a.timestamp);
+  const reachable = walk(repo, tips);
+  const extra = options.extraTips?.length ? walk(repo, options.extraTips, reachable) : new Map<string, GraphCommit>();
+  for (const c of extra.values()) c.lost = true;
+  const all = [...reachable.values(), ...extra.values()].sort((a, b) => b.timestamp - a.timestamp);
   const truncated = all.length > max;
   const kept = truncated ? all.slice(0, max) : all;
   const keptIds = new Set(kept.map((c) => c.id));
-  for (const c of kept) commits.push({ ...c, parents: c.parents.filter((p) => keptIds.has(p)) });
+  const commits = kept.map((c) => ({ ...c, parents: c.parents.filter((p) => keptIds.has(p)) }));
 
   return { commits, branches, remoteBranches, tags, head, primary: pickPrimary(branches, head, options.defaultBranch), truncated };
+}
+
+/** Breadth-first walk over commits from `tips`, skipping commits already in `skip`. */
+function walk(repo: RepoState, tips: string[], skip?: Map<string, GraphCommit>): Map<string, GraphCommit> {
+  const out = new Map<string, GraphCommit>();
+  const queue = [...tips];
+  while (queue.length) {
+    const id = queue.shift()!;
+    if (out.has(id) || skip?.has(id)) continue;
+    const c = getCommit(repo, id);
+    if (!c) continue;
+    out.set(id, { id, short: shortHash(id), parents: c.parents, subject: subjectOf(c.message), timestamp: c.committer.timestamp, author: c.author.name });
+    for (const p of c.parents) if (!out.has(p) && !skip?.has(p)) queue.push(p);
+  }
+  return out;
+}
+
+/** Commits the reflog remembers that no branch, tag or HEAD reaches any more. */
+export function reflogOnlyTips(repo: RepoState): string[] {
+  const tips = new Set<string>();
+  for (const entries of Object.values(repo.reflog)) for (const e of entries) if (getCommit(repo, e.new)) tips.add(e.new);
+  const live = [
+    ...(repo.head.type === 'detached' ? [repo.head.hash] : []),
+    ...Object.entries(repo.refs)
+      .filter(([r]) => r !== 'refs/stash')
+      .map(([, h]) => peel(repo, h)),
+  ];
+  const reachable = walk(repo, live);
+  return [...tips].filter((h) => !reachable.has(h));
 }
 
 /** Build graph input from a predict-card / question picture. Picture commits are listed oldest first. */
