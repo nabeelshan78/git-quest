@@ -115,12 +115,24 @@ that the output answers. `ranCommand` exists but use it sparingly.
   for story/quiz-only levels.
 - `allowedCommands`: prefixes like `["git add", "git commit", "git restore"]`.
   Always allowed anyway: `clear`, `help`, `history`, `pwd`, `ls`, `cat`,
-  `whoami`, `git status`, `git log`, `git diff`, `git show`, `git help`,
+  `git status`, `git log`, `git diff`, `git show`, `git help`,
   any `--help`. Use `null` (everything) for bosses and later chapters.
+  Shell commands in scope: `pwd`, `ls`, `cd`, `mkdir`, `touch`, `cat`,
+  `echo` (with `>` / `>>`), plus `clear`, `help`, `history`.
 - Scaffolding fades: early levels of a concept use `demo` (Ada types it),
   then `ui.actionButtons` (click types the command), then typing with
   hints, then bosses with nothing. Action buttons fade out from mid
   Chapter 2.
+
+### Level 6.7 (HTTPS token vs SSH)
+
+Explained and simulated without real cryptography: setup writes a prepared
+public key file (`~/.ssh/id_ed25519.pub`, content like
+`ssh-ed25519 SIMULATED... intern@laptop`) and sets `"requireAuth": true`
+under `setup.hub`. The player creates a personal access token on the
+simulated GitHub (`createToken`) or adds the public key (`cat` it, then
+`addSshKey`), switches to the SSH URL with `git remote set-url` if using
+the key, and pushes. Questions check the HTTPS-vs-SSH ideas.
 
 ### Predict cards and pictures
 
