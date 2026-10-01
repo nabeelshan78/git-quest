@@ -1,98 +1,51 @@
 /**
- * Public API of the classroom module (progress saving, export/import,
- * professor dashboard data).
- * @stub-owner classroom — minimal foundation version so other workstreams
- * can run. The Classroom workstream replaces it completely, keeping the
- * signatures. The dashboard page component is `ProfessorDashboard` in
- * ./ProfessorDashboard.tsx.
+ * Public API of the classroom module: the browser progress store, progress
+ * file export/import, the React hook for the UI, and the pure aggregation
+ * and CSV helpers behind the Professor Dashboard.
+ *
+ * The dashboard page component is `ProfessorDashboard` in
+ * ./ProfessorDashboard.tsx (rendered by the UI at #/professor).
+ *
+ * Typical UI use:
+ *   const progress = createProgressStore(window.localStorage);
+ *   const file = useProgress(progress);          // re-renders on change
+ *   downloadProgress(progress);                  // "Export progress" button
  */
-import { PROGRESS_FORMAT, PROGRESS_STORAGE_KEY, PROGRESS_VERSION, ProgressFileSchema } from '../shared/progress';
-import type { LevelResult, ProgressApi, ProgressFile } from '../shared/progress';
-
-/** Minimal storage interface (localStorage satisfies it; tests pass an in-memory one). */
-export interface StorageLike {
-  getItem(key: string): string | null;
-  setItem(key: string, value: string): void;
-  removeItem(key: string): void;
-}
-
-function emptyProgress(): ProgressFile {
-  return {
-    format: PROGRESS_FORMAT,
-    version: PROGRESS_VERSION,
-    exportedAt: new Date(0).toISOString(),
-    appVersion: '0.1.0',
-    player: { id: 'local', name: '', handle: 'intern', email: 'intern@lanternlabs.example', classCode: '', createdAt: new Date(0).toISOString() },
-    levels: {},
-    glossary: [],
-    badges: [],
-    daily: { streak: 0, lastDate: null, history: [] },
-    sandboxMinutes: 0,
-  };
-}
-
-export function createProgressStore(storage?: StorageLike): ProgressApi {
-  let state = emptyProgress();
-  try {
-    const raw = storage?.getItem(PROGRESS_STORAGE_KEY);
-    if (raw) state = ProgressFileSchema.parse(JSON.parse(raw));
-  } catch {
-    state = emptyProgress();
-  }
-  const listeners = new Set<(p: ProgressFile) => void>();
-  const set = (next: ProgressFile) => {
-    state = next;
-    storage?.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(state));
-    for (const l of listeners) l(state);
-  };
-  return {
-    get: () => state,
-    subscribe(listener) {
-      listeners.add(listener);
-      return () => listeners.delete(listener);
-    },
-    setProfile: (patch) => set({ ...state, player: { ...state.player, ...patch } }),
-    recordAttemptStart: () => undefined,
-    recordResult(result: LevelResult) {
-      const prev = state.levels[result.levelId];
-      const stars = Math.max(prev?.stars ?? 0, result.completed ? result.stars : 0);
-      set({
-        ...state,
-        levels: {
-          ...state.levels,
-          [result.levelId]: {
-            levelId: result.levelId,
-            completed: (prev?.completed ?? false) || result.completed,
-            stars,
-            attempts: (prev?.attempts ?? 0) + 1,
-            completions: (prev?.completions ?? 0) + (result.completed ? 1 : 0),
-            timeSpentSec: (prev?.timeSpentSec ?? 0) + result.timeMs / 1000,
-            bestTimeSec: prev?.bestTimeSec ?? null,
-            bestCommands: prev?.bestCommands ?? null,
-            hintsUsed: (prev?.hintsUsed ?? 0) + result.hintsRevealed,
-            maxHintTier: Math.max(prev?.maxHintTier ?? 0, result.hintsRevealed),
-            commandsTyped: (prev?.commandsTyped ?? 0) + result.commandsTyped,
-            errors: (prev?.errors ?? 0) + result.errors,
-            errorCodes: { ...(prev?.errorCodes ?? {}) },
-            rewinds: (prev?.rewinds ?? 0) + result.rewinds,
-            firstCompletedAt: prev?.firstCompletedAt ?? null,
-            lastPlayedAt: null,
-            challenge: prev?.challenge ?? null,
-          },
-        },
-      });
-    },
-    recordDaily: () => undefined,
-    unlockGlossary: (ids) => set({ ...state, glossary: [...new Set([...state.glossary, ...ids])] }),
-    awardBadge: (id) => set({ ...state, badges: [...new Set([...state.badges, id])] }),
-    addSandboxMinutes: (m) => set({ ...state, sandboxMinutes: state.sandboxMinutes + m }),
-    exportFile: () => JSON.stringify(state, null, 2),
-    importFile(text) {
-      const parsed = ProgressFileSchema.safeParse(JSON.parse(text));
-      if (!parsed.success) return { ok: false, error: 'This is not a Git Quest progress file.' };
-      set(parsed.data);
-      return { ok: true };
-    },
-    reset: () => set(emptyProgress()),
-  };
-}
+export { createProgressStore, generatePlayerId, APP_VERSION, CORRUPT_BACKUP_KEY } from './store';
+export type { LoadStatus, ProgressStore, ProgressStoreOptions, ResetOptions, StorageLike } from './store';
+export { useProgress } from './useProgress';
+export { canonicalJson, checksumStatus, computeChecksum, fnv1a32, verifyChecksum, withChecksum } from './checksum';
+export type { ChecksumStatus } from './checksum';
+export { describeParseError, parseProgressFile, progressFileName, serializeProgressFile, MAX_PROGRESS_FILE_BYTES } from './progressFile';
+export type { ParseError, ParseResult, Translate } from './progressFile';
+export {
+  applyDaily,
+  applyLevelResult,
+  applyProfilePatch,
+  createEmptyProgress,
+  currentStreak,
+  defaultEmail,
+  deriveHandle,
+  DEFAULT_HANDLE,
+  DAILY_HISTORY_LIMIT,
+  EMAIL_DOMAIN,
+} from './progressLogic';
+export type { ProfilePatch } from './progressLogic';
+export { downloadProgress, downloadText } from './download';
+export type { DownloadFn } from './download';
+export {
+  buildCurriculum,
+  classCodes,
+  classOverview,
+  filterRecords,
+  levelStats,
+  makeRecord,
+  mergeRecord,
+  stuckLevels,
+  summarizeStudent,
+  ALL_CLASSES,
+  HIGH_HINT_RATE,
+} from './aggregate';
+export type { Curriculum, LevelStat, StudentRecord, StudentSummary } from './aggregate';
+export { classSummaryCsv, levelStatsCsv, toCsv } from './csv';
+export { generateSampleClass } from './sampleData';
