@@ -84,7 +84,6 @@ export interface HostedRepoOptions {
   description?: string;
   visibility?: 'public' | 'private';
   defaultBranch?: string;
-  forkOf?: string | null;
   createdAt: number;
 }
 
@@ -100,25 +99,18 @@ export function createHostedRepoRecord(options: HostedRepoOptions): HostedRepo {
     visibility: options.visibility ?? 'public',
     repo: createEmptyRepo({ bare: true, initialBranch: defaultBranch }),
     defaultBranch,
-    forkOf: options.forkOf ?? null,
     collaborators: [owner],
-    protection: {},
     issues: [],
     pulls: [],
-    releases: [],
     labels: [
       { name: 'bug', color: '#D55E00', description: 'Something is not working' },
       { name: 'enhancement', color: '#0072B2', description: 'New feature or request' },
       { name: 'good first issue', color: '#009E73', description: 'Good for newcomers' },
       { name: 'documentation', color: '#56B4E9', description: 'Improvements to docs' },
     ],
-    workflows: [],
-    runs: [],
-    pages: null,
     settings: { allowMergeCommit: true, allowSquashMerge: true, allowRebaseMerge: true, deleteBranchOnMerge: false },
     nextNumber: 1,
     nextId: 1,
-    stars: 0,
     createdAt: options.createdAt,
   };
 }

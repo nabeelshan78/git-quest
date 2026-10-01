@@ -12,7 +12,7 @@ import type { DialogueLine, HubAction, LevelDefinition, PredictCard, Question } 
 import type { LevelResult, PlayerProfile } from './progress';
 import type { EditorRequest, MachineId, World } from './types';
 
-export type SessionMode = 'story' | 'sandbox' | 'daily' | 'challenge';
+export type SessionMode = 'story' | 'sandbox';
 
 /**
  * intro    – story beats are showing; the terminal already accepts input
@@ -89,8 +89,6 @@ export interface SessionSnapshot {
   demoLines: string[];
   /** Set when phase === 'complete'. */
   result: LevelResult | null;
-  /** Challenge mode: seconds left (null otherwise). */
-  timeLeftSec: number | null;
   /** Milliseconds since the level started. */
   elapsedMs: number;
 }

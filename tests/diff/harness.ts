@@ -24,7 +24,7 @@ const ENGINE_HOME = '/home/tester';
 
 export type Step =
   /** Run git with these args in both. `output: true` also compares stdout/stderr text. */
-  | { git: string[]; output?: boolean; editor?: string; sequenceEditor?: string; exitCode?: 'exact' | 'zero-or-not' }
+  | { git: string[]; output?: boolean; editor?: string; exitCode?: 'exact' | 'zero-or-not' }
   /** Write files (relative to the current directory). */
   | { write: Record<string, string> }
   | { rm: string[] }
@@ -236,10 +236,7 @@ function compareState(world: World, real: RealGit, clock: number, compare: Compa
   const gitDir = `${repoDir}/.git`;
   const flags: [string, boolean, boolean][] = [
     ['MERGE_HEAD', existsSync(`${gitDir}/MERGE_HEAD`), !!repo.special.MERGE_HEAD],
-    ['CHERRY_PICK_HEAD', existsSync(`${gitDir}/CHERRY_PICK_HEAD`), !!repo.special.CHERRY_PICK_HEAD],
     ['REVERT_HEAD', existsSync(`${gitDir}/REVERT_HEAD`), !!repo.special.REVERT_HEAD],
-    ['rebase in progress', existsSync(`${gitDir}/rebase-merge`) || existsSync(`${gitDir}/rebase-apply`), !!repo.rebase],
-    ['bisect in progress', existsSync(`${gitDir}/BISECT_START`), !!repo.bisect],
   ];
   for (const [name, r, e] of flags) if (r !== e) out.push(`${label}: ${name} — real: ${r}, engine: ${e}`);
   if (repo.special.MERGE_HEAD && existsSync(`${gitDir}/MERGE_HEAD`)) {
@@ -290,14 +287,13 @@ export function runScenario(scenario: Scenario): ScenarioResult {
       if ('git' in step) {
         const clock = world.clock;
         const editor = step.editor !== undefined ? real.editorFor(step.editor, 'msg') : undefined;
-        const seqEditor = step.sequenceEditor !== undefined ? real.editorFor(step.sequenceEditor, 'todo') : undefined;
-        const r = real.run(step.git, clock, { editor, sequenceEditor: seqEditor });
+        const r = real.run(step.git, clock, { editor });
         let e = runGit(world, 'laptop', step.git);
         // If the engine opened an editor, answer it the way the real editor did.
         let guard = 0;
         while (e.state.machines.laptop.editor && guard++ < 10) {
           const req = e.state.machines.laptop.editor;
-          const content = req.purpose === 'rebase-todo' ? (step.sequenceEditor ?? req.initialContent) : (step.editor ?? req.initialContent);
+          const content = step.editor ?? req.initialContent;
           const out = e.output;
           const after = e.state.clock;
           // Real git used one fixed date for the whole command, so resume at the original clock.
