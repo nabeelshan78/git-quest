@@ -27,8 +27,6 @@ export type CommitKind =
   | 'merge'
   | 'squash-merge'
   | 'revert'
-  | 'cherry-pick'
-  | 'rebase'
   | 'stash'
   | 'hub' // created on the simulated GitHub (web edit, PR merge, teammate)
   | 'teammate';
@@ -38,14 +36,11 @@ export type RefUpdateReason =
   | 'branch'
   | 'reset'
   | 'merge'
-  | 'rebase'
-  | 'cherry-pick'
   | 'revert'
   | 'fetch'
   | 'push'
   | 'pull'
   | 'clone'
-  | 'tag'
   | 'stash'
   | 'hub'
   | 'other';
@@ -85,22 +80,13 @@ export type GameEvent =
   // ----- merge / conflicts / sequencer -----
   | { type: 'merge.fastForward'; repo: RepoLocation; from: Hash; to: Hash }
   | { type: 'merge.start'; repo: RepoLocation; ours: Hash; theirs: Hash; base: Hash | null }
-  | { type: 'merge.conflict'; repo: RepoLocation; paths: RepoPath[]; operation: 'merge' | 'rebase' | 'cherry-pick' | 'revert' | 'stash' | 'pull' }
+  | { type: 'merge.conflict'; repo: RepoLocation; paths: RepoPath[]; operation: 'merge' | 'revert' | 'stash' | 'pull' }
   | { type: 'merge.resolved'; repo: RepoLocation; path: RepoPath }
   | { type: 'merge.complete'; repo: RepoLocation; hash: Hash }
-  | { type: 'merge.abort'; repo: RepoLocation; operation: 'merge' | 'rebase' | 'cherry-pick' | 'revert' }
-  | { type: 'rebase.start'; repo: RepoLocation; onto: Hash; commits: Hash[]; interactive: boolean }
-  | { type: 'rebase.step'; repo: RepoLocation; action: string; from: Hash; to: Hash | null }
-  | { type: 'rebase.stop'; repo: RepoLocation; reason: 'conflict' | 'edit' | 'break' | 'reword' }
-  | { type: 'rebase.finish'; repo: RepoLocation; head: Hash }
+  | { type: 'merge.abort'; repo: RepoLocation; operation: 'merge' | 'revert' }
   | { type: 'stash.push'; repo: RepoLocation; hash: Hash; message: string }
   | { type: 'stash.apply'; repo: RepoLocation; hash: Hash; dropped: boolean }
   | { type: 'stash.drop'; repo: RepoLocation; hash: Hash }
-  | { type: 'bisect.step'; repo: RepoLocation; current: Hash; remaining: number; steps: number }
-  | { type: 'bisect.found'; repo: RepoLocation; hash: Hash }
-  | { type: 'bisect.reset'; repo: RepoLocation }
-  | { type: 'tag.create'; repo: RepoLocation; name: string; target: Hash; annotated: boolean }
-  | { type: 'tag.delete'; repo: RepoLocation; name: string }
   // ----- editor -----
   | { type: 'editor.open'; request: EditorRequest }
   | { type: 'editor.close'; machine: MachineId; saved: boolean }
@@ -111,25 +97,19 @@ export type GameEvent =
   | { type: 'transfer.clone'; hosted: HostedRepoId; machine: MachineId; root: AbsPath }
   | { type: 'transfer.fetch'; repo: RepoLocation; remote: string; hosted: HostedRepoId; updates: RefChange[]; objects: number }
   | { type: 'transfer.push'; repo: RepoLocation; remote: string; hosted: HostedRepoId; updates: RefChange[]; objects: number }
-  | { type: 'transfer.rejected'; repo: RepoLocation; remote: string; hosted: HostedRepoId; ref: string; reason: 'non-fast-forward' | 'fetch-first' | 'stale-info' | 'protected' | 'auth' | 'not-found' | 'other' }
+  | { type: 'transfer.rejected'; repo: RepoLocation; remote: string; hosted: HostedRepoId; ref: string; reason: 'non-fast-forward' | 'fetch-first' | 'auth' | 'not-found' | 'other' }
   // ----- simulated GitHub -----
   | { type: 'hub.repo.create'; repo: HostedRepoId; by: string }
-  | { type: 'hub.repo.fork'; repo: HostedRepoId; from: HostedRepoId; by: string }
-  | { type: 'hub.repo.sync'; repo: HostedRepoId; branch: string }
   | { type: 'hub.repo.settings'; repo: HostedRepoId; by: string }
   | { type: 'hub.file.edit'; repo: HostedRepoId; branch: string; path: RepoPath; commit: Hash; by: string }
   | { type: 'hub.branch.delete'; repo: HostedRepoId; branch: string; by: string }
-  | { type: 'hub.branch.protect'; repo: HostedRepoId; branch: string; by: string }
   | { type: 'hub.issue.open'; repo: HostedRepoId; number: number; by: string }
   | { type: 'hub.issue.update'; repo: HostedRepoId; number: number; by: string; change: 'assign' | 'label' | 'close' | 'reopen' | 'comment' | 'reference' }
   | { type: 'hub.pr.open'; repo: HostedRepoId; number: number; by: string }
-  | { type: 'hub.pr.update'; repo: HostedRepoId; number: number; by: string; change: 'comment' | 'push' | 'close' | 'reopen' | 'ready' | 'reviewers' | 'branch-updated' }
+  | { type: 'hub.pr.update'; repo: HostedRepoId; number: number; by: string; change: 'comment' | 'push' | 'close' | 'reopen' | 'reviewers' }
   | { type: 'hub.pr.review'; repo: HostedRepoId; number: number; by: string; state: 'APPROVED' | 'CHANGES_REQUESTED' | 'COMMENTED' }
   | { type: 'hub.pr.reviewComment'; repo: HostedRepoId; number: number; by: string; commentId: number }
   | { type: 'hub.pr.merge'; repo: HostedRepoId; number: number; by: string; method: MergeMethod; commit: Hash }
-  | { type: 'hub.release.create'; repo: HostedRepoId; tag: string; by: string }
-  | { type: 'hub.actions.run'; repo: HostedRepoId; runId: number; conclusion: 'success' | 'failure' | null }
-  | { type: 'hub.pages.deploy'; repo: HostedRepoId; commit: Hash; url: string }
   | { type: 'hub.ssh.add'; title: string }
   | { type: 'hub.token.create'; name: string }
   // ----- story / teammates -----

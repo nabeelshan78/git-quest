@@ -1,9 +1,11 @@
 # Content guide — writing Git Quest levels
 
-For the three content workstreams (Chapters 0–3, 4–7, 8–11). Read
-`CLAUDE.md` ("Writing for beginners"), `docs/SPEC.md` (curriculum and
-"Level design and game mechanics"), `docs/ARCHITECTURE.md` and the schema
-`src/shared/level.ts` (every field is commented) before writing.
+For the two content workstreams (Chapters 0–4 and 5–8). Read
+`docs/SCOPE.md` (the level list: 9 chapters, 58 levels — it overrides the
+SPEC curriculum), `CLAUDE.md` ("Writing for beginners"), `docs/SPEC.md`
+(story, characters, "Level design and game mechanics"),
+`content/chapters.json` (exact ids and titles), `docs/ARCHITECTURE.md` and
+the schema `src/shared/level.ts` (every field is commented) before writing.
 
 ## The story
 
@@ -17,12 +19,12 @@ team needs it right now.
 | Ada | `ada-lantern` | Ada Okafor `<ada@lanternlabs.example>` | Mentor. Explains in 2–3 sentences, shows once, steps back. Her help fades. |
 | Sam | `sam-codes` | Sam Lee `<sam@lanternlabs.example>` | Fast teammate. Pushes without warning, edits your lines. Kind, always rushing. |
 | Priya | `priya-reviews` | Priya Natarajan `<priya@lanternlabs.example>` | Reviewer. Specific, friendly PR comments. |
-| Leo | `leo-maps` | Leo Martins `<leo@openmaps.example>` | Maintainer of the open-source **lantern-maps** widget (Chapter 8+). |
 | You | `{{player.handle}}` | `{{player.name}} <{{player.email}}>` | The intern. |
 
 Tone: warm, low pressure, a little funny. Mistakes get a friendly line and
-a rewind, never "game over". Speakers allowed: `Ada`, `Sam`, `Priya`,
-`Leo`, `Narrator`, `You`.
+a rewind, never "game over". Speakers used: `Ada`, `Sam`, `Priya`,
+`Narrator`, `You` (`Leo` exists in the schema but the open-source chapter
+is out of scope).
 
 ## Writing rules (hard)
 
@@ -36,14 +38,16 @@ a rewind, never "game over". Speakers allowed: `Ada`, `Sam`, `Priya`,
   "`git restore --staged <file>` takes a file out of the staging area. Your edits stay safe."
 - No lorem ipsum, no placeholders, no TODOs.
 - Boss levels: a realistic incident, no step-by-step guidance in the story,
-  needs every skill from the chapter, `boss: true`, a `challenge` block.
+  needs every skill from the chapter, `boss: true`.
 - About **1 in 3 levels has a `predict` card** (before the key command:
   "What will the graph look like after `git merge feature`?").
 
 ## The festival project (keep it consistent)
 
 Main folder: `~/festival` (workdir for most levels). Hosted repo (from
-Chapter 6): `lantern-labs/festival-site`. Typical files:
+Chapter 6): `lantern-labs/festival-site`. Use only the commands in scope
+(`docs/SCOPE.md`): no rebase, cherry-pick, tag, bisect, blame, force push
+or forks. Typical files:
 
 ```
 index.html      <h1>Riverside Lantern Festival</h1> ...

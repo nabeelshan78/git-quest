@@ -26,7 +26,6 @@ function emptyProgress(): ProgressFile {
     levels: {},
     glossary: [],
     badges: [],
-    daily: { streak: 0, lastDate: null, history: [] },
     sandboxMinutes: 0,
   };
 }
@@ -77,16 +76,15 @@ export function createProgressStore(storage?: StorageLike): ProgressApi {
             rewinds: (prev?.rewinds ?? 0) + result.rewinds,
             firstCompletedAt: prev?.firstCompletedAt ?? null,
             lastPlayedAt: null,
-            challenge: prev?.challenge ?? null,
           },
         },
       });
     },
-    recordDaily: () => undefined,
     unlockGlossary: (ids) => set({ ...state, glossary: [...new Set([...state.glossary, ...ids])] }),
     awardBadge: (id) => set({ ...state, badges: [...new Set([...state.badges, id])] }),
     addSandboxMinutes: (m) => set({ ...state, sandboxMinutes: state.sandboxMinutes + m }),
     exportFile: () => JSON.stringify(state, null, 2),
+    exportCsv: () => ['level,completed,stars', ...Object.values(state.levels).map((l) => `${l.levelId},${l.completed},${l.stars}`)].join('\n'),
     importFile(text) {
       const parsed = ProgressFileSchema.safeParse(JSON.parse(text));
       if (!parsed.success) return { ok: false, error: 'This is not a Git Quest progress file.' };
