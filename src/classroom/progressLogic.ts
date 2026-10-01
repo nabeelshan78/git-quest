@@ -12,11 +12,6 @@ export const HANDLE_PATTERN = /^[a-z0-9][a-z0-9-]{0,38}$/;
 export const HANDLE_MAX_LENGTH = 39;
 export const NAME_MAX_LENGTH = 80;
 export const CLASS_CODE_MAX_LENGTH = 40;
-/** Daily practice history keeps this many most recent days. */
-export const DAILY_HISTORY_LIMIT = 60;
-
-const DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
-const DAY_MS = 86_400_000;
 
 /**
  * Simulated-GitHub handle from a display name: lower case, letters, digits
@@ -73,7 +68,6 @@ export function createEmptyProgress(id: string, nowIso: string, appVersion: stri
     levels: {},
     glossary: [],
     badges: [],
-    daily: { streak: 0, lastDate: null, history: [] },
     sandboxMinutes: 0,
   };
 }
@@ -96,7 +90,6 @@ export function emptyLevelProgress(levelId: string): LevelProgress {
     rewinds: 0,
     firstCompletedAt: null,
     lastPlayedAt: null,
-    challenge: null,
   };
 }
 
@@ -109,20 +102,20 @@ export type ProfilePatch = Partial<Omit<PlayerProfile, 'id' | 'createdAt'>>;
  */
 export function applyProfilePatch(file: ProgressFile, patch: ProfilePatch): ProgressFile {
   const prev = file.player;
-  const name = patch.name !== undefined ? patch.name.trim().slice(0, NAME_MAX_LENGTH) : prev.name;
+  const name = typeof patch.name === 'string' ? patch.name.trim().slice(0, NAME_MAX_LENGTH) : prev.name;
   let handle = prev.handle;
-  if (patch.handle !== undefined) {
+  if (typeof patch.handle === 'string') {
     handle = HANDLE_PATTERN.test(patch.handle) ? patch.handle : deriveHandle(patch.handle);
   } else if (name !== prev.name) {
     handle = deriveHandle(name);
   }
   let email = prev.email;
-  if (patch.email !== undefined && patch.email.trim() !== '') {
+  if (typeof patch.email === 'string' && patch.email.trim() !== '') {
     email = patch.email.trim();
-  } else if (patch.email !== undefined || email === '' || email === defaultEmail(prev.handle)) {
+  } else if (typeof patch.email === 'string' || email === '' || email === defaultEmail(prev.handle)) {
     email = defaultEmail(handle);
   }
-  const classCode = patch.classCode !== undefined ? patch.classCode.trim().slice(0, CLASS_CODE_MAX_LENGTH) : prev.classCode;
+  const classCode = typeof patch.classCode === 'string' ? patch.classCode.trim().slice(0, CLASS_CODE_MAX_LENGTH) : prev.classCode;
   if (name === prev.name && handle === prev.handle && email === prev.email && classCode === prev.classCode) return file;
   return { ...file, player: { ...prev, name, handle, email, classCode } };
 }
@@ -149,103 +142,33 @@ export function mergeErrorCodes(a: Record<string, number>, b: Record<string, num
 /**
  * Record the end of an attempt (completed or abandoned).
  * `attemptCounted` is true when applyAttemptStart already counted it.
- * Story and daily results update the level's stats; challenge results
- * update only its `challenge` record (and undo the counted story attempt).
+ * Stars, completion and best results never get worse; totals are summed.
  */
 export function applyLevelResult(file: ProgressFile, result: LevelResult, nowIso: string, attemptCounted: boolean): ProgressFile {
   const prev = file.levels[result.levelId] ?? emptyLevelProgress(result.levelId);
   const seconds = msToSeconds(result.timeMs);
   const commands = toCount(result.commandsUsed);
-  let next: LevelProgress;
-  if (result.mode === 'challenge') {
-    const before = prev.challenge ?? { completed: false, bestTimeSec: null, bestCommands: null };
-    const challenge = result.completed
-      ? { completed: true, bestTimeSec: minOrNull(before.bestTimeSec, seconds), bestCommands: minOrNull(before.bestCommands, commands) }
-      : before;
-    next = {
-      ...prev,
-      attempts: attemptCounted ? Math.max(0, prev.attempts - 1) : prev.attempts,
-      lastPlayedAt: nowIso,
-      challenge,
-    };
-  } else {
-    const done = result.completed;
-    next = {
-      ...prev,
-      completed: prev.completed || done,
-      stars: Math.max(prev.stars, done ? clampTier(result.stars) : 0),
-      attempts: attemptCounted ? prev.attempts : prev.attempts + 1,
-      completions: prev.completions + (done ? 1 : 0),
-      timeSpentSec: Math.round((prev.timeSpentSec + seconds) * 10) / 10,
-      bestTimeSec: done ? minOrNull(prev.bestTimeSec, seconds) : prev.bestTimeSec,
-      bestCommands: done ? minOrNull(prev.bestCommands, commands) : prev.bestCommands,
-      hintsUsed: prev.hintsUsed + clampTier(result.hintsRevealed),
-      maxHintTier: Math.max(prev.maxHintTier, clampTier(result.hintsRevealed)),
-      commandsTyped: prev.commandsTyped + toCount(result.commandsTyped),
-      errors: prev.errors + toCount(result.errors),
-      errorCodes: mergeErrorCodes(prev.errorCodes, result.errorCodes ?? {}),
-      rewinds: prev.rewinds + toCount(result.rewinds),
-      firstCompletedAt: prev.firstCompletedAt ?? (done ? nowIso : null),
-      lastPlayedAt: nowIso,
-    };
-  }
+  const done = result.completed === true;
+  const hints = clampTier(result.hintsRevealed);
+  const next: LevelProgress = {
+    ...prev,
+    completed: prev.completed || done,
+    stars: Math.max(prev.stars, done ? clampTier(result.stars) : 0),
+    attempts: attemptCounted ? prev.attempts : prev.attempts + 1,
+    completions: prev.completions + (done ? 1 : 0),
+    timeSpentSec: Math.round((prev.timeSpentSec + seconds) * 10) / 10,
+    bestTimeSec: done ? minOrNull(prev.bestTimeSec, seconds) : prev.bestTimeSec,
+    bestCommands: done ? minOrNull(prev.bestCommands, commands) : prev.bestCommands,
+    hintsUsed: prev.hintsUsed + hints,
+    maxHintTier: Math.max(prev.maxHintTier, hints),
+    commandsTyped: prev.commandsTyped + toCount(result.commandsTyped),
+    errors: prev.errors + toCount(result.errors),
+    errorCodes: mergeErrorCodes(prev.errorCodes, result.errorCodes ?? {}),
+    rewinds: prev.rewinds + toCount(result.rewinds),
+    firstCompletedAt: prev.firstCompletedAt ?? (done ? nowIso : null),
+    lastPlayedAt: nowIso,
+  };
   return { ...file, levels: { ...file.levels, [result.levelId]: next } };
-}
-
-/** Day number of a "YYYY-MM-DD" date (UTC), or null when it is not a real date. */
-export function dayNumber(date: string): number | null {
-  const m = DATE_PATTERN.exec(date);
-  if (!m) return null;
-  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
-  const ms = Date.UTC(y, mo - 1, d);
-  const check = new Date(ms);
-  if (check.getUTCFullYear() !== y || check.getUTCMonth() !== mo - 1 || check.getUTCDate() !== d) return null;
-  return Math.round(ms / DAY_MS);
-}
-
-/**
- * Record a daily practice session. A day with at least one completed puzzle
- * extends the streak when it follows the last practice day, or restarts it
- * at 1 after a gap. Replaying the same day merges into that day's entry.
- * A date before the last practice day only updates history.
- */
-export function applyDaily(file: ProgressFile, date: string, levelIds: string[], completed: number): ProgressFile {
-  const day = dayNumber(date);
-  if (day === null) return file;
-  const done = toCount(completed);
-  const history = [...file.daily.history];
-  const index = history.findIndex((h) => h.date === date);
-  if (index >= 0) {
-    const old = history[index];
-    history[index] = { date, levels: [...new Set([...old.levels, ...levelIds])], completed: Math.max(old.completed, done) };
-  } else {
-    history.push({ date, levels: [...new Set(levelIds)], completed: done });
-  }
-  history.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-  const trimmed = history.slice(-DAILY_HISTORY_LIMIT);
-
-  let { streak, lastDate } = file.daily;
-  const lastDay = lastDate === null ? null : dayNumber(lastDate);
-  if (done > 0) {
-    if (lastDay === null || day > lastDay) {
-      streak = lastDay !== null && day - lastDay === 1 ? streak + 1 : 1;
-      lastDate = date;
-    } else if (day === lastDay && streak === 0) {
-      streak = 1;
-    }
-  }
-  return { ...file, daily: { streak, lastDate, history: trimmed } };
-}
-
-/**
- * The streak to show today: the saved streak while the last practice day is
- * today or yesterday, otherwise 0 (the streak was broken).
- */
-export function currentStreak(daily: ProgressFile['daily'], today: string): number {
-  const now = dayNumber(today);
-  const last = daily.lastDate === null ? null : dayNumber(daily.lastDate);
-  if (now === null || last === null) return 0;
-  return now - last <= 1 ? daily.streak : 0;
 }
 
 /** `list` plus new items in order, or null when nothing would change. */

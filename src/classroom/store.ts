@@ -5,20 +5,14 @@
  * change. Damaged saved data is copied to CORRUPT_BACKUP_KEY and the player
  * starts fresh; nothing here ever throws because of storage problems.
  */
-import i18n from '../i18n';
+import { getChapters } from '../levels/content';
+import type { ChaptersFile } from '../shared/level';
 import { PROGRESS_STORAGE_KEY, ProgressFileSchema } from '../shared/progress';
 import type { LevelResult, ProgressApi, ProgressFile } from '../shared/progress';
 import { version as packageVersion } from '../../package.json';
+import { progressToCsv } from './csv';
 import { describeParseError, parseProgressFile, serializeProgressFile } from './progressFile';
-import type { Translate } from './progressFile';
-import {
-  addUnique,
-  applyAttemptStart,
-  applyDaily,
-  applyLevelResult,
-  applyProfilePatch,
-  createEmptyProgress,
-} from './progressLogic';
+import { addUnique, applyAttemptStart, applyLevelResult, applyProfilePatch, createEmptyProgress } from './progressLogic';
 import type { ProfilePatch } from './progressLogic';
 
 /** Minimal storage interface (localStorage satisfies it; tests pass an in-memory one). */
@@ -30,15 +24,13 @@ export interface StorageLike {
 
 export const APP_VERSION: string = packageVersion;
 
-const translate: Translate = (key, options) => String(i18n.t(key, options));
-
 /** Where damaged saved progress is copied before starting fresh. */
 export const CORRUPT_BACKUP_KEY = `${PROGRESS_STORAGE_KEY}.corrupt-backup`;
 
 /**
- * new        – nothing was saved yet (first launch)
- * loaded     – saved progress was read
- * recovered  – saved progress was damaged; it was backed up and a fresh start was made
+ * new         – nothing was saved yet (first launch)
+ * loaded      – saved progress was read
+ * recovered   – saved progress was damaged; it was backed up and a fresh start was made
  * unavailable – the browser blocked storage; progress lives in memory only
  */
 export type LoadStatus = 'new' | 'loaded' | 'recovered' | 'unavailable';
@@ -49,6 +41,8 @@ export interface ProgressStoreOptions {
   /** Player id generator (defaults to crypto.randomUUID with a fallback). */
   createId?: () => string;
   appVersion?: string;
+  /** Curriculum for the CSV export (default: content/chapters.json). */
+  chapters?: ChaptersFile;
 }
 
 export interface ResetOptions {
@@ -58,7 +52,7 @@ export interface ResetOptions {
 
 /** ProgressApi plus a few extras for settings screens and tests. */
 export interface ProgressStore extends ProgressApi {
-  /** Clears levels, glossary, badges, daily practice and sandbox time. */
+  /** Clears levels, glossary, badges and sandbox time. */
   reset(options?: ResetOptions): void;
   /** How the saved progress was found when the store was created. */
   getLoadStatus(): LoadStatus;
@@ -114,12 +108,20 @@ function readSaved(raw: string): ProgressFile | null {
   }
 }
 
+/** The local copy carries no checksum; one is computed fresh on every export. */
+function withoutChecksum(file: ProgressFile): ProgressFile {
+  const { checksum: _ignored, ...rest } = file;
+  return rest;
+}
+
 export function createProgressStore(storage?: StorageLike, options: ProgressStoreOptions = {}): ProgressStore {
   const now = options.now ?? (() => new Date());
   const createId = options.createId ?? generatePlayerId;
   const appVersion = options.appVersion ?? APP_VERSION;
   const nowIso = () => now().toISOString();
   const fresh = (): ProgressFile => createEmptyProgress(createId(), nowIso(), appVersion);
+  let chapters: ChaptersFile | undefined = options.chapters;
+  const curriculum = (): ChaptersFile => (chapters ??= getChapters());
 
   let state: ProgressFile;
   let loadStatus: LoadStatus;
@@ -133,7 +135,7 @@ export function createProgressStore(storage?: StorageLike, options: ProgressStor
   } else {
     const file = readSaved(saved.value);
     if (file) {
-      state = file;
+      state = withoutChecksum(file);
       loadStatus = 'loaded';
     } else {
       safeSet(storage, CORRUPT_BACKUP_KEY, saved.value);
@@ -146,17 +148,26 @@ export function createProgressStore(storage?: StorageLike, options: ProgressStor
   const persist = () => {
     saveError = !safeSet(storage, PROGRESS_STORAGE_KEY, JSON.stringify(state));
   };
-  if (loadStatus !== 'loaded' && loadStatus !== 'unavailable') persist();
+  if (loadStatus === 'new' || loadStatus === 'recovered') persist();
 
   const listeners = new Set<(p: ProgressFile) => void>();
-  /** Level ids whose attempt start was counted and whose result has not arrived yet. */
-  const openAttempts = new Set<string>();
+  /** Level id -> attempts counted by recordAttemptStart whose result has not arrived yet. */
+  const openAttempts = new Map<string, number>();
 
   const commit = (next: ProgressFile) => {
     if (next === state) return;
     state = { ...next, exportedAt: nowIso() };
     persist();
     for (const listener of [...listeners]) listener(state);
+  };
+
+  /** True (and one fewer open attempt) when recordAttemptStart already counted this attempt. */
+  const takeOpenAttempt = (levelId: string): boolean => {
+    const open = openAttempts.get(levelId) ?? 0;
+    if (open <= 0) return false;
+    if (open === 1) openAttempts.delete(levelId);
+    else openAttempts.set(levelId, open - 1);
+    return true;
   };
 
   return {
@@ -168,23 +179,19 @@ export function createProgressStore(storage?: StorageLike, options: ProgressStor
       };
     },
     setProfile(patch: ProfilePatch) {
-      commit(applyProfilePatch(state, patch));
+      commit(applyProfilePatch(state, patch ?? {}));
     },
     recordAttemptStart(levelId: string) {
-      if (!levelId) return;
-      openAttempts.add(levelId);
+      if (typeof levelId !== 'string' || levelId === '') return;
+      openAttempts.set(levelId, (openAttempts.get(levelId) ?? 0) + 1);
       commit(applyAttemptStart(state, levelId, nowIso()));
     },
     recordResult(result: LevelResult) {
-      if (!result || !result.levelId) return;
-      const counted = openAttempts.delete(result.levelId);
-      commit(applyLevelResult(state, result, nowIso(), counted));
-    },
-    recordDaily(date: string, levelIds: string[], completed: number) {
-      commit(applyDaily(state, date, levelIds, completed));
+      if (!result || typeof result.levelId !== 'string' || result.levelId === '') return;
+      commit(applyLevelResult(state, result, nowIso(), takeOpenAttempt(result.levelId)));
     },
     unlockGlossary(termIds: string[]) {
-      const glossary = addUnique(state.glossary, termIds);
+      const glossary = addUnique(state.glossary, Array.isArray(termIds) ? termIds : []);
       if (glossary) commit({ ...state, glossary });
     },
     awardBadge(badgeId: string) {
@@ -198,11 +205,14 @@ export function createProgressStore(storage?: StorageLike, options: ProgressStor
     exportFile() {
       return serializeProgressFile({ ...state, appVersion }, nowIso());
     },
+    exportCsv() {
+      return progressToCsv(state, curriculum(), nowIso());
+    },
     importFile(text: string) {
-      const parsed = parseProgressFile(typeof text === 'string' ? text : '');
-      if (!parsed.ok) return { ok: false as const, error: describeParseError(parsed.error, translate) };
+      const parsed = parseProgressFile(text);
+      if (!parsed.ok) return { ok: false as const, error: describeParseError(parsed.error) };
       openAttempts.clear();
-      commit(parsed.file);
+      commit(withoutChecksum(parsed.file));
       return { ok: true as const };
     },
     reset(resetOptions: ResetOptions = {}) {

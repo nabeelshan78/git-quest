@@ -2,19 +2,26 @@ import { describe, expect, it } from 'vitest';
 import { PlayerProfileSchema, ProgressFileSchema } from '../shared/progress';
 import {
   addUnique,
-  applyDaily,
+  applyAttemptStart,
+  applyLevelResult,
   applyProfilePatch,
   createEmptyProgress,
-  currentStreak,
-  dayNumber,
   deriveHandle,
-  DAILY_HISTORY_LIMIT,
   mergeErrorCodes,
   msToSeconds,
   toCount,
 } from './progressLogic';
+import { levelResult } from './testing';
 
 const empty = () => createEmptyProgress('id-1', '2026-09-01T10:00:00.000Z', 'test');
+
+describe('createEmptyProgress', () => {
+  it('is a valid progress file with the default handle and email', () => {
+    const file = empty();
+    expect(ProgressFileSchema.safeParse(file).success).toBe(true);
+    expect(file.player).toMatchObject({ id: 'id-1', name: '', handle: 'intern', email: 'intern@lanternlabs.example', classCode: '' });
+  });
+});
 
 describe('deriveHandle', () => {
   it.each([
@@ -63,82 +70,42 @@ describe('applyProfilePatch', () => {
     expect(next.player.email).toBe('not-valid@lanternlabs.example');
   });
 
+  it('falls back to "intern" when the name has no usable letters', () => {
+    const named = applyProfilePatch(empty(), { name: 'Ada' });
+    const next = applyProfilePatch(named, { name: '李雷' });
+    expect(next.player).toMatchObject({ name: '李雷', handle: 'intern', email: 'intern@lanternlabs.example' });
+  });
+
   it('returns the same object when nothing changes', () => {
     const file = empty();
     expect(applyProfilePatch(file, { classCode: '' })).toBe(file);
   });
 });
 
-describe('applyDaily', () => {
-  it('counts consecutive days, including month and year boundaries', () => {
-    let f = empty();
-    for (const d of ['2026-12-30', '2026-12-31', '2027-01-01']) f = applyDaily(f, d, ['1.4'], 3);
-    expect(f.daily.streak).toBe(3);
-    expect(f.daily.lastDate).toBe('2027-01-01');
+describe('applyAttemptStart and applyLevelResult', () => {
+  it('never mutate their input', () => {
+    const file = empty();
+    const snapshot = JSON.stringify(file);
+    const started = applyAttemptStart(file, '1.4', '2026-09-01T10:01:00.000Z');
+    applyLevelResult(started, levelResult({ levelId: '1.4' }), '2026-09-01T10:02:00.000Z', true);
+    expect(JSON.stringify(file)).toBe(snapshot);
+    expect(started.levels['1.4'].attempts).toBe(1);
+    expect(started.levels['1.4'].completed).toBe(false);
   });
 
-  it('restarts the streak after a gap', () => {
-    let f = applyDaily(empty(), '2026-09-01', ['1.4'], 3);
-    f = applyDaily(f, '2026-09-02', ['1.5'], 3);
-    f = applyDaily(f, '2026-09-05', ['2.1'], 2);
-    expect(f.daily.streak).toBe(1);
-    expect(f.daily.history.map((h) => h.date)).toEqual(['2026-09-01', '2026-09-02', '2026-09-05']);
+  it('keep the file valid against the schema', () => {
+    let file = applyAttemptStart(empty(), '2.4', '2026-09-01T10:01:00.000Z');
+    file = applyLevelResult(file, levelResult({ levelId: '2.4', hintsRevealed: 3, errorCodes: { 'nothing-added': 2 } }), '2026-09-01T10:02:00.000Z', true);
+    expect(ProgressFileSchema.safeParse(file).success).toBe(true);
   });
 
-  it('merges a second session on the same day without changing the streak', () => {
-    let f = applyDaily(empty(), '2026-09-01', ['1.4'], 1);
-    f = applyDaily(f, '2026-09-01', ['1.5'], 3);
-    expect(f.daily.streak).toBe(1);
-    expect(f.daily.history).toEqual([{ date: '2026-09-01', levels: ['1.4', '1.5'], completed: 3 }]);
-  });
-
-  it('does not extend the streak when no puzzle was completed', () => {
-    let f = applyDaily(empty(), '2026-09-01', ['1.4'], 2);
-    f = applyDaily(f, '2026-09-02', ['1.5'], 0);
-    expect(f.daily.streak).toBe(1);
-    expect(f.daily.lastDate).toBe('2026-09-01');
-    expect(f.daily.history).toHaveLength(2);
-  });
-
-  it('ignores an earlier date for the streak (clock changes)', () => {
-    let f = applyDaily(empty(), '2026-09-10', ['1.4'], 2);
-    f = applyDaily(f, '2026-09-09', ['1.5'], 2);
-    expect(f.daily.streak).toBe(1);
-    expect(f.daily.lastDate).toBe('2026-09-10');
-  });
-
-  it('caps history at the most recent days', () => {
-    let f = empty();
-    const start = Date.UTC(2026, 0, 1);
-    for (let i = 0; i < DAILY_HISTORY_LIMIT + 15; i++) {
-      f = applyDaily(f, new Date(start + i * 86_400_000).toISOString().slice(0, 10), ['1.4'], 1);
-    }
-    expect(f.daily.history).toHaveLength(DAILY_HISTORY_LIMIT);
-    expect(f.daily.history[0].date).toBe(new Date(start + 15 * 86_400_000).toISOString().slice(0, 10));
-    expect(f.daily.streak).toBe(DAILY_HISTORY_LIMIT + 15);
-    expect(ProgressFileSchema.safeParse(f).success).toBe(true);
-  });
-
-  it('ignores invalid dates', () => {
-    const f = empty();
-    expect(applyDaily(f, '2026-02-30', ['1.4'], 1)).toBe(f);
-    expect(applyDaily(f, 'yesterday', ['1.4'], 1)).toBe(f);
-  });
-
-  it('shows a broken streak as 0', () => {
-    const f = applyDaily(applyDaily(empty(), '2026-09-01', ['1.4'], 1), '2026-09-02', ['1.5'], 1);
-    expect(currentStreak(f.daily, '2026-09-02')).toBe(2);
-    expect(currentStreak(f.daily, '2026-09-03')).toBe(2);
-    expect(currentStreak(f.daily, '2026-09-04')).toBe(0);
+  it('do not set firstCompletedAt for an abandoned attempt', () => {
+    const file = applyLevelResult(empty(), levelResult({ levelId: '3.1', completed: false, stars: 0 }), '2026-09-01T10:02:00.000Z', false);
+    expect(file.levels['3.1']).toMatchObject({ completed: false, stars: 0, completions: 0, firstCompletedAt: null, bestTimeSec: null, bestCommands: null });
   });
 });
 
 describe('small helpers', () => {
-  it('dayNumber counts whole days', () => {
-    expect((dayNumber('2026-03-01') ?? 0) - (dayNumber('2026-02-28') ?? 0)).toBe(1);
-    expect(dayNumber('2026-13-01')).toBeNull();
-  });
-
   it('toCount and msToSeconds clean bad numbers', () => {
     expect(toCount(Number.NaN)).toBe(0);
     expect(toCount(-4)).toBe(0);

@@ -1,18 +1,20 @@
 import { describe, expect, it, vi } from 'vitest';
-import '../i18n';
+import { getChapters } from '../levels/content';
 import { PROGRESS_STORAGE_KEY, ProgressFileSchema } from '../shared/progress';
 import type { ProgressFile } from '../shared/progress';
-import { verifyChecksum } from './checksum';
+import { STRINGS } from '../strings';
+import { verifyChecksum, withChecksum } from './checksum';
+import { CSV_BOM } from './csv';
 import { CORRUPT_BACKUP_KEY, createProgressStore, generatePlayerId } from './store';
-import type { StorageLike } from './store';
-import { MemoryStorage, fakeClock, levelResult } from './testing';
+import type { ProgressStoreOptions, StorageLike } from './store';
+import { MemoryStorage, TINY_CHAPTERS, fakeClock, levelResult } from './testing';
 
 let counter = 0;
 const ids = () => `player-${++counter}`;
 
-function setup(storage: StorageLike = new MemoryStorage()) {
+function setup(storage: StorageLike = new MemoryStorage(), extra: ProgressStoreOptions = {}) {
   const clock = fakeClock();
-  const store = createProgressStore(storage, { now: clock.now, createId: ids, appVersion: '9.9.9' });
+  const store = createProgressStore(storage, { now: clock.now, createId: ids, appVersion: '9.9.9', ...extra });
   return { store, storage, clock };
 }
 
@@ -31,6 +33,15 @@ describe('createProgressStore: loading and saving', () => {
     expect(p.player.id).toMatch(/^player-/);
     expect(store.getLoadStatus()).toBe('new');
     expect(saved(storage).player.id).toBe(p.player.id);
+  });
+
+  it('saves under the contract storage key after every change', () => {
+    const storage = new MemoryStorage();
+    const { store } = setup(storage);
+    store.recordResult(levelResult({ levelId: '1.1' }));
+    expect(saved(storage).levels['1.1'].completed).toBe(true);
+    store.unlockGlossary(['commit']);
+    expect(saved(storage).glossary).toEqual(['commit']);
   });
 
   it('keeps the same player and progress across reloads', () => {
@@ -80,6 +91,17 @@ describe('createProgressStore: loading and saving', () => {
     expect(store.hasSaveError()).toBe(true);
   });
 
+  it('reports a failed save but keeps the progress in memory', () => {
+    const storage = new MemoryStorage();
+    const { store } = setup(storage);
+    vi.spyOn(storage, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceededError');
+    });
+    store.awardBadge('first-commit');
+    expect(store.hasSaveError()).toBe(true);
+    expect(store.get().badges).toEqual(['first-commit']);
+  });
+
   it('works without any storage', () => {
     const store = createProgressStore();
     store.awardBadge('first-commit');
@@ -114,6 +136,12 @@ describe('player ids', () => {
     }
     expect(typeof globalThis.crypto.randomUUID).toBe('function');
   });
+
+  it('gives every new player a random id by default', () => {
+    const a = createProgressStore().get().player.id;
+    const b = createProgressStore().get().player.id;
+    expect(a).not.toBe(b);
+  });
 });
 
 describe('setProfile', () => {
@@ -121,6 +149,12 @@ describe('setProfile', () => {
     const { store } = setup();
     store.setProfile({ name: 'Chloé Dubois' });
     expect(store.get().player).toMatchObject({ name: 'Chloé Dubois', handle: 'chloe-dubois', email: 'chloe-dubois@lanternlabs.example' });
+  });
+
+  it('stores the class code', () => {
+    const { store } = setup();
+    store.setProfile({ classCode: 'CPSC-101-F26' });
+    expect(store.get().player.classCode).toBe('CPSC-101-F26');
   });
 
   it('does not notify listeners when nothing changes', () => {
@@ -149,6 +183,16 @@ describe('recordAttemptStart and recordResult', () => {
     expect(store.get().levels['2.5'].attempts).toBe(2);
   });
 
+  it('counts each start once when several starts come before their results', () => {
+    const { store } = setup();
+    store.recordAttemptStart('2.5');
+    store.recordAttemptStart('2.5');
+    store.recordResult(levelResult({ levelId: '2.5', completed: false, stars: 0 }));
+    store.recordResult(levelResult({ levelId: '2.5' }));
+    store.recordResult(levelResult({ levelId: '2.5' }));
+    expect(store.get().levels['2.5'].attempts).toBe(3);
+  });
+
   it('records a completed attempt fully', () => {
     const { store, clock } = setup();
     store.recordAttemptStart('1.4');
@@ -173,7 +217,6 @@ describe('recordAttemptStart and recordResult', () => {
       rewinds: 1,
       firstCompletedAt: '2026-09-01T10:01:30.000Z',
       lastPlayedAt: '2026-09-01T10:01:30.000Z',
-      challenge: null,
     });
   });
 
@@ -207,9 +250,9 @@ describe('recordAttemptStart and recordResult', () => {
 
   it('merges error codes and sums typed commands, errors and rewinds', () => {
     const { store } = setup();
-    store.recordResult(levelResult({ levelId: '6.7', completed: false, stars: 0, errors: 2, commandsTyped: 5, rewinds: 1, errorCodes: { 'push-rejected': 2 } }));
-    store.recordResult(levelResult({ levelId: '6.7', errors: 3, commandsTyped: 6, rewinds: 2, errorCodes: { 'push-rejected': 1, 'not-a-repo': 2 } }));
-    expect(store.get().levels['6.7']).toMatchObject({
+    store.recordResult(levelResult({ levelId: '6.6', completed: false, stars: 0, errors: 2, commandsTyped: 5, rewinds: 1, errorCodes: { 'push-rejected': 2 } }));
+    store.recordResult(levelResult({ levelId: '6.6', errors: 3, commandsTyped: 6, rewinds: 2, errorCodes: { 'push-rejected': 1, 'not-a-repo': 2 } }));
+    expect(store.get().levels['6.6']).toMatchObject({
       errors: 5,
       commandsTyped: 11,
       rewinds: 3,
@@ -217,10 +260,11 @@ describe('recordAttemptStart and recordResult', () => {
     });
   });
 
-  it('treats daily practice results like story results', () => {
+  it('adds abandoned attempts to the time spent', () => {
     const { store } = setup();
-    store.recordResult(levelResult({ levelId: '1.4', mode: 'daily', stars: 2 }));
-    expect(store.get().levels['1.4']).toMatchObject({ completed: true, stars: 2, attempts: 1 });
+    store.recordResult(levelResult({ levelId: '2.3', completed: false, stars: 0, timeMs: 45_000 }));
+    store.recordResult(levelResult({ levelId: '2.3', timeMs: 30_000 }));
+    expect(store.get().levels['2.3']).toMatchObject({ timeSpentSec: 75, bestTimeSec: 30, completions: 1, attempts: 2 });
   });
 
   it('cleans impossible numbers instead of saving invalid data', () => {
@@ -230,46 +274,17 @@ describe('recordAttemptStart and recordResult', () => {
     expect(store.get().levels['1.1']).toMatchObject({ timeSpentSec: 0, commandsTyped: 0, errors: 2 });
     expect(ProgressFileSchema.safeParse(saved(storage)).success).toBe(true);
   });
-});
 
-describe('challenge results', () => {
-  it('update only the challenge record', () => {
+  it('ignores a result without a level id', () => {
     const { store } = setup();
-    store.recordResult(levelResult({ levelId: '2.10', stars: 2, timeMs: 200_000 }));
-    const before = store.get().levels['2.10'];
-    store.recordAttemptStart('2.10');
-    store.recordResult(levelResult({ levelId: '2.10', mode: 'challenge', stars: 3, timeMs: 95_000, commandsUsed: 7, hintsRevealed: 3, errors: 4 }));
-    const after = store.get().levels['2.10'];
-    expect(after.challenge).toEqual({ completed: true, bestTimeSec: 95, bestCommands: 7 });
-    expect({ ...after, challenge: null, lastPlayedAt: null }).toEqual({ ...before, challenge: null, lastPlayedAt: null });
-  });
-
-  it('keep the best challenge time and commands', () => {
-    const { store } = setup();
-    store.recordResult(levelResult({ levelId: '4.8', mode: 'challenge', timeMs: 120_000, commandsUsed: 9 }));
-    store.recordResult(levelResult({ levelId: '4.8', mode: 'challenge', completed: false, stars: 0, timeMs: 10_000, commandsUsed: 1 }));
-    store.recordResult(levelResult({ levelId: '4.8', mode: 'challenge', timeMs: 150_000, commandsUsed: 6 }));
-    expect(store.get().levels['4.8'].challenge).toEqual({ completed: true, bestTimeSec: 120, bestCommands: 6 });
-    expect(store.get().levels['4.8'].completed).toBe(false);
-    expect(store.get().levels['4.8'].attempts).toBe(0);
-  });
-
-  it('record a failed first challenge as tried', () => {
-    const { store } = setup();
-    store.recordResult(levelResult({ levelId: '5.6', mode: 'challenge', completed: false, stars: 0 }));
-    expect(store.get().levels['5.6'].challenge).toEqual({ completed: false, bestTimeSec: null, bestCommands: null });
+    const before = store.get();
+    store.recordResult(levelResult({ levelId: '' }));
+    store.recordAttemptStart('');
+    expect(store.get()).toBe(before);
   });
 });
 
-describe('daily, glossary, badges, sandbox', () => {
-  it('recordDaily keeps a streak through the store', () => {
-    const { store } = setup();
-    store.recordDaily('2026-09-01', ['1.4', '2.2', '2.6'], 3);
-    store.recordDaily('2026-09-02', ['1.5', '2.3', '2.7'], 2);
-    expect(store.get().daily).toMatchObject({ streak: 2, lastDate: '2026-09-02' });
-    expect(store.get().daily.history).toHaveLength(2);
-  });
-
+describe('glossary, badges, sandbox', () => {
   it('unlocks glossary terms once each', () => {
     const { store } = setup();
     const listener = vi.fn();
@@ -325,27 +340,64 @@ describe('exportFile and importFile', () => {
     expect(verifyChecksum(file)).toBe(true);
   });
 
+  it('does not change the saved progress when exporting', () => {
+    const { store } = setup();
+    const before = store.get();
+    store.exportFile();
+    store.exportCsv();
+    expect(store.get()).toBe(before);
+    expect(before.checksum).toBeUndefined();
+  });
+
   it('round-trips through import into another browser', () => {
     const a = setup().store;
     a.setProfile({ name: 'Bao Tran', classCode: 'X1' });
     a.recordResult(levelResult({ levelId: '2.2', stars: 2 }));
-    a.recordDaily('2026-09-01', ['1.4'], 1);
     a.unlockGlossary(['staging-area']);
+    a.addSandboxMinutes(4);
     const b = setup().store;
     expect(b.importFile(a.exportFile())).toEqual({ ok: true });
-    const { exportedAt: _a, checksum: _c, ...restB } = b.get();
-    const { exportedAt: _b, checksum: _d, ...restA } = a.get();
+    const { exportedAt: _a, ...restB } = b.get();
+    const { exportedAt: _b, ...restA } = a.get();
     expect(restB).toEqual(restA);
+    expect(b.get().checksum).toBeUndefined();
   });
 
-  it('accepts a file whose checksum does not match and keeps its checksum', () => {
+  it('accepts a file with a byte-order mark and Windows line ends', () => {
+    const a = setup().store;
+    a.recordResult(levelResult({ levelId: '1.2' }));
+    const text = `${CSV_BOM}${a.exportFile().replace(/\n/g, '\r\n')}`;
+    const b = setup().store;
+    expect(b.importFile(text)).toEqual({ ok: true });
+    expect(b.get().levels['1.2'].completed).toBe(true);
+  });
+
+  it('refuses a file that was edited after export', () => {
     const a = setup().store;
     a.recordResult(levelResult({ levelId: '1.1', stars: 1 }));
     const file = JSON.parse(a.exportFile()) as ProgressFile;
     file.levels['1.1'].stars = 3;
     const b = setup().store;
-    expect(b.importFile(JSON.stringify(file))).toEqual({ ok: true });
-    expect(b.get().checksum).toBe(file.checksum);
+    const before = b.get();
+    expect(b.importFile(JSON.stringify(file))).toEqual({ ok: false, error: STRINGS.classroom.importError.checksum });
+    expect(b.get()).toBe(before);
+  });
+
+  it('refuses a file without a checksum', () => {
+    const a = setup().store;
+    const file = JSON.parse(a.exportFile()) as ProgressFile;
+    delete file.checksum;
+    const result = setup().store.importFile(JSON.stringify(file));
+    expect(result).toEqual({ ok: false, error: STRINGS.classroom.importError.checksum });
+  });
+
+  it('accepts an edited file once its checksum is recomputed (the checksum is not security)', () => {
+    const a = setup().store;
+    a.recordResult(levelResult({ levelId: '1.1', stars: 1 }));
+    const file = JSON.parse(a.exportFile()) as ProgressFile;
+    file.levels['1.1'].stars = 3;
+    const b = setup().store;
+    expect(b.importFile(JSON.stringify(withChecksum(file)))).toEqual({ ok: true });
     expect(b.get().levels['1.1'].stars).toBe(3);
   });
 
@@ -355,16 +407,61 @@ describe('exportFile and importFile', () => {
     ['hello there', /not a Git Quest progress file/i],
     ['{"name": "something else"}', /not a Git Quest progress file/i],
     ['[1, 2, 3]', /not a Git Quest progress file/i],
-    [JSON.stringify({ format: 'git-quest-progress', version: 7 }), /newer version/i],
-    [JSON.stringify({ format: 'git-quest-progress', version: 0 }), /old version/i],
+    [JSON.stringify({ format: 'git-quest-progress', version: 7 }), /newer version.*format 7/i],
+    [JSON.stringify({ format: 'git-quest-progress', version: 0 }), /old version.*format 0/i],
     [JSON.stringify({ format: 'git-quest-progress', version: 1, player: {} }), /damaged/i],
   ])('refuses %j with a friendly message', (text, message) => {
     const { store } = setup();
     const before = store.get();
     const result = store.importFile(text);
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toMatch(message);
+    if (!result.ok) {
+      expect(result.error).toMatch(message);
+      expect(result.error).not.toMatch(/[{}]/);
+    }
     expect(store.get()).toBe(before);
+  });
+
+  it('refuses a huge file before parsing it', () => {
+    const { store } = setup();
+    const result = store.importFile(`{"format":"git-quest-progress","pad":"${'x'.repeat(5 * 1024 * 1024)}"}`);
+    expect(result).toEqual({ ok: false, error: STRINGS.classroom.importError.tooLarge });
+  });
+
+  it('notifies listeners after an import', () => {
+    const a = setup().store;
+    a.recordResult(levelResult({ levelId: '1.1' }));
+    const b = setup().store;
+    const listener = vi.fn();
+    b.subscribe(listener);
+    b.importFile(a.exportFile());
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('exportCsv', () => {
+  it('uses the injected curriculum', () => {
+    const { store, clock } = setup(new MemoryStorage(), { chapters: TINY_CHAPTERS });
+    store.setProfile({ name: 'Ada Lovelace', classCode: 'CPSC-101' });
+    store.recordResult(levelResult({ levelId: '1.1', stars: 2, hintsRevealed: 1, errors: 2, timeMs: 61_400 }));
+    clock.set('2026-09-30T15:00:00.000Z');
+    const csv = store.exportCsv();
+    expect(csv.startsWith(CSV_BOM)).toBe(true);
+    const lines = csv.slice(CSV_BOM.length).split('\r\n');
+    expect(lines.slice(0, 4)).toEqual(['Name,Ada Lovelace', 'Handle,ada-lovelace', 'Class code,CPSC-101', 'Exported at,2026-09-30T15:00:00.000Z']);
+    expect(lines.slice(6, 9)).toEqual([
+      '0.1,Where am I?,no,0,0,0,0,0,0,0,',
+      '1.1,Tell git who you are,yes,2,1,1,61,1,1,2,2026-09-01T10:00:00.000Z',
+      '1.2,"Boss: start the ""festival"", repo",no,0,0,0,0,0,0,0,',
+    ]);
+  });
+
+  it('defaults to content/chapters.json with one row per level in curriculum order', () => {
+    const { store } = setup();
+    const lines = store.exportCsv().slice(CSV_BOM.length).trimEnd().split('\r\n');
+    const order = getChapters().chapters.flatMap((c) => c.levels.map((l) => l.id));
+    expect(order.length).toBeGreaterThan(0);
+    expect(lines.slice(6).map((line) => line.split(',')[0])).toEqual(order);
   });
 });
 
@@ -374,11 +471,15 @@ describe('reset', () => {
     store.setProfile({ name: 'Ada', classCode: 'C1' });
     store.recordResult(levelResult({ levelId: '1.1' }));
     store.unlockGlossary(['commit']);
+    store.awardBadge('first-commit');
+    store.addSandboxMinutes(3);
     const player = store.get().player;
     store.reset();
     expect(store.get().player).toEqual(player);
     expect(store.get().levels).toEqual({});
     expect(store.get().glossary).toEqual([]);
+    expect(store.get().badges).toEqual([]);
+    expect(store.get().sandboxMinutes).toBe(0);
   });
 
   it('can forget the profile too', () => {
@@ -388,5 +489,13 @@ describe('reset', () => {
     store.reset({ keepProfile: false });
     expect(store.get().player.name).toBe('');
     expect(store.get().player.id).not.toBe(oldId);
+  });
+
+  it('saves the reset progress', () => {
+    const storage = new MemoryStorage();
+    const { store } = setup(storage);
+    store.recordResult(levelResult({ levelId: '1.1' }));
+    store.reset();
+    expect(saved(storage).levels).toEqual({});
   });
 });

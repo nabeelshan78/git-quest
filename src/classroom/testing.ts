@@ -1,9 +1,10 @@
 /**
- * Helpers for the classroom unit and component tests (not used by the app).
+ * Helpers for the classroom unit tests (not used by the app).
  */
+import type { ChaptersFile } from '../shared/level';
 import type { LevelProgress, LevelResult, ProgressFile } from '../shared/progress';
 import { withChecksum } from './checksum';
-import { createEmptyProgress, deriveHandle, defaultEmail, emptyLevelProgress } from './progressLogic';
+import { createEmptyProgress, defaultEmail, deriveHandle, emptyLevelProgress } from './progressLogic';
 import type { StorageLike } from './store';
 
 /** In-memory StorageLike. */
@@ -59,11 +60,11 @@ export interface FileSpec {
   classCode?: string;
   exportedAt?: string;
   levels?: Record<string, Partial<LevelProgress>>;
-  /** Sign the file (default true). */
+  /** Add a checksum (default true). */
   sign?: boolean;
 }
 
-/** A valid progress file for dashboard tests. */
+/** A valid progress file built from a short description. */
 export function makeProgressFile(spec: FileSpec): ProgressFile {
   const base = createEmptyProgress(spec.id, '2026-09-01T09:00:00.000Z', 'test');
   const name = spec.name ?? '';
@@ -80,3 +81,26 @@ export function makeProgressFile(spec: FileSpec): ProgressFile {
   };
   return spec.sign === false ? file : withChecksum(file);
 }
+
+/** A small two-chapter curriculum for CSV tests (listed out of order on purpose). */
+export const TINY_CHAPTERS: ChaptersFile = {
+  chapters: [
+    {
+      number: 1,
+      title: 'Your first repository',
+      stage: 'laptop',
+      summary: 'First commits.',
+      levels: [
+        { id: '1.1', title: 'Tell git who you are', concept: 'git config' },
+        { id: '1.2', title: 'Boss: start the "festival", repo', concept: 'All of it', boss: true },
+      ],
+    },
+    {
+      number: 0,
+      title: 'Welcome and the terminal',
+      stage: 'laptop',
+      summary: 'No git yet.',
+      levels: [{ id: '0.1', title: 'Where am I?', concept: 'pwd' }],
+    },
+  ],
+};

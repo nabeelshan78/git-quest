@@ -1,0 +1,65 @@
+/* The page for professors. Colours follow the app theme (light or dark) through currentColor. */
+.gq-prof {
+  box-sizing: border-box;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  line-height: 1.6;
+}
+
+.gq-prof h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.75rem;
+  line-height: 1.25;
+}
+
+.gq-prof h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+
+.gq-prof-lead {
+  margin: 0 0 1.5rem;
+  font-size: 1.05rem;
+}
+
+.gq-prof-section {
+  margin: 0 0 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 0.5rem;
+}
+
+.gq-prof-section ol,
+.gq-prof-section ul {
+  margin: 0;
+  padding-left: 1.4rem;
+}
+
+.gq-prof-section li + li {
+  margin-top: 0.35rem;
+}
+
+.gq-prof-section p {
+  margin: 0;
+}
+
+.gq-prof-privacy {
+  border-left-width: 4px;
+}
+
+.gq-prof-guide {
+  margin: 1.5rem 0 0.5rem;
+}
+
+.gq-prof a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.gq-prof a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
