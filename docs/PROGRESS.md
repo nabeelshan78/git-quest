@@ -21,13 +21,13 @@ committed code works; not extended).
 | --- | --- | --- | --- | --- |
 | 0 | Foundation (orchestrator) | main | done | scaffold, contracts, core data layer, harness, CI |
 | 0b | Scope cut (orchestrator) | main | done | contracts, chapters.json (58 levels), strings file, docs |
-| 1 | Engine A | ws/engine-a | in progress | fresh agent: all 17 commands + differential tests |
-| 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | not started | after Engine A |
-| 3 | Remote (remote, clone, fetch, pull, push, teammates) | ws/remote | not started | after Engine A |
-| 4 | Parser | ws/parser | in progress | fresh agent: shell commands, tokenizer, completion |
-| 5 | UI | ws/ui | in progress | fresh agent: React components, xterm.js, all screens |
-| 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub | not started | after Engine A |
-| 7 | Level runner | ws/levels | not started | after Engine A + Parser |
+| 1 | Engine A | ws/engine-a | **done** | merged to main (50 diff tests, 16 commands) |
+| 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | in progress | batch 2 agent running |
+| 3 | Remote (remote, clone, fetch, pull, push, teammates) | ws/remote | in progress | batch 2 agent running |
+| 4 | Parser | ws/parser | **done** | merged to main (66 tests) |
+| 5 | UI | ws/ui | in progress | batch 1 agent still running |
+| 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub | in progress | batch 2 agent running |
+| 7 | Level runner | ws/levels | in progress | batch 2 agent running |
 | 8a | Content ch 0–4 (32 levels) | ws/content-0-4 | not started | after runner |
 | 8b | Content ch 5–8 (26 levels) | ws/content-5-8 | not started | after runner |
 | 9 | Classroom (progress save, export JSON/CSV, short guide) | ws/classroom | **done** | merged to main (120 tests) |
@@ -67,3 +67,7 @@ committed code works; not extended).
   professor guide). Old worktrees cleaned up.
 - Batch 1 relaunched: Engine A (17 commands), Parser (shell + tokenizer),
   UI (React components) — all three running in parallel.
+- Parser merged (66 tests). Engine A merged (50 differential tests, 16
+  commands). 243 total tests on main.
+- Batch 2 launched: Engine B, Remote, Mock GitHub, Level runner. UI still
+  running from batch 1.
