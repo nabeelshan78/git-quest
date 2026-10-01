@@ -124,15 +124,29 @@ that the output answers. `ranCommand` exists but use it sparingly.
   hints, then bosses with nothing. Action buttons fade out from mid
   Chapter 2.
 
-### Level 6.7 (HTTPS token vs SSH)
+### Keep it beginner-simple (docs/SCOPE.md correction)
 
-Explained and simulated without real cryptography: setup writes a prepared
-public key file (`~/.ssh/id_ed25519.pub`, content like
-`ssh-ed25519 SIMULATED... intern@laptop`) and sets `"requireAuth": true`
-under `setup.hub`. The player creates a personal access token on the
-simulated GitHub (`createToken`) or adds the public key (`cat` it, then
-`addSshKey`), switches to the SSH URL with `git remote set-url` if using
-the key, and pushes. Questions check the HTTPS-vs-SSH ideas.
+If something is not needed for a beginner to use git alone and open a
+simple pull request with a teammate, explain it in one sentence or leave
+it out. Specific levels:
+
+- **6.7 Proving it is you** — a short concept level only. Ada explains in
+  plain words that real GitHub asks you to sign in, and that on a real
+  computer this happens once through the browser. In the game, sign-in is
+  automatic. No SSH keys, tokens, key files or `git remote set-url`. End
+  with 2 simple check questions (`questions` + `answered` goals, `par: null`).
+- **7.5 The merge button** — the simulated GitHub has one green "Merge
+  pull request" button (a merge commit). Squash and rebase merges get one
+  sentence of explanation and no practice. Then delete the branch and
+  update local `main` with `git switch main` + `git pull`.
+- **8.3 Undo the last commit** — teach only "undo my last commit but keep
+  my changes" with `git reset --soft HEAD~1`. Mention `git reset --hard`
+  in one sentence as dangerous; do not practise it.
+- **8.4 Git's secret diary** — one simple scenario: a commit seems lost
+  and `git reflog` brings it back.
+- The simulated GitHub is minimal: repo page with files and README,
+  issues, pull requests with review comments, and the merge button. No
+  settings pages, branch rules, keys or tokens.
 
 ### Predict cards and pictures
 

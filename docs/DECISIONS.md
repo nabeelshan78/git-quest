@@ -64,17 +64,18 @@ Every other assumption made while building is listed here.
     name (and optional class code). Levels after 1.1 preset
     `user.name`/`user.email` from this profile via `{{player.name}}` /
     `{{player.email}}`; the simulated GitHub handle is derived from it.
-15. **Authentication (6.7).** Explained and simulated: the player creates
-    a personal access token on the simulated GitHub and/or generates a
-    simulated SSH key (`ssh-keygen`, never real key material), adds it on
-    the simulated GitHub and switches the remote URL to SSH. No
-    interactive password prompt is simulated.
+15. **Signing in (6.7).** A concept level only: real GitHub asks you to
+    sign in (once, through the browser, on a real computer); in the game
+    sign-in is automatic. There are no SSH keys, tokens or credential
+    checks in the simulator.
 16. **Leaving the simulator (8.6)** is not a boss: Chapter 8's boss is
     8.5; 8.6 covers installing git, running the same commands in a real
     terminal, and the final-project brief from `docs/PROFESSOR_GUIDE.md`.
-17. **Merge options on the simulated GitHub** (merge commit, squash,
-    rebase-and-merge) stay in scope as buttons; the `git rebase` command
-    does not.
+17. **One merge button.** The simulated GitHub has a single green "Merge
+    pull request" button that creates a merge commit. Squash and rebase
+    merges are explained in one sentence. Its other pages are limited to
+    the repo page (files + README), issues and pull requests with review
+    comments.
 18. **Pull reconciliation.** The engine reproduces modern git's refusal
     to pull divergent branches without `pull.rebase` configured; levels
     that need `git pull` on divergent history preset
