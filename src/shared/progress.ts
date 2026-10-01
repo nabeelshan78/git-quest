@@ -2,8 +2,8 @@
  * FROZEN CONTRACT — saved progress and the exported progress file.
  *
  * Progress lives in the browser (localStorage key PROGRESS_STORAGE_KEY).
- * Students export it as a `.gitquest.json` file; the Professor Dashboard
- * imports many such files.
+ * Students export it ("Export my progress") as a `.gitquest.json` or CSV
+ * file and submit it to their professor.
  *
  * Only the orchestrator may change this file.
  */
@@ -52,8 +52,6 @@ export const LevelProgressSchema = z.strictObject({
   rewinds: z.number().int().min(0),
   firstCompletedAt: z.string().nullable(),
   lastPlayedAt: z.string().nullable(),
-  /** Best boss-challenge result, if attempted. */
-  challenge: z.strictObject({ completed: z.boolean(), bestTimeSec: z.number().nullable(), bestCommands: z.number().int().nullable() }).nullable(),
 });
 
 export const ProgressFileSchema = z.strictObject({
@@ -68,11 +66,6 @@ export const ProgressFileSchema = z.strictObject({
   glossary: z.array(z.string()),
   /** Badge ids earned (cosmetic). */
   badges: z.array(z.string()),
-  daily: z.strictObject({
-    streak: z.number().int().min(0),
-    lastDate: z.string().nullable(),
-    history: z.array(z.strictObject({ date: z.string(), levels: z.array(z.string()), completed: z.number().int() })),
-  }),
   sandboxMinutes: z.number().min(0),
   /**
    * FNV-1a hex digest of the canonical JSON of this object without `checksum`
@@ -88,7 +81,7 @@ export type ProgressFile = z.infer<typeof ProgressFileSchema>;
 /** Reported by a game session when a level attempt ends (completed or abandoned). */
 export interface LevelResult {
   levelId: string;
-  mode: 'story' | 'daily' | 'challenge';
+  mode: 'story';
   completed: boolean;
   stars: 0 | 1 | 2 | 3;
   /** State-changing commands (the par count). */
@@ -111,12 +104,13 @@ export interface ProgressApi {
   setProfile(patch: Partial<Omit<PlayerProfile, 'id' | 'createdAt'>>): void;
   recordAttemptStart(levelId: string): void;
   recordResult(result: LevelResult): void;
-  recordDaily(date: string, levelIds: string[], completed: number): void;
   unlockGlossary(termIds: string[]): void;
   awardBadge(badgeId: string): void;
   addSandboxMinutes(minutes: number): void;
-  /** JSON text of the progress file with a fresh checksum. */
+  /** JSON text of the progress file with a fresh checksum ("Export my progress"). */
   exportFile(): string;
+  /** The same progress as CSV: one row per level (for students to submit). */
+  exportCsv(): string;
   /** Replace local progress with an exported file (after validation). */
   importFile(text: string): { ok: true } | { ok: false; error: string };
   reset(): void;

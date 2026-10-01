@@ -125,56 +125,12 @@ export interface ReflogEntry {
 // In-progress operations
 // ---------------------------------------------------------------------------
 
-export type RebaseTodoAction = 'pick' | 'reword' | 'edit' | 'squash' | 'fixup' | 'drop' | 'exec' | 'break';
-
-export interface RebaseTodoItem {
-  action: RebaseTodoAction;
-  /** Commit being replayed (absent for exec/break). */
-  hash?: Hash;
-  /** Original subject line shown in the todo list, or the exec command. */
-  subject: string;
-}
-
-export interface RebaseState {
-  interactive: boolean;
-  /** Branch being rebased, e.g. "refs/heads/feature", or null if HEAD was detached. */
-  headName: string | null;
-  /** HEAD before the rebase started. */
-  origHead: Hash;
-  /** Commit the replayed commits are placed on top of. */
-  onto: Hash;
-  /** Remaining steps. */
-  todo: RebaseTodoItem[];
-  /** Steps already executed. */
-  done: RebaseTodoItem[];
-  /** The step that stopped (conflict / edit / reword), if any. */
-  stopped?: { item: RebaseTodoItem; reason: 'conflict' | 'edit' | 'break' };
-  /** Message being accumulated for squash/fixup chains. */
-  pendingMessage?: string;
-  /** Anything else an implementation needs; must stay JSON-serialisable. */
-  extra?: Record<string, unknown>;
-}
-
 export interface SequencerState {
-  /** Multi-commit cherry-pick/revert in progress. */
-  kind: 'cherry-pick' | 'revert';
+  /** Multi-commit revert in progress. */
+  kind: 'revert';
   todo: Hash[];
   done: Hash[];
   options: Record<string, unknown>;
-}
-
-export interface BisectState {
-  /** Branch/ref name or hash to return to on `git bisect reset`. */
-  start: string;
-  bad: Hash | null;
-  good: Hash[];
-  skipped: Hash[];
-  /** Lines of `git bisect log`. */
-  log: string[];
-  /** Commit currently checked out for testing. */
-  current: Hash | null;
-  /** Set once the first bad commit is identified. */
-  found: Hash | null;
 }
 
 /**
@@ -184,11 +140,8 @@ export interface BisectState {
 export interface SpecialRefs {
   ORIG_HEAD?: Hash;
   MERGE_HEAD?: Hash[];
-  CHERRY_PICK_HEAD?: Hash;
   REVERT_HEAD?: Hash;
   FETCH_HEAD?: { hash: Hash; description: string; forMerge: boolean }[];
-  REBASE_HEAD?: Hash;
-  BISECT_HEAD?: Hash;
   AUTO_MERGE?: Hash;
 }
 
@@ -197,11 +150,8 @@ export interface SpecialRefs {
 // ---------------------------------------------------------------------------
 
 export type EditorPurpose =
-  | 'commit-message' // git commit without -m, merge commit, revert, cherry-pick -e, amend
-  | 'merge-message'
-  | 'rebase-todo' // git rebase -i
-  | 'rebase-message' // reword / squash during a rebase
-  | 'tag-message'
+  | 'commit-message' // git commit without -m, revert, amend
+  | 'merge-message' // committing a merge after resolving conflicts
   | 'other';
 
 /**
@@ -247,11 +197,9 @@ export interface RepoState {
    */
   config: Record<string, string>;
   special: SpecialRefs;
-  /** Content of .git/MERGE_MSG while a merge/cherry-pick/revert is stopped. */
+  /** Content of .git/MERGE_MSG while a merge/revert is stopped. */
   mergeMsg?: string;
-  rebase?: RebaseState;
   sequencer?: SequencerState;
-  bisect?: BisectState;
   /** Content of .git/info/exclude style extra ignore rules (rarely used). */
   infoExclude?: string;
 }
@@ -373,7 +321,7 @@ export interface PullRequest {
   title: string;
   body: string;
   author: string;
-  /** Head branch; `repo` differs from the base repo for fork PRs. */
+  /** Head branch (always in the same repo; forks are out of scope). */
   head: { repo: HostedRepoId; branch: string };
   base: string;
   state: 'open' | 'closed' | 'merged';
@@ -393,66 +341,6 @@ export interface PullRequest {
   closedAt?: number;
 }
 
-export interface Release {
-  tag: string;
-  name: string;
-  body: string;
-  author: string;
-  target: Hash;
-  prerelease: boolean;
-  createdAt: number;
-}
-
-export interface BranchProtection {
-  requirePullRequest: boolean;
-  requiredApprovals: number;
-  requireStatusChecks: boolean;
-  /** Names of checks that must pass when requireStatusChecks is on. */
-  requiredChecks: string[];
-  allowForcePushes: boolean;
-  allowDeletions: boolean;
-}
-
-/** A deterministic, simulated rule a workflow "test" evaluates on a commit's files. */
-export type SimRule =
-  | { type: 'fileExists'; path: RepoPath }
-  | { type: 'fileMissing'; path: RepoPath }
-  | { type: 'fileContains'; path: RepoPath; text: string }
-  | { type: 'fileNotContains'; path: RepoPath; text: string }
-  | { type: 'allFilesMatching'; glob: string; contain: string }
-  | { type: 'noConflictMarkers' };
-
-export interface SimWorkflow {
-  /** Path of the workflow file that enables it, e.g. ".github/workflows/check.yml". */
-  file: RepoPath;
-  name: string;
-  on: ('push' | 'pull_request')[];
-  jobs: { name: string; steps: { name: string; rule?: SimRule; log?: string }[] }[];
-}
-
-export interface WorkflowRun {
-  id: number;
-  workflow: string;
-  event: 'push' | 'pull_request';
-  branch: string;
-  commit: Hash;
-  pullNumber?: number;
-  status: 'queued' | 'in_progress' | 'completed';
-  conclusion?: 'success' | 'failure';
-  jobs: { name: string; conclusion: 'success' | 'failure'; steps: { name: string; conclusion: 'success' | 'failure'; log: string }[] }[];
-  createdAt: number;
-}
-
-export interface PagesConfig {
-  enabled: boolean;
-  branch: string;
-  folder: '/' | '/docs';
-  url: string;
-  status: 'building' | 'built' | 'errored';
-  deployedCommit?: Hash;
-  deployedAt?: number;
-}
-
 export interface HostedRepo {
   id: HostedRepoId;
   owner: string;
@@ -462,18 +350,10 @@ export interface HostedRepo {
   /** Bare repository holding the actual git data. */
   repo: RepoState;
   defaultBranch: string;
-  /** Upstream repo id when this is a fork. */
-  forkOf: HostedRepoId | null;
   collaborators: string[];
-  protection: Record<string, BranchProtection>;
   issues: Issue[];
   pulls: PullRequest[];
-  releases: Release[];
   labels: { name: string; color: string; description: string }[];
-  /** Workflows that can run; enabled only when their `file` exists on the branch. */
-  workflows: SimWorkflow[];
-  runs: WorkflowRun[];
-  pages: PagesConfig | null;
   settings: {
     allowMergeCommit: boolean;
     allowSquashMerge: boolean;
@@ -484,7 +364,6 @@ export interface HostedRepo {
   nextNumber: number;
   /** Counter for comment/review ids. */
   nextId: number;
-  stars: number;
   createdAt: number;
 }
 
@@ -496,7 +375,7 @@ export interface HubState {
   sshKeys: { id: number; title: string; key: string; addedAt: number }[];
   /** Personal access tokens created by the viewer. */
   tokens: { id: number; name: string; scopes: string[]; token: string; createdAt: number }[];
-  /** When true, pushes/clones of private repos require working credentials. */
+  /** When true, pushes need working credentials (an SSH key or token registered on the hub). */
   requireAuth: boolean;
   notifications: { id: number; text: string; repo?: HostedRepoId; at: number; read: boolean }[];
   nextId: number;
@@ -539,7 +418,7 @@ export interface StatusSummary {
   untracked: RepoPath[];
   ignored: RepoPath[];
   conflicted: { path: RepoPath; kind: 'both modified' | 'both added' | 'deleted by us' | 'deleted by them' | 'added by us' | 'added by them' | 'both deleted' }[];
-  inProgress: null | 'merge' | 'rebase' | 'rebase-interactive' | 'cherry-pick' | 'revert' | 'bisect';
+  inProgress: null | 'merge' | 'revert';
   clean: boolean; // no staged, unstaged, conflicted (untracked files allowed)
 }
 

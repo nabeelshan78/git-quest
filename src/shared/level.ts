@@ -133,7 +133,6 @@ const RepoId = z.string().min(3); // "owner/name"
 export const HubActionSchema = z.discriminatedUnion('type', [
   z.strictObject({ type: z.literal('createRepo'), ...Actor, owner: z.string().optional(), name: z.string(), description: z.string().optional(), visibility: z.enum(['public', 'private']).optional(), readme: z.boolean().optional(), gitignore: z.string().optional(), license: z.string().optional() }),
   z.strictObject({ type: z.literal('editFile'), ...Actor, repo: RepoId, branch: z.string().optional(), path: z.string(), content: z.string(), message: z.string() }),
-  z.strictObject({ type: z.literal('deleteFile'), ...Actor, repo: RepoId, branch: z.string().optional(), path: z.string(), message: z.string() }),
   z.strictObject({ type: z.literal('createBranch'), ...Actor, repo: RepoId, branch: z.string(), from: z.string().optional() }),
   z.strictObject({ type: z.literal('deleteBranch'), ...Actor, repo: RepoId, branch: z.string() }),
   z.strictObject({ type: z.literal('createIssue'), ...Actor, repo: RepoId, title: z.string(), body: z.string().optional(), labels: z.array(z.string()).optional(), assignees: z.array(z.string()).optional() }),
@@ -142,7 +141,7 @@ export const HubActionSchema = z.discriminatedUnion('type', [
   z.strictObject({ type: z.literal('labelIssue'), ...Actor, repo: RepoId, number: z.number().int(), labels: z.array(z.string()) }),
   z.strictObject({ type: z.literal('closeIssue'), ...Actor, repo: RepoId, number: z.number().int(), reason: z.enum(['completed', 'not_planned']).optional() }),
   z.strictObject({ type: z.literal('reopenIssue'), ...Actor, repo: RepoId, number: z.number().int() }),
-  z.strictObject({ type: z.literal('openPullRequest'), ...Actor, repo: RepoId, head: z.string(), headRepo: z.string().optional(), base: z.string().optional(), title: z.string(), body: z.string().optional(), draft: z.boolean().optional(), reviewers: z.array(z.string()).optional() }),
+  z.strictObject({ type: z.literal('openPullRequest'), ...Actor, repo: RepoId, head: z.string(), base: z.string().optional(), title: z.string(), body: z.string().optional(), draft: z.boolean().optional(), reviewers: z.array(z.string()).optional() }),
   z.strictObject({ type: z.literal('commentPullRequest'), ...Actor, repo: RepoId, number: z.number().int(), body: z.string() }),
   z.strictObject({ type: z.literal('requestReviewers'), ...Actor, repo: RepoId, number: z.number().int(), reviewers: z.array(z.string()) }),
   z.strictObject({
@@ -159,40 +158,18 @@ export const HubActionSchema = z.discriminatedUnion('type', [
   z.strictObject({ type: z.literal('mergePullRequest'), ...Actor, repo: RepoId, number: z.number().int(), method: z.enum(['merge', 'squash', 'rebase']), title: z.string().optional(), message: z.string().optional(), deleteBranch: z.boolean().optional() }),
   z.strictObject({ type: z.literal('closePullRequest'), ...Actor, repo: RepoId, number: z.number().int() }),
   z.strictObject({ type: z.literal('reopenPullRequest'), ...Actor, repo: RepoId, number: z.number().int() }),
-  z.strictObject({ type: z.literal('updatePullRequestBranch'), ...Actor, repo: RepoId, number: z.number().int() }),
-  z.strictObject({ type: z.literal('forkRepo'), ...Actor, repo: RepoId, owner: z.string().optional(), name: z.string().optional() }),
-  z.strictObject({ type: z.literal('syncFork'), ...Actor, repo: RepoId, branch: z.string().optional() }),
-  z.strictObject({
-    type: z.literal('protectBranch'),
-    ...Actor,
-    repo: RepoId,
-    branch: z.string(),
-    requirePullRequest: z.boolean().optional(),
-    requiredApprovals: z.number().int().min(0).optional(),
-    requireStatusChecks: z.boolean().optional(),
-    requiredChecks: z.array(z.string()).optional(),
-    allowForcePushes: z.boolean().optional(),
-  }),
-  z.strictObject({ type: z.literal('unprotectBranch'), ...Actor, repo: RepoId, branch: z.string() }),
   z.strictObject({
     type: z.literal('updateSettings'),
     ...Actor,
     repo: RepoId,
     description: z.string().optional(),
-    visibility: z.enum(['public', 'private']).optional(),
     allowMergeCommit: z.boolean().optional(),
     allowSquashMerge: z.boolean().optional(),
     allowRebaseMerge: z.boolean().optional(),
     deleteBranchOnMerge: z.boolean().optional(),
   }),
-  z.strictObject({ type: z.literal('createRelease'), ...Actor, repo: RepoId, tag: z.string(), target: z.string().optional(), name: z.string().optional(), body: z.string().optional(), prerelease: z.boolean().optional() }),
-  z.strictObject({ type: z.literal('enablePages'), ...Actor, repo: RepoId, branch: z.string(), folder: z.enum(['/', '/docs']).optional() }),
-  z.strictObject({ type: z.literal('disablePages'), ...Actor, repo: RepoId }),
   z.strictObject({ type: z.literal('addSshKey'), ...Actor, title: z.string(), key: z.string() }),
   z.strictObject({ type: z.literal('createToken'), ...Actor, name: z.string(), scopes: z.array(z.string()).optional() }),
-  z.strictObject({ type: z.literal('rerunWorkflow'), ...Actor, repo: RepoId, runId: z.number().int() }),
-  z.strictObject({ type: z.literal('addCollaborator'), ...Actor, repo: RepoId, login: z.string() }),
-  z.strictObject({ type: z.literal('starRepo'), ...Actor, repo: RepoId }),
 ]);
 
 // ---------------------------------------------------------------------------
@@ -309,21 +286,19 @@ const BaseCheckSchema = z.discriminatedUnion('type', [
   /** No merge commits reachable from ref (default HEAD). */
   z.strictObject({ type: z.literal('linearHistory'), ref: z.string().optional(), ...RepoSel }),
   z.strictObject({ type: z.literal('noOperationInProgress'), ...RepoSel }),
-  z.strictObject({ type: z.literal('operationInProgress'), operation: z.enum(['merge', 'rebase', 'cherry-pick', 'revert', 'bisect']), ...RepoSel }),
+  z.strictObject({ type: z.literal('operationInProgress'), operation: z.enum(['merge', 'revert']), ...RepoSel }),
   z.strictObject({ type: z.literal('conflicted'), path: z.string(), ...RepoSel }),
   /** No unmerged paths in the index. */
   z.strictObject({ type: z.literal('noConflicts'), ...RepoSel }),
   /** No "<<<<<<<", "=======", ">>>>>>>" marker lines in the given work tree files (default: all tracked files). */
   z.strictObject({ type: z.literal('noConflictMarkers'), paths: z.array(z.string()).optional(), ...RepoSel }),
-  z.strictObject({ type: z.literal('tagExists'), name: z.string(), annotated: z.boolean().optional(), pointsTo: z.string().optional(), messageContains: z.string().optional(), ...RepoSel }),
   z.strictObject({ type: z.literal('stashCount'), ...Count.shape, ...RepoSel }),
   z.strictObject({ type: z.literal('remoteExists'), name: z.string(), url: z.string().optional(), urlMatches: z.string().optional(), ...RepoSel }),
   z.strictObject({ type: z.literal('remoteMissing'), name: z.string(), ...RepoSel }),
   /** branch.<branch>.remote / .merge are set. */
   z.strictObject({ type: z.literal('upstream'), branch: z.string(), remote: z.string(), remoteBranch: z.string().optional(), ...RepoSel }),
-  z.strictObject({ type: z.literal('bisect'), state: z.enum(['none', 'running', 'found']), foundMessageContains: z.string().optional(), ...RepoSel }),
   // --- simulated GitHub ---
-  z.strictObject({ type: z.literal('hostedRepoExists'), repo: RepoId, visibility: z.enum(['public', 'private']).optional(), forkOf: z.string().optional() }),
+  z.strictObject({ type: z.literal('hostedRepoExists'), repo: RepoId, visibility: z.enum(['public', 'private']).optional() }),
   z.strictObject({
     type: z.literal('hostedBranch'),
     repo: RepoId,
@@ -337,8 +312,6 @@ const BaseCheckSchema = z.discriminatedUnion('type', [
   }),
   z.strictObject({ type: z.literal('hostedFile'), repo: RepoId, branch: z.string().optional(), path: z.string(), absent: z.boolean().optional(), ...ContentMatcherSchema.shape }),
   z.strictObject({ type: z.literal('hostedCommitCount'), repo: RepoId, branch: z.string().optional(), ...Count.shape }),
-  z.strictObject({ type: z.literal('hostedLinearHistory'), repo: RepoId, branch: z.string().optional() }),
-  z.strictObject({ type: z.literal('hostedTag'), repo: RepoId, tag: z.string() }),
   /** Local refs/remotes/<remote>/<branch> equals the hosted branch (the player fetched). */
   z.strictObject({ type: z.literal('trackingUpToDate'), remote: z.string(), branch: z.string(), ...RepoSel }),
   /** Local branch equals the hosted branch of its remote (pushed and pulled). */
@@ -360,7 +333,6 @@ const BaseCheckSchema = z.discriminatedUnion('type', [
     repo: RepoId,
     number: z.number().int().optional(),
     head: z.string().optional(),
-    headRepo: z.string().optional(),
     base: z.string().optional(),
     titleContains: z.string().optional(),
     state: z.enum(['open', 'closed', 'merged']).optional(),
@@ -373,10 +345,6 @@ const BaseCheckSchema = z.discriminatedUnion('type', [
     minCommits: z.number().int().optional(),
     count: Count.optional(),
   }),
-  z.strictObject({ type: z.literal('branchProtection'), repo: RepoId, branch: z.string(), requirePullRequest: z.boolean().optional(), minApprovals: z.number().int().optional(), requireStatusChecks: z.boolean().optional() }),
-  z.strictObject({ type: z.literal('release'), repo: RepoId, tag: z.string(), nameContains: z.string().optional() }),
-  z.strictObject({ type: z.literal('pages'), repo: RepoId, enabled: z.boolean(), deployed: z.boolean().optional(), branch: z.string().optional() }),
-  z.strictObject({ type: z.literal('workflowRun'), repo: RepoId, branch: z.string().optional(), workflow: z.string().optional(), conclusion: z.enum(['success', 'failure']), event: z.enum(['push', 'pull_request']).optional() }),
   /** An SSH public key from the machine is registered on the viewer's hub account. */
   z.strictObject({ type: z.literal('sshKeyRegistered'), machine: z.string().optional() }),
   z.strictObject({ type: z.literal('tokenCreated') }),
@@ -428,57 +396,13 @@ export const HostedRepoSetupSchema = z.strictObject({
   description: z.string().optional(),
   visibility: z.enum(['public', 'private']).optional(),
   defaultBranch: z.string().optional(),
-  /** Copy every branch and tag of this local repo to the hosted repo and add it as `remoteName` (default "origin"). */
+  /** Copy every branch of this local repo to the hosted repo and add it as `remoteName` (default "origin"). */
   fromLocal: z.strictObject({ machine: z.string().optional(), repoPath: z.string().optional(), remoteName: z.string().optional(), setUpstream: z.boolean().optional() }).optional(),
-  /** Create as a fork of this hosted repo (copies its branches). */
-  forkOf: z.string().optional(),
   /** Seed files for an otherwise empty repo: one initial commit on the default branch. */
   initialFiles: z.record(z.string(), z.string()).optional(),
   initialMessage: z.string().optional(),
   initialAuthor: z.string().optional(),
   collaborators: z.array(z.string()).optional(),
-  protection: z
-    .record(
-      z.string(),
-      z.strictObject({
-        requirePullRequest: z.boolean().optional(),
-        requiredApprovals: z.number().int().optional(),
-        requireStatusChecks: z.boolean().optional(),
-        requiredChecks: z.array(z.string()).optional(),
-        allowForcePushes: z.boolean().optional(),
-      }),
-    )
-    .optional(),
-  workflows: z
-    .array(
-      z.strictObject({
-        file: z.string(),
-        name: z.string(),
-        on: z.array(z.enum(['push', 'pull_request'])),
-        jobs: z.array(
-          z.strictObject({
-            name: z.string(),
-            steps: z.array(
-              z.strictObject({
-                name: z.string(),
-                rule: z
-                  .discriminatedUnion('type', [
-                    z.strictObject({ type: z.literal('fileExists'), path: z.string() }),
-                    z.strictObject({ type: z.literal('fileMissing'), path: z.string() }),
-                    z.strictObject({ type: z.literal('fileContains'), path: z.string(), text: z.string() }),
-                    z.strictObject({ type: z.literal('fileNotContains'), path: z.string(), text: z.string() }),
-                    z.strictObject({ type: z.literal('allFilesMatching'), glob: z.string(), contain: z.string() }),
-                    z.strictObject({ type: z.literal('noConflictMarkers') }),
-                  ])
-                  .optional(),
-                log: z.string().optional(),
-              }),
-            ),
-          }),
-        ),
-      }),
-    )
-    .optional(),
   labels: z.array(z.strictObject({ name: z.string(), color: z.string(), description: z.string().optional() })).optional(),
   settings: z
     .strictObject({
@@ -488,7 +412,6 @@ export const HostedRepoSetupSchema = z.strictObject({
       deleteBranchOnMerge: z.boolean().optional(),
     })
     .optional(),
-  stars: z.number().int().optional(),
 });
 
 export const SetupStepSchema = z.union([
@@ -543,7 +466,7 @@ export const SolutionStepSchema = z.union([
   z.strictObject({ run: z.string() }),
   /** Open a file in the editor panel, replace its content, save. Creates the file if missing. */
   z.strictObject({ edit: z.strictObject({ path: z.string(), content: z.string() }) }),
-  /** Respond to an editor that git opened (commit message, rebase todo...). */
+  /** Respond to an editor that git opened (commit message, merge message...). */
   z.strictObject({ editor: z.strictObject({ action: z.enum(['save', 'abort']), content: z.string().optional() }) }),
   /** Do something on the simulated GitHub panel. */
   z.strictObject({ hub: HubActionSchema }),
@@ -590,8 +513,8 @@ export const LevelUiSchema = z.strictObject({
 export const LevelSchema = z.strictObject({
   $schema: z.string().optional(),
   /** "<chapter>.<number>", e.g. "2.5". Must match content/chapters.json. */
-  id: z.string().regex(/^(?:[0-9]|1[01])\.[1-9][0-9]?$/),
-  chapter: z.number().int().min(0).max(11),
+  id: z.string().regex(/^[0-8]\.[1-9]$/),
+  chapter: z.number().int().min(0).max(8),
   number: z.number().int().min(1),
   title: z.string().min(1),
   /** The one new idea this level teaches, in a few words. */
@@ -623,10 +546,6 @@ export const LevelSchema = z.strictObject({
   /** Lines shown after the goal is reached. */
   success: z.array(DialogueLineSchema).optional(),
   ui: LevelUiSchema.optional(),
-  /** Boss levels only: the timed / fewest-commands challenge variant. */
-  challenge: z.strictObject({ timeLimitSeconds: z.number().int().min(30), par: z.number().int().min(1).optional() }).optional(),
-  /** Can this level appear in daily practice? Default: true for non-boss levels with a par. */
-  daily: z.boolean().optional(),
   /** Reference solution: must reach every goal within par with no hints. */
   solution: z.array(SolutionStepSchema).min(1),
 });
@@ -662,9 +581,9 @@ export const ChaptersFileSchema = z.strictObject({
   $schema: z.string().optional(),
   chapters: z.array(
     z.strictObject({
-      number: z.number().int().min(0).max(11),
+      number: z.number().int().min(0).max(8),
       title: z.string(),
-      stage: z.enum(['laptop', 'github', 'power', 'graduation']),
+      stage: z.enum(['laptop', 'github', 'graduation']),
       summary: z.string(),
       levels: z.array(z.strictObject({ id: z.string(), title: z.string(), concept: z.string(), boss: z.boolean().optional() })),
     }),
@@ -676,7 +595,7 @@ export const GlossaryFileSchema = z.array(
     id: z.string().regex(/^[a-z0-9-]+$/),
     term: z.string(),
     definition: z.string(),
-    chapter: z.number().int().min(0).max(11),
+    chapter: z.number().int().min(0).max(8),
     command: z.string().optional(),
     related: z.array(z.string()).optional(),
   }),

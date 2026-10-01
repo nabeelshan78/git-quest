@@ -40,19 +40,7 @@ export function computeStatus(world: World, machineId: string, root?: AbsPath): 
   const conflicted = Object.keys(repo.index.conflicts)
     .sort()
     .map((path) => ({ path, kind: 'both modified' as const }));
-  const inProgress: StatusSummary['inProgress'] = repo.rebase
-    ? repo.rebase.interactive
-      ? 'rebase-interactive'
-      : 'rebase'
-    : repo.special.MERGE_HEAD
-      ? 'merge'
-      : repo.special.CHERRY_PICK_HEAD
-        ? 'cherry-pick'
-        : repo.special.REVERT_HEAD
-          ? 'revert'
-          : repo.bisect
-            ? 'bisect'
-            : null;
+  const inProgress: StatusSummary['inProgress'] = repo.special.MERGE_HEAD ? 'merge' : repo.special.REVERT_HEAD ? 'revert' : null;
   return {
     root: handle.root,
     branch: currentBranch(repo),
