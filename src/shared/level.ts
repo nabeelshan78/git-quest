@@ -155,21 +155,9 @@ export const HubActionSchema = z.discriminatedUnion('type', [
   }),
   z.strictObject({ type: z.literal('replyReviewComment'), ...Actor, repo: RepoId, number: z.number().int(), commentId: z.number().int().optional(), body: z.string() }),
   z.strictObject({ type: z.literal('resolveReviewThread'), ...Actor, repo: RepoId, number: z.number().int(), commentId: z.number().int().optional() }),
-  z.strictObject({ type: z.literal('mergePullRequest'), ...Actor, repo: RepoId, number: z.number().int(), method: z.enum(['merge', 'squash', 'rebase']), title: z.string().optional(), message: z.string().optional(), deleteBranch: z.boolean().optional() }),
+  z.strictObject({ type: z.literal('mergePullRequest'), ...Actor, repo: RepoId, number: z.number().int(), method: z.literal('merge').optional(), title: z.string().optional(), message: z.string().optional(), deleteBranch: z.boolean().optional() }),
   z.strictObject({ type: z.literal('closePullRequest'), ...Actor, repo: RepoId, number: z.number().int() }),
   z.strictObject({ type: z.literal('reopenPullRequest'), ...Actor, repo: RepoId, number: z.number().int() }),
-  z.strictObject({
-    type: z.literal('updateSettings'),
-    ...Actor,
-    repo: RepoId,
-    description: z.string().optional(),
-    allowMergeCommit: z.boolean().optional(),
-    allowSquashMerge: z.boolean().optional(),
-    allowRebaseMerge: z.boolean().optional(),
-    deleteBranchOnMerge: z.boolean().optional(),
-  }),
-  z.strictObject({ type: z.literal('addSshKey'), ...Actor, title: z.string(), key: z.string() }),
-  z.strictObject({ type: z.literal('createToken'), ...Actor, name: z.string(), scopes: z.array(z.string()).optional() }),
 ]);
 
 // ---------------------------------------------------------------------------
@@ -336,7 +324,6 @@ const BaseCheckSchema = z.discriminatedUnion('type', [
     base: z.string().optional(),
     titleContains: z.string().optional(),
     state: z.enum(['open', 'closed', 'merged']).optional(),
-    mergeMethod: z.enum(['merge', 'squash', 'rebase']).optional(),
     approved: z.boolean().optional(),
     /** The author of the PR replied to at least one review comment or review. */
     repliedToReview: z.boolean().optional(),
@@ -345,9 +332,6 @@ const BaseCheckSchema = z.discriminatedUnion('type', [
     minCommits: z.number().int().optional(),
     count: Count.optional(),
   }),
-  /** An SSH public key from the machine is registered on the viewer's hub account. */
-  z.strictObject({ type: z.literal('sshKeyRegistered'), machine: z.string().optional() }),
-  z.strictObject({ type: z.literal('tokenCreated') }),
   // --- session (understanding checks) ---
   /** The question with this id was answered correctly. */
   z.strictObject({ type: z.literal('answered'), question: z.string() }),
@@ -404,14 +388,6 @@ export const HostedRepoSetupSchema = z.strictObject({
   initialAuthor: z.string().optional(),
   collaborators: z.array(z.string()).optional(),
   labels: z.array(z.strictObject({ name: z.string(), color: z.string(), description: z.string().optional() })).optional(),
-  settings: z
-    .strictObject({
-      allowMergeCommit: z.boolean().optional(),
-      allowSquashMerge: z.boolean().optional(),
-      allowRebaseMerge: z.boolean().optional(),
-      deleteBranchOnMerge: z.boolean().optional(),
-    })
-    .optional(),
 });
 
 export const SetupStepSchema = z.union([
@@ -447,7 +423,6 @@ export const LevelSetupSchema = z.strictObject({
   hub: z
     .strictObject({
       users: z.array(z.strictObject({ login: z.string(), name: z.string(), color: z.string().optional(), bot: z.boolean().optional() })).optional(),
-      requireAuth: z.boolean().optional(),
     })
     .optional(),
   /** Unix seconds for the simulated clock at the start of setup. */

@@ -240,20 +240,8 @@ export interface Machine {
   editor: EditorRequest | null;
   /** Shell history, most recent last. */
   history: string[];
-  /** Simulated ~/.ssh keys and credentials. */
-  ssh: { keys: SshKeyPair[]; knownHosts: string[] };
   /** Shell environment variables. */
   env: Record<string, string>;
-}
-
-export interface SshKeyPair {
-  /** e.g. "~/.ssh/id_ed25519" (absolute path). */
-  privatePath: AbsPath;
-  publicPath: AbsPath;
-  type: 'ed25519' | 'rsa';
-  /** Public key text, e.g. "ssh-ed25519 AAAA... you@example.com". */
-  publicKey: string;
-  comment: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -314,7 +302,8 @@ export interface Review {
   submittedAt: number;
 }
 
-export type MergeMethod = 'merge' | 'squash' | 'rebase';
+/** The simulated GitHub has one "Merge pull request" button (a merge commit). */
+export type MergeMethod = 'merge';
 
 export interface PullRequest {
   number: number;
@@ -354,12 +343,6 @@ export interface HostedRepo {
   issues: Issue[];
   pulls: PullRequest[];
   labels: { name: string; color: string; description: string }[];
-  settings: {
-    allowMergeCommit: boolean;
-    allowSquashMerge: boolean;
-    allowRebaseMerge: boolean;
-    deleteBranchOnMerge: boolean;
-  };
   /** Shared counter for issue + PR numbers, like GitHub. */
   nextNumber: number;
   /** Counter for comment/review ids. */
@@ -371,12 +354,7 @@ export interface HubState {
   /** Login of the player on the simulated GitHub. */
   viewer: string;
   users: Record<string, HubUser>;
-  /** SSH public keys registered to the viewer's account. */
-  sshKeys: { id: number; title: string; key: string; addedAt: number }[];
-  /** Personal access tokens created by the viewer. */
-  tokens: { id: number; name: string; scopes: string[]; token: string; createdAt: number }[];
-  /** When true, pushes need working credentials (an SSH key or token registered on the hub). */
-  requireAuth: boolean;
+  /** Sign-in is automatic in the game (docs/SCOPE.md); there are no keys or tokens. */
   notifications: { id: number; text: string; repo?: HostedRepoId; at: number; read: boolean }[];
   nextId: number;
 }

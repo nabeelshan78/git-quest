@@ -278,7 +278,7 @@
         {
           "id": "6.7",
           "title": "Proving it is you",
-          "concept": "HTTPS with a personal access token vs SSH keys"
+          "concept": "Signing in to GitHub, explained (automatic in the game)"
         },
         {
           "id": "6.8",
@@ -316,8 +316,8 @@
         },
         {
           "id": "7.5",
-          "title": "Ways to merge",
-          "concept": "Merge options, delete the branch, update local main"
+          "title": "The merge button",
+          "concept": "Merge the pull request, delete the branch, update local main"
         },
         {
           "id": "7.6",
@@ -350,13 +350,13 @@
         },
         {
           "id": "8.3",
-          "title": "Three kinds of reset",
-          "concept": "--soft, --mixed, --hard, shown on the three boxes"
+          "title": "Undo the last commit",
+          "concept": "git reset --soft HEAD~1 keeps your changes"
         },
         {
           "id": "8.4",
           "title": "Git's secret diary",
-          "concept": "git reflog to recover lost work"
+          "concept": "git reflog brings back a lost commit"
         },
         {
           "id": "8.5",
