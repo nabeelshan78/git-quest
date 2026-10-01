@@ -21,16 +21,16 @@ committed code works; not extended).
 | --- | --- | --- | --- | --- |
 | 0 | Foundation (orchestrator) | main | done | scaffold, contracts, core data layer, harness, CI |
 | 0b | Scope cut (orchestrator) | main | done | contracts, chapters.json (58 levels), strings file, docs |
-| 1 | Engine A | ws/engine-a | in progress | relaunched on the saved branch, reduced scope |
+| 1 | Engine A | ws/engine-a | in progress | fresh agent: all 17 commands + differential tests |
 | 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | not started | after Engine A |
 | 3 | Remote (remote, clone, fetch, pull, push, teammates) | ws/remote | not started | after Engine A |
-| 4 | Parser | ws/parser | in progress | relaunched with reduced shell scope (no SSH tools) |
-| 5 | UI | ws/ui | in progress | relaunched on the saved branch: no i18n, light/dark only |
+| 4 | Parser | ws/parser | in progress | fresh agent: shell commands, tokenizer, completion |
+| 5 | UI | ws/ui | in progress | fresh agent: React components, xterm.js, all screens |
 | 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub | not started | after Engine A |
 | 7 | Level runner | ws/levels | not started | after Engine A + Parser |
 | 8a | Content ch 0–4 (32 levels) | ws/content-0-4 | not started | after runner |
 | 8b | Content ch 5–8 (26 levels) | ws/content-5-8 | not started | after runner |
-| 9 | Classroom (progress save, export JSON/CSV, short guide) | ws/classroom | in progress | relaunched on the saved branch, small scope |
+| 9 | Classroom (progress save, export JSON/CSV, short guide) | ws/classroom | **done** | merged to main (120 tests) |
 | 10 | QA (e2e per level) | ws/qa | not started | after UI + content |
 | 11 | Beginner review | — | not started | after everything |
 
@@ -63,3 +63,7 @@ committed code works; not extended).
   request" button, 8.3 = `git reset --soft HEAD~1` only, 8.4 = one simple
   reflog rescue, minimal simulated GitHub. Contracts updated: no SSH keys,
   tokens, requireAuth or merge-settings; `MergeMethod` is 'merge' only.
+- Classroom merged to main (120 tests, progress store, CSV export,
+  professor guide). Old worktrees cleaned up.
+- Batch 1 relaunched: Engine A (17 commands), Parser (shell + tokenizer),
+  UI (React components) — all three running in parallel.
