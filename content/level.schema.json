@@ -97,9 +97,6 @@
                 ],
                 "additionalProperties": false
               }
-            },
-            "requireAuth": {
-              "type": "boolean"
             }
           },
           "additionalProperties": false
@@ -309,24 +306,6 @@
                           ],
                           "additionalProperties": false
                         }
-                      },
-                      "settings": {
-                        "type": "object",
-                        "properties": {
-                          "allowMergeCommit": {
-                            "type": "boolean"
-                          },
-                          "allowSquashMerge": {
-                            "type": "boolean"
-                          },
-                          "allowRebaseMerge": {
-                            "type": "boolean"
-                          },
-                          "deleteBranchOnMerge": {
-                            "type": "boolean"
-                          }
-                        },
-                        "additionalProperties": false
                       }
                     },
                     "required": [
@@ -1606,11 +1585,7 @@
             },
             "method": {
               "type": "string",
-              "enum": [
-                "merge",
-                "squash",
-                "rebase"
-              ]
+              "const": "merge"
             },
             "title": {
               "type": "string"
@@ -1625,8 +1600,7 @@
           "required": [
             "type",
             "repo",
-            "number",
-            "method"
+            "number"
           ],
           "additionalProperties": false
         },
@@ -1679,91 +1653,6 @@
             "type",
             "repo",
             "number"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "updateSettings"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "description": {
-              "type": "string"
-            },
-            "allowMergeCommit": {
-              "type": "boolean"
-            },
-            "allowSquashMerge": {
-              "type": "boolean"
-            },
-            "allowRebaseMerge": {
-              "type": "boolean"
-            },
-            "deleteBranchOnMerge": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "type",
-            "repo"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "addSshKey"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "title": {
-              "type": "string"
-            },
-            "key": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "title",
-            "key"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "createToken"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "name": {
-              "type": "string"
-            },
-            "scopes": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "required": [
-            "type",
-            "name"
           ],
           "additionalProperties": false
         }
@@ -3206,14 +3095,6 @@
                 "merged"
               ]
             },
-            "mergeMethod": {
-              "type": "string",
-              "enum": [
-                "merge",
-                "squash",
-                "rebase"
-              ]
-            },
             "approved": {
               "type": "boolean"
             },
@@ -3235,35 +3116,6 @@
           "required": [
             "type",
             "repo"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "sshKeyRegistered"
-            },
-            "machine": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "tokenCreated"
-            }
-          },
-          "required": [
-            "type"
           ],
           "additionalProperties": false
         },

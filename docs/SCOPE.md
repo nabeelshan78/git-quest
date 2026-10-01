@@ -38,3 +38,21 @@ WORKSTREAM CHANGES:
 All testing rules in CLAUDE.md still apply: differential tests vs real git for every in-scope command, and a Playwright test per level. The Final Definition of Done now means all 58 levels in docs/SCOPE.md.
 
 Continue autonomously until done. Do not ask me for approval.
+
+---
+
+SMALL SCOPE CORRECTION: keep it beginner-simple. Do not stop or restart running agents. Add these rules to docs/SCOPE.md, commit, and apply them to all batch 2 work (Remote, Mock GitHub, level runner, content) and to any level already written.
+
+1. Level 6.7 becomes a short concept level only. Ada explains in plain words that real GitHub asks you to sign in, and that on a real computer this happens once through the browser. In the game, sign-in is automatic. No SSH keys, no tokens, no key files, no git remote set-url, no requireAuth. End with 2 simple check questions. Remove any SSH or token features from the Remote and Mock GitHub work.
+
+2. Level 7.5: the mock GitHub has one green "Merge pull request" button. Squash and rebase merges get one sentence of explanation and no practice.
+
+3. Level 8.3: teach only "undo my last commit but keep my changes" with git reset --soft HEAD~1. Mention git reset --hard in one sentence as dangerous; do not practice it. The engine may still support it.
+
+4. Level 8.4 (reflog): keep it very simple, one scenario where a commit seems lost and reflog brings it back.
+
+5. Mock GitHub stays minimal: repo page with files and README, issues, pull requests with review comments, and the merge button. No settings pages, no branch rules, no keys or tokens pages, no Actions, no Pages.
+
+6. General rule for all content: if something is not needed for a beginner to use git alone and open a simple pull request with a teammate, explain it in one sentence or leave it out.
+
+Level count stays 58. Continue autonomously until all 58 levels are done.

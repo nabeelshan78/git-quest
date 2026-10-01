@@ -97,10 +97,9 @@ export type GameEvent =
   | { type: 'transfer.clone'; hosted: HostedRepoId; machine: MachineId; root: AbsPath }
   | { type: 'transfer.fetch'; repo: RepoLocation; remote: string; hosted: HostedRepoId; updates: RefChange[]; objects: number }
   | { type: 'transfer.push'; repo: RepoLocation; remote: string; hosted: HostedRepoId; updates: RefChange[]; objects: number }
-  | { type: 'transfer.rejected'; repo: RepoLocation; remote: string; hosted: HostedRepoId; ref: string; reason: 'non-fast-forward' | 'fetch-first' | 'auth' | 'not-found' | 'other' }
+  | { type: 'transfer.rejected'; repo: RepoLocation; remote: string; hosted: HostedRepoId; ref: string; reason: 'non-fast-forward' | 'fetch-first' | 'not-found' | 'other' }
   // ----- simulated GitHub -----
   | { type: 'hub.repo.create'; repo: HostedRepoId; by: string }
-  | { type: 'hub.repo.settings'; repo: HostedRepoId; by: string }
   | { type: 'hub.file.edit'; repo: HostedRepoId; branch: string; path: RepoPath; commit: Hash; by: string }
   | { type: 'hub.branch.delete'; repo: HostedRepoId; branch: string; by: string }
   | { type: 'hub.issue.open'; repo: HostedRepoId; number: number; by: string }
@@ -110,8 +109,6 @@ export type GameEvent =
   | { type: 'hub.pr.review'; repo: HostedRepoId; number: number; by: string; state: 'APPROVED' | 'CHANGES_REQUESTED' | 'COMMENTED' }
   | { type: 'hub.pr.reviewComment'; repo: HostedRepoId; number: number; by: string; commentId: number }
   | { type: 'hub.pr.merge'; repo: HostedRepoId; number: number; by: string; method: MergeMethod; commit: Hash }
-  | { type: 'hub.ssh.add'; title: string }
-  | { type: 'hub.token.create'; name: string }
   // ----- story / teammates -----
   | { type: 'teammate.action'; actor: string; summary: string }
   | { type: 'dialogue'; speaker: string; text: string }

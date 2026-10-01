@@ -37,7 +37,6 @@ export function createMachine(options: MachineOptions = {}): Machine {
     repos: {},
     editor: null,
     history: [],
-    ssh: { keys: [], knownHosts: [] },
     env: { HOME: home, USER: user, SHELL: '/bin/bash', PATH: '/usr/local/bin:/usr/bin:/bin' },
   };
 }
@@ -55,7 +54,7 @@ export function createHub(viewer: string = DEFAULT_USER, viewerName = 'Intern'):
   const users: Record<string, HubUser> = {};
   for (const u of CHARACTER_USERS) users[u.login] = u;
   users[viewer] = { login: viewer, name: viewerName, color: '#009E73' };
-  return { viewer, users, sshKeys: [], tokens: [], requireAuth: false, notifications: [], nextId: 1 };
+  return { viewer, users, notifications: [], nextId: 1 };
 }
 
 export interface WorldOptions {
@@ -108,7 +107,6 @@ export function createHostedRepoRecord(options: HostedRepoOptions): HostedRepo {
       { name: 'good first issue', color: '#009E73', description: 'Good for newcomers' },
       { name: 'documentation', color: '#56B4E9', description: 'Improvements to docs' },
     ],
-    settings: { allowMergeCommit: true, allowSquashMerge: true, allowRebaseMerge: true, deleteBranchOnMerge: false },
     nextNumber: 1,
     nextId: 1,
     createdAt: options.createdAt,
