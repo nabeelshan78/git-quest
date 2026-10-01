@@ -1,0 +1,4516 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^(?:[0-9]|1[01])\\.[1-9][0-9]?$"
+    },
+    "chapter": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 11
+    },
+    "number": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "concept": {
+      "type": "string",
+      "minLength": 1
+    },
+    "boss": {
+      "type": "boolean"
+    },
+    "story": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "workdir": {
+      "type": "string"
+    },
+    "setup": {
+      "type": "object",
+      "properties": {
+        "machine": {
+          "type": "object",
+          "properties": {
+            "label": {
+              "$ref": "#/$defs/__schema2"
+            },
+            "user": {
+              "$ref": "#/$defs/__schema3"
+            },
+            "host": {
+              "$ref": "#/$defs/__schema4"
+            },
+            "home": {
+              "$ref": "#/$defs/__schema5"
+            },
+            "cwd": {
+              "$ref": "#/$defs/__schema6"
+            },
+            "globalConfig": {
+              "$ref": "#/$defs/__schema7"
+            },
+            "identity": {
+              "$ref": "#/$defs/__schema8"
+            }
+          },
+          "additionalProperties": false
+        },
+        "hub": {
+          "type": "object",
+          "properties": {
+            "users": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "login": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "color": {
+                    "type": "string"
+                  },
+                  "bot": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "login",
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "requireAuth": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "clock": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "run": {
+                    "type": "string"
+                  },
+                  "machine": {
+                    "type": "string"
+                  },
+                  "expectFail": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "run"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  },
+                  "machine": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "files"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "delete": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "machine": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "delete"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "mkdir": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "machine": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mkdir"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "commit": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      },
+                      "files": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "author": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "message"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "machine": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "commit"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "hosted": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "$ref": "#/$defs/__schema9"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "visibility": {
+                        "type": "string",
+                        "enum": [
+                          "public",
+                          "private"
+                        ]
+                      },
+                      "defaultBranch": {
+                        "type": "string"
+                      },
+                      "fromLocal": {
+                        "type": "object",
+                        "properties": {
+                          "machine": {
+                            "type": "string"
+                          },
+                          "repoPath": {
+                            "type": "string"
+                          },
+                          "remoteName": {
+                            "type": "string"
+                          },
+                          "setUpstream": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "forkOf": {
+                        "type": "string"
+                      },
+                      "initialFiles": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      },
+                      "initialMessage": {
+                        "type": "string"
+                      },
+                      "initialAuthor": {
+                        "type": "string"
+                      },
+                      "collaborators": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "protection": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "requirePullRequest": {
+                              "type": "boolean"
+                            },
+                            "requiredApprovals": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "requireStatusChecks": {
+                              "type": "boolean"
+                            },
+                            "requiredChecks": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "allowForcePushes": {
+                              "type": "boolean"
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "workflows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "on": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "enum": [
+                                  "push",
+                                  "pull_request"
+                                ]
+                              }
+                            },
+                            "jobs": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "steps": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "rule": {
+                                          "oneOf": [
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "const": "fileExists"
+                                                },
+                                                "path": {
+                                                  "type": "string"
+                                                }
+                                              },
+                                              "required": [
+                                                "type",
+                                                "path"
+                                              ],
+                                              "additionalProperties": false
+                                            },
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "const": "fileMissing"
+                                                },
+                                                "path": {
+                                                  "type": "string"
+                                                }
+                                              },
+                                              "required": [
+                                                "type",
+                                                "path"
+                                              ],
+                                              "additionalProperties": false
+                                            },
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "const": "fileContains"
+                                                },
+                                                "path": {
+                                                  "type": "string"
+                                                },
+                                                "text": {
+                                                  "type": "string"
+                                                }
+                                              },
+                                              "required": [
+                                                "type",
+                                                "path",
+                                                "text"
+                                              ],
+                                              "additionalProperties": false
+                                            },
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "const": "fileNotContains"
+                                                },
+                                                "path": {
+                                                  "type": "string"
+                                                },
+                                                "text": {
+                                                  "type": "string"
+                                                }
+                                              },
+                                              "required": [
+                                                "type",
+                                                "path",
+                                                "text"
+                                              ],
+                                              "additionalProperties": false
+                                            },
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "const": "allFilesMatching"
+                                                },
+                                                "glob": {
+                                                  "type": "string"
+                                                },
+                                                "contain": {
+                                                  "type": "string"
+                                                }
+                                              },
+                                              "required": [
+                                                "type",
+                                                "glob",
+                                                "contain"
+                                              ],
+                                              "additionalProperties": false
+                                            },
+                                            {
+                                              "type": "object",
+                                              "properties": {
+                                                "type": {
+                                                  "type": "string",
+                                                  "const": "noConflictMarkers"
+                                                }
+                                              },
+                                              "required": [
+                                                "type"
+                                              ],
+                                              "additionalProperties": false
+                                            }
+                                          ]
+                                        },
+                                        "log": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "name"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": [
+                                  "name",
+                                  "steps"
+                                ],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": [
+                            "file",
+                            "name",
+                            "on",
+                            "jobs"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "labels": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "color": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "color"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "settings": {
+                        "type": "object",
+                        "properties": {
+                          "allowMergeCommit": {
+                            "type": "boolean"
+                          },
+                          "allowSquashMerge": {
+                            "type": "boolean"
+                          },
+                          "allowRebaseMerge": {
+                            "type": "boolean"
+                          },
+                          "deleteBranchOnMerge": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "stars": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "hosted"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "teammate": {
+                    "$ref": "#/$defs/__schema10"
+                  }
+                },
+                "required": [
+                  "teammate"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "hub": {
+                    "$ref": "#/$defs/__schema11"
+                  }
+                },
+                "required": [
+                  "hub"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "machineAdd": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "$ref": "#/$defs/__schema2"
+                      },
+                      "user": {
+                        "$ref": "#/$defs/__schema3"
+                      },
+                      "host": {
+                        "$ref": "#/$defs/__schema4"
+                      },
+                      "home": {
+                        "$ref": "#/$defs/__schema5"
+                      },
+                      "cwd": {
+                        "$ref": "#/$defs/__schema6"
+                      },
+                      "globalConfig": {
+                        "$ref": "#/$defs/__schema7"
+                      },
+                      "identity": {
+                        "$ref": "#/$defs/__schema8"
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "machineAdd"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "switchMachine": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "switchMachine"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "advanceClock": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "advanceClock"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "cwd": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "steps"
+      ],
+      "additionalProperties": false
+    },
+    "demo": {
+      "type": "object",
+      "properties": {
+        "lines": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema13"
+          }
+        },
+        "captions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "lines"
+      ],
+      "additionalProperties": false
+    },
+    "goal": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema14"
+          }
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "par": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "allowedCommands": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "hints": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ],
+      "items": false,
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "predict": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "trigger": {
+              "type": "string",
+              "minLength": 1
+            },
+            "question": {
+              "type": "string",
+              "minLength": 1
+            },
+            "choices": {
+              "minItems": 2,
+              "maxItems": 3,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema31"
+              }
+            },
+            "answer": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "explanation": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "trigger",
+            "question",
+            "choices",
+            "answer",
+            "explanation"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 1
+          },
+          "choices": {
+            "minItems": 2,
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema31"
+            }
+          },
+          "answer": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "prompt",
+          "choices",
+          "answer",
+          "explanation"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "recap": {
+      "type": "string",
+      "minLength": 1
+    },
+    "glossary": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cheatSheet": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "command",
+          "summary"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "teammates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "when": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "on": {
+                    "type": "string",
+                    "const": "start"
+                  }
+                },
+                "required": [
+                  "on"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "on": {
+                    "type": "string",
+                    "const": "event"
+                  },
+                  "event": {
+                    "type": "string"
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "where": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "on",
+                  "event"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "on": {
+                    "type": "string",
+                    "const": "goal"
+                  },
+                  "item": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "on",
+                  "item"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "on": {
+                    "type": "string",
+                    "const": "commands"
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "on",
+                  "count"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "actions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema10"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "when",
+          "actions"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "success": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "ui": {
+      "type": "object",
+      "properties": {
+        "panels": {
+          "type": "object",
+          "properties": {
+            "world": {
+              "type": "boolean"
+            },
+            "editor": {
+              "type": "boolean"
+            },
+            "hub": {
+              "type": "boolean"
+            },
+            "remote": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "hubPage": {
+          "type": "string"
+        },
+        "actionButtons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "label",
+              "command"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "terminalOnly": {
+          "type": "boolean"
+        },
+        "slowAnimations": {
+          "type": "boolean"
+        },
+        "focus": {
+          "type": "string",
+          "enum": [
+            "terminal",
+            "hub",
+            "editor",
+            "mission"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "challenge": {
+      "type": "object",
+      "properties": {
+        "timeLimitSeconds": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 9007199254740991
+        },
+        "par": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "timeLimitSeconds"
+      ],
+      "additionalProperties": false
+    },
+    "daily": {
+      "type": "boolean"
+    },
+    "solution": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema32"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "chapter",
+    "number",
+    "title",
+    "concept",
+    "story",
+    "setup",
+    "goal",
+    "par",
+    "allowedCommands",
+    "hints",
+    "predict",
+    "recap",
+    "solution"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "speaker": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mood": {
+          "type": "string",
+          "enum": [
+            "neutral",
+            "happy",
+            "excited",
+            "worried",
+            "thinking",
+            "proud"
+          ]
+        }
+      },
+      "required": [
+        "speaker",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "string",
+      "enum": [
+        "Ada",
+        "Sam",
+        "Priya",
+        "Leo",
+        "Narrator",
+        "You"
+      ]
+    },
+    "__schema2": {
+      "type": "string"
+    },
+    "__schema3": {
+      "type": "string"
+    },
+    "__schema4": {
+      "type": "string"
+    },
+    "__schema5": {
+      "type": "string"
+    },
+    "__schema6": {
+      "type": "string"
+    },
+    "__schema7": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "__schema8": {
+      "type": "boolean"
+    },
+    "__schema9": {
+      "type": "string",
+      "minLength": 3
+    },
+    "__schema10": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "push"
+            },
+            "actor": {
+              "type": "string"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "from": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "files": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "required": [
+            "type",
+            "actor",
+            "repo",
+            "branch",
+            "message",
+            "files"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "hub"
+            },
+            "action": {
+              "$ref": "#/$defs/__schema11"
+            }
+          },
+          "required": [
+            "type",
+            "action"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "say"
+            },
+            "speaker": {
+              "$ref": "#/$defs/__schema1"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "speaker",
+            "text"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "run"
+            },
+            "machine": {
+              "type": "string"
+            },
+            "line": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "machine",
+            "line"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema11": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "createRepo"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "owner": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "public",
+                "private"
+              ]
+            },
+            "readme": {
+              "type": "boolean"
+            },
+            "gitignore": {
+              "type": "string"
+            },
+            "license": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "editFile"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "content": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "path",
+            "content",
+            "message"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "deleteFile"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "path",
+            "message"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "createBranch"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "from": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "branch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "deleteBranch"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "branch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "createIssue"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "title": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            },
+            "labels": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "assignees": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "commentIssue"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "body": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number",
+            "body"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "assignIssue"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "assignees": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number",
+            "assignees"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "labelIssue"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "labels": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number",
+            "labels"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "closeIssue"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "reason": {
+              "type": "string",
+              "enum": [
+                "completed",
+                "not_planned"
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "reopenIssue"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "openPullRequest"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "head": {
+              "type": "string"
+            },
+            "headRepo": {
+              "type": "string"
+            },
+            "base": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            },
+            "draft": {
+              "type": "boolean"
+            },
+            "reviewers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "head",
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "commentPullRequest"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "body": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number",
+            "body"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "requestReviewers"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "reviewers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number",
+            "reviewers"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "reviewPullRequest"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "event": {
+              "type": "string",
+              "enum": [
+                "approve",
+                "request_changes",
+                "comment"
+              ]
+            },
+            "body": {
+              "type": "string"
+            },
+            "comments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "line": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "body": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "line",
+                  "body"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number",
+            "event"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "replyReviewComment"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "commentId": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "body": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number",
+            "body"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "resolveReviewThread"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "commentId": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "mergePullRequest"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "method": {
+              "type": "string",
+              "enum": [
+                "merge",
+                "squash",
+                "rebase"
+              ]
+            },
+            "title": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "deleteBranch": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number",
+            "method"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "closePullRequest"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "reopenPullRequest"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "updatePullRequestBranch"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "number"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "forkRepo"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "owner": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "syncFork"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "protectBranch"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "requirePullRequest": {
+              "type": "boolean"
+            },
+            "requiredApprovals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "requireStatusChecks": {
+              "type": "boolean"
+            },
+            "requiredChecks": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "allowForcePushes": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "branch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "unprotectBranch"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "branch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "updateSettings"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "description": {
+              "type": "string"
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "public",
+                "private"
+              ]
+            },
+            "allowMergeCommit": {
+              "type": "boolean"
+            },
+            "allowSquashMerge": {
+              "type": "boolean"
+            },
+            "allowRebaseMerge": {
+              "type": "boolean"
+            },
+            "deleteBranchOnMerge": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "createRelease"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "tag": {
+              "type": "string"
+            },
+            "target": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            },
+            "prerelease": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "tag"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "enablePages"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string",
+              "enum": [
+                "/",
+                "/docs"
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "branch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "disablePages"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "addSshKey"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "title": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "title",
+            "key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "createToken"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "name": {
+              "type": "string"
+            },
+            "scopes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "rerunWorkflow"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "runId": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "runId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "addCollaborator"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "login": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "login"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "starRepo"
+            },
+            "actor": {
+              "$ref": "#/$defs/__schema12"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema12": {
+      "type": "string"
+    },
+    "__schema13": {
+      "type": "string"
+    },
+    "__schema14": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checks": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema15"
+          }
+        }
+      },
+      "required": [
+        "text",
+        "checks"
+      ],
+      "additionalProperties": false
+    },
+    "__schema15": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/__schema16"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "not"
+            },
+            "check": {
+              "$ref": "#/$defs/__schema16"
+            }
+          },
+          "required": [
+            "type",
+            "check"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "anyOf"
+            },
+            "checks": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema16"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "checks"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "allOf"
+            },
+            "checks": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema16"
+              }
+            }
+          },
+          "required": [
+            "type",
+            "checks"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema16": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "cwd"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "dirExists"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "dirMissing"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "fileExists"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "fileMissing"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "fileContent"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "type": "string"
+            },
+            "equals": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "contains": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "notContains": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "matches": {
+              "$ref": "#/$defs/__schema20"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "repoExists"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "repoMissing"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "configValue"
+            },
+            "key": {
+              "type": "string"
+            },
+            "scope": {
+              "type": "string",
+              "enum": [
+                "global",
+                "local",
+                "any"
+              ]
+            },
+            "equals": {
+              "type": "string"
+            },
+            "matches": {
+              "type": "string"
+            },
+            "exists": {
+              "type": "boolean"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "staged"
+            },
+            "path": {
+              "type": "string"
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "equals": {
+                  "$ref": "#/$defs/__schema17"
+                },
+                "contains": {
+                  "$ref": "#/$defs/__schema18"
+                },
+                "notContains": {
+                  "$ref": "#/$defs/__schema19"
+                },
+                "matches": {
+                  "$ref": "#/$defs/__schema20"
+                }
+              },
+              "additionalProperties": false
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "notStaged"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "tracked"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "untracked"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "modified"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "unmodified"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "ignored"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "clean"
+            },
+            "allowUntracked": {
+              "type": "boolean"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "commitCount"
+            },
+            "ref": {
+              "type": "string"
+            },
+            "equals": {
+              "$ref": "#/$defs/__schema23"
+            },
+            "min": {
+              "$ref": "#/$defs/__schema24"
+            },
+            "max": {
+              "$ref": "#/$defs/__schema25"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "commit"
+            },
+            "ref": {
+              "type": "string"
+            },
+            "messageContains": {
+              "$ref": "#/$defs/__schema26"
+            },
+            "messageNotContains": {
+              "$ref": "#/$defs/__schema27"
+            },
+            "messageMatches": {
+              "$ref": "#/$defs/__schema28"
+            },
+            "messageEquals": {
+              "$ref": "#/$defs/__schema29"
+            },
+            "parents": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "changes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "changesExactly": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "authorName": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "commitExists"
+            },
+            "on": {
+              "type": "string"
+            },
+            "messageContains": {
+              "$ref": "#/$defs/__schema26"
+            },
+            "messageNotContains": {
+              "$ref": "#/$defs/__schema27"
+            },
+            "messageMatches": {
+              "$ref": "#/$defs/__schema28"
+            },
+            "messageEquals": {
+              "$ref": "#/$defs/__schema29"
+            },
+            "parents": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "changes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "changesExactly": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "count": {
+              "$ref": "#/$defs/__schema30"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "noCommitMatching"
+            },
+            "on": {
+              "type": "string"
+            },
+            "messageContains": {
+              "$ref": "#/$defs/__schema26"
+            },
+            "messageNotContains": {
+              "$ref": "#/$defs/__schema27"
+            },
+            "messageMatches": {
+              "$ref": "#/$defs/__schema28"
+            },
+            "messageEquals": {
+              "$ref": "#/$defs/__schema29"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "fileInCommit"
+            },
+            "ref": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "absent": {
+              "type": "boolean"
+            },
+            "equals": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "contains": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "notContains": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "matches": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "branchExists"
+            },
+            "name": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "branchMissing"
+            },
+            "name": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "currentBranch"
+            },
+            "name": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "detachedHead"
+            },
+            "value": {
+              "type": "boolean"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "refsEqual"
+            },
+            "a": {
+              "type": "string"
+            },
+            "b": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "a",
+            "b"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "refsDiffer"
+            },
+            "a": {
+              "type": "string"
+            },
+            "b": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "a",
+            "b"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "isAncestor"
+            },
+            "ancestor": {
+              "type": "string"
+            },
+            "descendant": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "ancestor",
+            "descendant"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "notAncestor"
+            },
+            "ancestor": {
+              "type": "string"
+            },
+            "descendant": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "ancestor",
+            "descendant"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "linearHistory"
+            },
+            "ref": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "noOperationInProgress"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "operationInProgress"
+            },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "merge",
+                "rebase",
+                "cherry-pick",
+                "revert",
+                "bisect"
+              ]
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "operation"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "conflicted"
+            },
+            "path": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "noConflicts"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "noConflictMarkers"
+            },
+            "paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "tagExists"
+            },
+            "name": {
+              "type": "string"
+            },
+            "annotated": {
+              "type": "boolean"
+            },
+            "pointsTo": {
+              "type": "string"
+            },
+            "messageContains": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "stashCount"
+            },
+            "equals": {
+              "$ref": "#/$defs/__schema23"
+            },
+            "min": {
+              "$ref": "#/$defs/__schema24"
+            },
+            "max": {
+              "$ref": "#/$defs/__schema25"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "remoteExists"
+            },
+            "name": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "urlMatches": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "remoteMissing"
+            },
+            "name": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "upstream"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "remote": {
+              "type": "string"
+            },
+            "remoteBranch": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "branch",
+            "remote"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "bisect"
+            },
+            "state": {
+              "type": "string",
+              "enum": [
+                "none",
+                "running",
+                "found"
+              ]
+            },
+            "foundMessageContains": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "state"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "hostedRepoExists"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "public",
+                "private"
+              ]
+            },
+            "forkOf": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "hostedBranch"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "exists": {
+              "type": "boolean"
+            },
+            "equalsLocal": {
+              "type": "string"
+            },
+            "messageContains": {
+              "$ref": "#/$defs/__schema26"
+            },
+            "messageNotContains": {
+              "$ref": "#/$defs/__schema27"
+            },
+            "messageMatches": {
+              "$ref": "#/$defs/__schema28"
+            },
+            "messageEquals": {
+              "$ref": "#/$defs/__schema29"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "branch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "hostedFile"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "absent": {
+              "type": "boolean"
+            },
+            "equals": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "contains": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "notContains": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "matches": {
+              "$ref": "#/$defs/__schema20"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "hostedCommitCount"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "equals": {
+              "$ref": "#/$defs/__schema23"
+            },
+            "min": {
+              "$ref": "#/$defs/__schema24"
+            },
+            "max": {
+              "$ref": "#/$defs/__schema25"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "hostedLinearHistory"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "hostedTag"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "tag": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "tag"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "trackingUpToDate"
+            },
+            "remote": {
+              "type": "string"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "remote",
+            "branch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "inSync"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "remote": {
+              "type": "string"
+            },
+            "remoteBranch": {
+              "type": "string"
+            },
+            "machine": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "repoPath": {
+              "$ref": "#/$defs/__schema22"
+            }
+          },
+          "required": [
+            "type",
+            "branch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "issue"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "titleContains": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed"
+              ]
+            },
+            "assignee": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "commentBy": {
+              "type": "string"
+            },
+            "referenced": {
+              "type": "boolean"
+            },
+            "count": {
+              "$ref": "#/$defs/__schema30"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "pullRequest"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "number": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "head": {
+              "type": "string"
+            },
+            "headRepo": {
+              "type": "string"
+            },
+            "base": {
+              "type": "string"
+            },
+            "titleContains": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string",
+              "enum": [
+                "open",
+                "closed",
+                "merged"
+              ]
+            },
+            "mergeMethod": {
+              "type": "string",
+              "enum": [
+                "merge",
+                "squash",
+                "rebase"
+              ]
+            },
+            "approved": {
+              "type": "boolean"
+            },
+            "repliedToReview": {
+              "type": "boolean"
+            },
+            "commentBy": {
+              "type": "string"
+            },
+            "minCommits": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "count": {
+              "$ref": "#/$defs/__schema30"
+            }
+          },
+          "required": [
+            "type",
+            "repo"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "branchProtection"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "requirePullRequest": {
+              "type": "boolean"
+            },
+            "minApprovals": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "requireStatusChecks": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "branch"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "release"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "tag": {
+              "type": "string"
+            },
+            "nameContains": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "tag"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "pages"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "deployed": {
+              "type": "boolean"
+            },
+            "branch": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "enabled"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "workflowRun"
+            },
+            "repo": {
+              "$ref": "#/$defs/__schema9"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "workflow": {
+              "type": "string"
+            },
+            "conclusion": {
+              "type": "string",
+              "enum": [
+                "success",
+                "failure"
+              ]
+            },
+            "event": {
+              "type": "string",
+              "enum": [
+                "push",
+                "pull_request"
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "repo",
+            "conclusion"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "sshKeyRegistered"
+            },
+            "machine": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "tokenCreated"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "answered"
+            },
+            "question": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "question"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "storyRead"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "ranCommand"
+            },
+            "command": {
+              "type": "string"
+            },
+            "times": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "type",
+            "command"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema17": {
+      "type": "string"
+    },
+    "__schema18": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "__schema19": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "__schema20": {
+      "type": "string"
+    },
+    "__schema21": {
+      "type": "string"
+    },
+    "__schema22": {
+      "type": "string"
+    },
+    "__schema23": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "__schema24": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "__schema25": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "__schema26": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "__schema27": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "__schema28": {
+      "type": "string"
+    },
+    "__schema29": {
+      "type": "string"
+    },
+    "__schema30": {
+      "type": "object",
+      "properties": {
+        "equals": {
+          "$ref": "#/$defs/__schema23"
+        },
+        "min": {
+          "$ref": "#/$defs/__schema24"
+        },
+        "max": {
+          "$ref": "#/$defs/__schema25"
+        }
+      },
+      "additionalProperties": false
+    },
+    "__schema31": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "picture": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "graph"
+                },
+                "commits": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "parents": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "label": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "parents"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "branches": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "head": {
+                  "type": "string"
+                },
+                "remoteBranches": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "tags": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "commits",
+                "branches",
+                "head"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "boxes"
+                },
+                "working": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "staging": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "repository": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "working",
+                "staging",
+                "repository"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "text"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "__schema32": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "run": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "run"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "edit": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "content"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "edit"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "editor": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "save",
+                    "abort"
+                  ]
+                },
+                "content": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "action"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "editor"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "hub": {
+              "$ref": "#/$defs/__schema11"
+            }
+          },
+          "required": [
+            "hub"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "answer": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string"
+                },
+                "choice": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "question",
+                "choice"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "answer"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "story": {
+              "type": "string",
+              "const": "read"
+            }
+          },
+          "required": [
+            "story"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "switchMachine": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "switchMachine"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "$id": "https://git-quest.local/level.schema.json",
+  "title": "Git Quest level",
+  "description": "One level of Git Quest. Generated from src/shared/level.ts by `npm run schema`; do not edit by hand."
+}

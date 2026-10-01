@@ -1,0 +1,11 @@
+{
+  "characters": [
+    { "id": "Ada", "name": "Ada Okafor", "role": "Mentor", "login": "ada-lantern", "color": "#0072B2", "bio": "Lead developer at Lantern Labs. Explains each new idea in two or three sentences, shows it once, then steps back." },
+    { "id": "Sam", "name": "Sam Lee", "role": "Fast teammate", "login": "sam-codes", "color": "#E69F00", "bio": "Pushes code without warning and edits the same lines as you. Kind, but always in a hurry." },
+    { "id": "Priya", "name": "Priya Natarajan", "role": "Reviewer", "login": "priya-reviews", "color": "#009E73", "bio": "Reads every pull request carefully and leaves friendly, specific comments." },
+    { "id": "Leo", "name": "Leo Martins", "role": "Open-source maintainer", "login": "leo-maps", "color": "#CC79A7", "bio": "Maintains Lantern Maps, a free map widget the festival site uses." },
+    { "id": "Narrator", "name": "Narrator", "role": "Narrator", "login": "", "color": "#56B4E9", "bio": "Sets the scene." },
+    { "id": "You", "name": "You", "role": "Intern", "login": "", "color": "#009E73", "bio": "The new intern at Lantern Labs." }
+  ],
+  "setting": "Lantern Labs is a tiny team building the website for the Riverside Lantern Festival. You are the new intern."
+}

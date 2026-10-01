@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["vite/client"],
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.core.tsbuildinfo"
+  },
+  "include": [
+    "src/shared/**/*.ts",
+    "src/engine/**/*.ts",
+    "src/remote/**/*.ts",
+    "src/parser/**/*.ts",
+    "src/hub/**/*.ts",
+    "src/levels/**/*.ts"
+  ],
+  "exclude": ["**/*.test.ts"]
+}
