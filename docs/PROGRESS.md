@@ -22,7 +22,7 @@ committed code works; not extended).
 | 0 | Foundation (orchestrator) | main | done | scaffold, contracts, core data layer, harness, CI |
 | 0b | Scope cut (orchestrator) | main | done | contracts, chapters.json (58 levels), strings file, docs |
 | 1 | Engine A | ws/engine-a | **done** | merged to main (50 diff tests, 16 commands) |
-| 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | in progress | agent running |
+| 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | **done** | merged (22 diff tests, 4 commands) |
 | 3 | Remote (remote, clone, fetch, pull, push, teammates) | ws/remote | **done** | merged to main (13 tests, 5 commands) |
 | 4 | Parser | ws/parser | **done** | merged to main (66 tests) |
 | 5 | UI | ws/ui | **done** | merged to main (50 files, 8033 lines) |
