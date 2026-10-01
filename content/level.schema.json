@@ -7,12 +7,12 @@
     },
     "id": {
       "type": "string",
-      "pattern": "^(?:[0-9]|1[01])\\.[1-9][0-9]?$"
+      "pattern": "^[0-8]\\.[1-9]$"
     },
     "chapter": {
       "type": "integer",
       "minimum": 0,
-      "maximum": 11
+      "maximum": 8
     },
     "number": {
       "type": "integer",
@@ -267,9 +267,6 @@
                         },
                         "additionalProperties": false
                       },
-                      "forkOf": {
-                        "type": "string"
-                      },
                       "initialFiles": {
                         "type": "object",
                         "propertyNames": {
@@ -289,217 +286,6 @@
                         "type": "array",
                         "items": {
                           "type": "string"
-                        }
-                      },
-                      "protection": {
-                        "type": "object",
-                        "propertyNames": {
-                          "type": "string"
-                        },
-                        "additionalProperties": {
-                          "type": "object",
-                          "properties": {
-                            "requirePullRequest": {
-                              "type": "boolean"
-                            },
-                            "requiredApprovals": {
-                              "type": "integer",
-                              "minimum": -9007199254740991,
-                              "maximum": 9007199254740991
-                            },
-                            "requireStatusChecks": {
-                              "type": "boolean"
-                            },
-                            "requiredChecks": {
-                              "type": "array",
-                              "items": {
-                                "type": "string"
-                              }
-                            },
-                            "allowForcePushes": {
-                              "type": "boolean"
-                            }
-                          },
-                          "additionalProperties": false
-                        }
-                      },
-                      "workflows": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "file": {
-                              "type": "string"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "on": {
-                              "type": "array",
-                              "items": {
-                                "type": "string",
-                                "enum": [
-                                  "push",
-                                  "pull_request"
-                                ]
-                              }
-                            },
-                            "jobs": {
-                              "type": "array",
-                              "items": {
-                                "type": "object",
-                                "properties": {
-                                  "name": {
-                                    "type": "string"
-                                  },
-                                  "steps": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "object",
-                                      "properties": {
-                                        "name": {
-                                          "type": "string"
-                                        },
-                                        "rule": {
-                                          "oneOf": [
-                                            {
-                                              "type": "object",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "const": "fileExists"
-                                                },
-                                                "path": {
-                                                  "type": "string"
-                                                }
-                                              },
-                                              "required": [
-                                                "type",
-                                                "path"
-                                              ],
-                                              "additionalProperties": false
-                                            },
-                                            {
-                                              "type": "object",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "const": "fileMissing"
-                                                },
-                                                "path": {
-                                                  "type": "string"
-                                                }
-                                              },
-                                              "required": [
-                                                "type",
-                                                "path"
-                                              ],
-                                              "additionalProperties": false
-                                            },
-                                            {
-                                              "type": "object",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "const": "fileContains"
-                                                },
-                                                "path": {
-                                                  "type": "string"
-                                                },
-                                                "text": {
-                                                  "type": "string"
-                                                }
-                                              },
-                                              "required": [
-                                                "type",
-                                                "path",
-                                                "text"
-                                              ],
-                                              "additionalProperties": false
-                                            },
-                                            {
-                                              "type": "object",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "const": "fileNotContains"
-                                                },
-                                                "path": {
-                                                  "type": "string"
-                                                },
-                                                "text": {
-                                                  "type": "string"
-                                                }
-                                              },
-                                              "required": [
-                                                "type",
-                                                "path",
-                                                "text"
-                                              ],
-                                              "additionalProperties": false
-                                            },
-                                            {
-                                              "type": "object",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "const": "allFilesMatching"
-                                                },
-                                                "glob": {
-                                                  "type": "string"
-                                                },
-                                                "contain": {
-                                                  "type": "string"
-                                                }
-                                              },
-                                              "required": [
-                                                "type",
-                                                "glob",
-                                                "contain"
-                                              ],
-                                              "additionalProperties": false
-                                            },
-                                            {
-                                              "type": "object",
-                                              "properties": {
-                                                "type": {
-                                                  "type": "string",
-                                                  "const": "noConflictMarkers"
-                                                }
-                                              },
-                                              "required": [
-                                                "type"
-                                              ],
-                                              "additionalProperties": false
-                                            }
-                                          ]
-                                        },
-                                        "log": {
-                                          "type": "string"
-                                        }
-                                      },
-                                      "required": [
-                                        "name"
-                                      ],
-                                      "additionalProperties": false
-                                    }
-                                  }
-                                },
-                                "required": [
-                                  "name",
-                                  "steps"
-                                ],
-                                "additionalProperties": false
-                              }
-                            }
-                          },
-                          "required": [
-                            "file",
-                            "name",
-                            "on",
-                            "jobs"
-                          ],
-                          "additionalProperties": false
                         }
                       },
                       "labels": {
@@ -541,11 +327,6 @@
                           }
                         },
                         "additionalProperties": false
-                      },
-                      "stars": {
-                        "type": "integer",
-                        "minimum": -9007199254740991,
-                        "maximum": 9007199254740991
                       }
                     },
                     "required": [
@@ -1042,28 +823,6 @@
       },
       "additionalProperties": false
     },
-    "challenge": {
-      "type": "object",
-      "properties": {
-        "timeLimitSeconds": {
-          "type": "integer",
-          "minimum": 30,
-          "maximum": 9007199254740991
-        },
-        "par": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 9007199254740991
-        }
-      },
-      "required": [
-        "timeLimitSeconds"
-      ],
-      "additionalProperties": false
-    },
-    "daily": {
-      "type": "boolean"
-    },
     "solution": {
       "minItems": 1,
       "type": "array",
@@ -1352,37 +1111,6 @@
           "properties": {
             "type": {
               "type": "string",
-              "const": "deleteFile"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "branch": {
-              "type": "string"
-            },
-            "path": {
-              "type": "string"
-            },
-            "message": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "path",
-            "message"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
               "const": "createBranch"
             },
             "actor": {
@@ -1637,9 +1365,6 @@
               "$ref": "#/$defs/__schema9"
             },
             "head": {
-              "type": "string"
-            },
-            "headRepo": {
               "type": "string"
             },
             "base": {
@@ -1962,149 +1687,6 @@
           "properties": {
             "type": {
               "type": "string",
-              "const": "updatePullRequestBranch"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "number": {
-              "type": "integer",
-              "minimum": -9007199254740991,
-              "maximum": 9007199254740991
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "number"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "forkRepo"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "owner": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "repo"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "syncFork"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "branch": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "repo"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "protectBranch"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "branch": {
-              "type": "string"
-            },
-            "requirePullRequest": {
-              "type": "boolean"
-            },
-            "requiredApprovals": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
-            },
-            "requireStatusChecks": {
-              "type": "boolean"
-            },
-            "requiredChecks": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "allowForcePushes": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "branch"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "unprotectBranch"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "branch": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "branch"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
               "const": "updateSettings"
             },
             "actor": {
@@ -2115,13 +1697,6 @@
             },
             "description": {
               "type": "string"
-            },
-            "visibility": {
-              "type": "string",
-              "enum": [
-                "public",
-                "private"
-              ]
             },
             "allowMergeCommit": {
               "type": "boolean"
@@ -2134,93 +1709,6 @@
             },
             "deleteBranchOnMerge": {
               "type": "boolean"
-            }
-          },
-          "required": [
-            "type",
-            "repo"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "createRelease"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "tag": {
-              "type": "string"
-            },
-            "target": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "body": {
-              "type": "string"
-            },
-            "prerelease": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "tag"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "enablePages"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "branch": {
-              "type": "string"
-            },
-            "folder": {
-              "type": "string",
-              "enum": [
-                "/",
-                "/docs"
-              ]
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "branch"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "disablePages"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
             }
           },
           "required": [
@@ -2276,76 +1764,6 @@
           "required": [
             "type",
             "name"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "rerunWorkflow"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "runId": {
-              "type": "integer",
-              "minimum": -9007199254740991,
-              "maximum": 9007199254740991
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "runId"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "addCollaborator"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "login": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "login"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "starRepo"
-            },
-            "actor": {
-              "$ref": "#/$defs/__schema12"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            }
-          },
-          "required": [
-            "type",
-            "repo"
           ],
           "additionalProperties": false
         }
@@ -3323,10 +2741,7 @@
               "type": "string",
               "enum": [
                 "merge",
-                "rebase",
-                "cherry-pick",
-                "revert",
-                "bisect"
+                "revert"
               ]
             },
             "machine": {
@@ -3406,38 +2821,6 @@
           },
           "required": [
             "type"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "tagExists"
-            },
-            "name": {
-              "type": "string"
-            },
-            "annotated": {
-              "type": "boolean"
-            },
-            "pointsTo": {
-              "type": "string"
-            },
-            "messageContains": {
-              "type": "string"
-            },
-            "machine": {
-              "$ref": "#/$defs/__schema21"
-            },
-            "repoPath": {
-              "$ref": "#/$defs/__schema22"
-            }
-          },
-          "required": [
-            "type",
-            "name"
           ],
           "additionalProperties": false
         },
@@ -3556,37 +2939,6 @@
           "properties": {
             "type": {
               "type": "string",
-              "const": "bisect"
-            },
-            "state": {
-              "type": "string",
-              "enum": [
-                "none",
-                "running",
-                "found"
-              ]
-            },
-            "foundMessageContains": {
-              "type": "string"
-            },
-            "machine": {
-              "$ref": "#/$defs/__schema21"
-            },
-            "repoPath": {
-              "$ref": "#/$defs/__schema22"
-            }
-          },
-          "required": [
-            "type",
-            "state"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
               "const": "hostedRepoExists"
             },
             "repo": {
@@ -3598,9 +2950,6 @@
                 "public",
                 "private"
               ]
-            },
-            "forkOf": {
-              "type": "string"
             }
           },
           "required": [
@@ -3727,47 +3076,6 @@
           "properties": {
             "type": {
               "type": "string",
-              "const": "hostedLinearHistory"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "branch": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "repo"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "hostedTag"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "tag": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "tag"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
               "const": "trackingUpToDate"
             },
             "remote": {
@@ -3884,9 +3192,6 @@
             "head": {
               "type": "string"
             },
-            "headRepo": {
-              "type": "string"
-            },
             "base": {
               "type": "string"
             },
@@ -3930,127 +3235,6 @@
           "required": [
             "type",
             "repo"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "branchProtection"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "branch": {
-              "type": "string"
-            },
-            "requirePullRequest": {
-              "type": "boolean"
-            },
-            "minApprovals": {
-              "type": "integer",
-              "minimum": -9007199254740991,
-              "maximum": 9007199254740991
-            },
-            "requireStatusChecks": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "branch"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "release"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "tag": {
-              "type": "string"
-            },
-            "nameContains": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "tag"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "pages"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "enabled": {
-              "type": "boolean"
-            },
-            "deployed": {
-              "type": "boolean"
-            },
-            "branch": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "enabled"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "const": "workflowRun"
-            },
-            "repo": {
-              "$ref": "#/$defs/__schema9"
-            },
-            "branch": {
-              "type": "string"
-            },
-            "workflow": {
-              "type": "string"
-            },
-            "conclusion": {
-              "type": "string",
-              "enum": [
-                "success",
-                "failure"
-              ]
-            },
-            "event": {
-              "type": "string",
-              "enum": [
-                "push",
-                "pull_request"
-              ]
-            }
-          },
-          "required": [
-            "type",
-            "repo",
-            "conclusion"
           ],
           "additionalProperties": false
         },

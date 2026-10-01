@@ -14,27 +14,22 @@
         {
           "id": "0.2",
           "title": "Where am I?",
-          "concept": "What a terminal is; pwd"
+          "concept": "What a terminal is; pwd, ls, cd"
         },
         {
           "id": "0.3",
-          "title": "Looking around",
-          "concept": "ls, cd, cd .."
-        },
-        {
-          "id": "0.4",
           "title": "Making things",
           "concept": "mkdir, touch"
         },
         {
-          "id": "0.5",
+          "id": "0.4",
           "title": "Reading and writing",
           "concept": "cat, echo \"text\" > file"
         },
         {
-          "id": "0.6",
+          "id": "0.5",
           "title": "Boss: tidy the festival folder",
-          "concept": "Use all five commands together",
+          "concept": "Use the terminal commands together",
           "boss": true
         }
       ]
@@ -97,40 +92,30 @@
         {
           "id": "2.3",
           "title": "What did I change?",
-          "concept": "git diff"
+          "concept": "git diff and git diff --staged"
         },
         {
           "id": "2.4",
-          "title": "What am I about to commit?",
-          "concept": "git diff --staged"
-        },
-        {
-          "id": "2.5",
           "title": "Oops, not that file",
           "concept": "git restore --staged"
         },
         {
-          "id": "2.6",
+          "id": "2.5",
           "title": "Throw away an edit",
           "concept": "git restore"
         },
         {
-          "id": "2.7",
+          "id": "2.6",
           "title": "Files git should ignore",
           "concept": ".gitignore"
         },
         {
-          "id": "2.8",
+          "id": "2.7",
           "title": "Delete and rename",
           "concept": "git rm, git mv"
         },
         {
-          "id": "2.9",
-          "title": "Messages people can read",
-          "concept": "Good commit messages"
-        },
-        {
-          "id": "2.10",
+          "id": "2.8",
           "title": "Boss: one messy day, three clean commits",
           "concept": "Stage selectively",
           "boss": true
@@ -145,36 +130,31 @@
       "levels": [
         {
           "id": "3.1",
-          "title": "The story so far",
-          "concept": "git log --oneline --graph"
+          "title": "Every commit has an ID",
+          "concept": "git log --oneline, hashes and git show"
         },
         {
           "id": "3.2",
-          "title": "Every commit has an ID",
-          "concept": "Hashes; git show"
-        },
-        {
-          "id": "3.3",
           "title": "You are here",
           "concept": "What HEAD means"
         },
         {
-          "id": "3.4",
+          "id": "3.3",
           "title": "Visit the past",
           "concept": "git switch --detach; detached HEAD without fear"
         },
         {
-          "id": "3.5",
+          "id": "3.4",
           "title": "Bring back an old file",
           "concept": "git restore --source=<commit> file"
         },
         {
-          "id": "3.6",
+          "id": "3.5",
           "title": "Undo safely",
           "concept": "git revert"
         },
         {
-          "id": "3.7",
+          "id": "3.6",
           "title": "Boss: the logo broke five commits ago",
           "concept": "Find it and undo it",
           "boss": true
@@ -190,40 +170,35 @@
         {
           "id": "4.1",
           "title": "Why branches?",
-          "concept": "Try an idea without breaking main"
+          "concept": "Try an idea without breaking main; git branch"
         },
         {
           "id": "4.2",
-          "title": "Branches are labels",
-          "concept": "git branch"
-        },
-        {
-          "id": "4.3",
           "title": "Move between branches",
           "concept": "git switch, git switch -c (and git checkout -b)"
         },
         {
-          "id": "4.4",
+          "id": "4.3",
           "title": "Two paths",
           "concept": "Commits on two branches; the graph splits"
         },
         {
-          "id": "4.5",
+          "id": "4.4",
           "title": "The easy merge",
           "concept": "Fast-forward git merge"
         },
         {
-          "id": "4.6",
+          "id": "4.5",
           "title": "The real merge",
           "concept": "Three-way merge and merge commits"
         },
         {
-          "id": "4.7",
+          "id": "4.6",
           "title": "Clean up",
           "concept": "git branch -d"
         },
         {
-          "id": "4.8",
+          "id": "4.7",
           "title": "Boss: two features at once",
           "concept": "Build, merge, delete",
           "boss": true
@@ -258,13 +233,8 @@
         },
         {
           "id": "5.5",
-          "title": "Conflicts in several files",
-          "concept": "Work through them one by one"
-        },
-        {
-          "id": "5.6",
           "title": "Boss: Sam's midnight edits",
-          "concept": "Resolve a three-file conflict",
+          "concept": "Resolve a conflict in several files",
           "boss": true
         }
       ]
@@ -278,45 +248,40 @@
         {
           "id": "6.1",
           "title": "Git is not GitHub",
-          "concept": "Local tool vs hosting website"
+          "concept": "Local tool vs hosting website; your first GitHub repo and README"
         },
         {
           "id": "6.2",
-          "title": "Your first GitHub repo",
-          "concept": "Create it; README and Markdown basics"
-        },
-        {
-          "id": "6.3",
           "title": "Connect the two",
           "concept": "git remote add origin, git remote -v"
         },
         {
-          "id": "6.4",
+          "id": "6.3",
           "title": "Upload",
           "concept": "git push -u origin main"
         },
         {
-          "id": "6.5",
+          "id": "6.4",
           "title": "Download a project",
           "concept": "git clone"
         },
         {
-          "id": "6.6",
+          "id": "6.5",
           "title": "Check vs bring in",
           "concept": "git fetch vs git pull; what origin/main is"
         },
         {
-          "id": "6.7",
+          "id": "6.6",
           "title": "Push rejected!",
           "concept": "Why, then pull and push again"
         },
         {
-          "id": "6.8",
+          "id": "6.7",
           "title": "Proving it is you",
           "concept": "HTTPS with a personal access token vs SSH keys"
         },
         {
-          "id": "6.9",
+          "id": "6.8",
           "title": "Boss: set up a second laptop",
           "concept": "Clone, change, push, sync the first",
           "boss": true
@@ -331,235 +296,78 @@
       "levels": [
         {
           "id": "7.1",
-          "title": "Issues",
-          "concept": "Report a bug, assign it, reference it in a commit"
+          "title": "Issues and one branch per task",
+          "concept": "Report a bug, assign it; one branch per task"
         },
         {
           "id": "7.2",
-          "title": "The team workflow",
-          "concept": "One branch per task (GitHub Flow)"
-        },
-        {
-          "id": "7.3",
           "title": "Your first pull request",
           "concept": "Push a branch, open a PR"
         },
         {
-          "id": "7.4",
+          "id": "7.3",
           "title": "Code review",
           "concept": "Read Priya's comments, reply, request changes"
         },
         {
-          "id": "7.5",
+          "id": "7.4",
           "title": "Update the PR",
           "concept": "Push new commits to the same branch"
         },
         {
-          "id": "7.6",
+          "id": "7.5",
           "title": "Ways to merge",
-          "concept": "Merge commit, squash, rebase-and-merge"
+          "concept": "Merge options, delete the branch, update local main"
         },
         {
-          "id": "7.7",
-          "title": "After the merge",
-          "concept": "Delete the branch, update local main"
-        },
-        {
-          "id": "7.8",
+          "id": "7.6",
           "title": "Conflicts in a PR",
           "concept": "Bring main into your branch and resolve"
         },
         {
-          "id": "7.9",
-          "title": "Rules for main",
-          "concept": "Protected branches and required reviews"
-        },
-        {
-          "id": "7.10",
+          "id": "7.7",
           "title": "Boss: festival launch sprint",
-          "concept": "Three PRs, one conflict, one review",
+          "concept": "Several PRs, one conflict, one review",
           "boss": true
         }
       ]
     },
     {
       "number": 8,
-      "title": "Open source and forks",
-      "stage": "github",
-      "summary": "Contribute to a project you do not own: fork, keep up to date, and send a pull request.",
+      "title": "Rescue and graduation",
+      "stage": "graduation",
+      "summary": "Park work, fix and undo commits, recover lost work with git's diary, then graduate to real git.",
       "levels": [
         {
           "id": "8.1",
-          "title": "Fork vs clone",
-          "concept": "Your own copy on GitHub"
-        },
-        {
-          "id": "8.2",
-          "title": "Two remotes",
-          "concept": "origin and upstream"
-        },
-        {
-          "id": "8.3",
-          "title": "Reading a project",
-          "concept": "README, CONTRIBUTING, LICENSE"
-        },
-        {
-          "id": "8.4",
-          "title": "Stay up to date",
-          "concept": "Sync your fork with upstream"
-        },
-        {
-          "id": "8.5",
-          "title": "Your first contribution",
-          "concept": "A PR to Leo's project"
-        },
-        {
-          "id": "8.6",
-          "title": "Boss: fix a bug in a public project",
-          "concept": "The full fork-to-merge loop",
-          "boss": true
-        }
-      ]
-    },
-    {
-      "number": 9,
-      "title": "Rewriting history",
-      "stage": "power",
-      "summary": "Amend, reset, rebase, cherry-pick and force-push safely, and learn the golden rule.",
-      "levels": [
-        {
-          "id": "9.1",
-          "title": "Fix the last commit",
-          "concept": "git commit --amend"
-        },
-        {
-          "id": "9.2",
-          "title": "Three kinds of reset",
-          "concept": "--soft, --mixed, --hard, shown on the three boxes"
-        },
-        {
-          "id": "9.3",
-          "title": "Rebase vs merge",
-          "concept": "git rebase main"
-        },
-        {
-          "id": "9.4",
-          "title": "Tidy your commits",
-          "concept": "git rebase -i: squash, reword, drop, reorder"
-        },
-        {
-          "id": "9.5",
-          "title": "Copy one commit",
-          "concept": "git cherry-pick"
-        },
-        {
-          "id": "9.6",
-          "title": "The golden rule",
-          "concept": "Never rewrite history others already have"
-        },
-        {
-          "id": "9.7",
-          "title": "Force push safely",
-          "concept": "git push --force-with-lease"
-        },
-        {
-          "id": "9.8",
-          "title": "Boss: clean up before review",
-          "concept": "Squash 6 messy commits into 2",
-          "boss": true
-        }
-      ]
-    },
-    {
-      "number": 10,
-      "title": "Rescue and detective tools",
-      "stage": "power",
-      "summary": "Park work, read git's diary, recover lost commits and hunt down the commit that broke things.",
-      "levels": [
-        {
-          "id": "10.1",
           "title": "Park your work",
           "concept": "git stash, git stash pop"
         },
         {
-          "id": "10.2",
+          "id": "8.2",
+          "title": "Fix the last commit",
+          "concept": "git commit --amend"
+        },
+        {
+          "id": "8.3",
+          "title": "Three kinds of reset",
+          "concept": "--soft, --mixed, --hard, shown on the three boxes"
+        },
+        {
+          "id": "8.4",
           "title": "Git's secret diary",
-          "concept": "git reflog"
+          "concept": "git reflog to recover lost work"
         },
         {
-          "id": "10.3",
-          "title": "Bring back a deleted branch",
-          "concept": "Reflog to the rescue"
-        },
-        {
-          "id": "10.4",
-          "title": "Undo a bad reset",
-          "concept": "Recover \"lost\" commits"
-        },
-        {
-          "id": "10.5",
-          "title": "Who wrote this line?",
-          "concept": "git blame"
-        },
-        {
-          "id": "10.6",
-          "title": "Find the bad commit fast",
-          "concept": "git bisect"
-        },
-        {
-          "id": "10.7",
+          "id": "8.5",
           "title": "Boss: the site is down at midnight",
-          "concept": "Bisect, revert, push",
+          "concept": "Rescue the festival site with every tool",
           "boss": true
-        }
-      ]
-    },
-    {
-      "number": 11,
-      "title": "Pro workflows and graduation",
-      "stage": "graduation",
-      "summary": "Releases, conventions, automation, deployment and your own config, then graduate to real git and GitHub.",
-      "levels": [
-        {
-          "id": "11.1",
-          "title": "Versions and releases",
-          "concept": "git tag, GitHub Releases, semantic versioning"
         },
         {
-          "id": "11.2",
-          "title": "Commit message conventions",
-          "concept": "Conventional Commits"
-        },
-        {
-          "id": "11.3",
-          "title": "Robots that check your work",
-          "concept": "GitHub Actions runs tests on every PR (simulated)"
-        },
-        {
-          "id": "11.4",
-          "title": "Put it online",
-          "concept": "Deploy the festival site with GitHub Pages"
-        },
-        {
-          "id": "11.5",
-          "title": "Make git yours",
-          "concept": "Aliases and useful config"
-        },
-        {
-          "id": "11.6",
-          "title": "Team strategies",
-          "concept": "GitHub Flow, Git Flow and trunk-based development compared"
-        },
-        {
-          "id": "11.7",
+          "id": "8.6",
           "title": "Leaving the simulator",
-          "concept": "Install git on your own computer; same commands, real terminal"
-        },
-        {
-          "id": "11.8",
-          "title": "Final project",
-          "concept": "A real team assignment on real GitHub, graded by the professor",
-          "boss": true
+          "concept": "Install git; same commands in a real terminal; the final project"
         }
       ]
     }

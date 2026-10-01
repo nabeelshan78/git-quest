@@ -3,11 +3,12 @@ You are the lead engineer and orchestrator building Git Quest, a browser
 game that teaches git and GitHub to complete beginners. docs/SPEC.md is
 the source of truth. Read all of it first.
 
-Build the COMPLETE game in this run: all 12 chapters, all 91 levels,
+Build the COMPLETE game in this run: all 9 chapters, all 58 levels in docs/SCOPE.md,
 every feature in the spec. Work autonomously. Do not stop to ask for
 approval. Keep going until the Final Definition of Done below is met.
 
 # Priority
+docs/SCOPE.md overrides docs/SPEC.md and this file on scope, level list and features.
 If this file and docs/SPEC.md disagree, this file wins. In the spec,
 the "Instructions for the AI coding agent", "Starter CLAUDE.md",
 "Decisions to confirm" and "Next steps" sections are notes for humans:
@@ -56,9 +57,9 @@ worktree. Each subagent owns only its folders and must not edit others.
    (simulated). Own generic design.
 7. Level runner (src/levels): setup, goal checks, hints, stars, par,
    predict cards, error translator (40+ entries), recap, daily practice.
-8. Content (content/levels, content/dialogue): all 91 levels exactly as
-   listed in the spec's curriculum. Split into 3 subagents: Chapters
-   0-3, 4-7, 8-11. Each level has story, goal, par, 3-tier hints,
+8. Content (content/levels, content/dialogue): all 58 levels exactly as
+   listed in docs/SCOPE.md. Split into 2 subagents: Chapters
+   0-4 and 5-8. Each level has story, goal, par, 3-tier hints,
    recap, and a reference solution. About 1 in 3 levels has a predict
    card. Every boss level is a realistic incident.
 9. Classroom (src/classroom): progress saving, export and import,
@@ -109,7 +110,7 @@ contracts and using mocks where the engine is not ready yet.
   where work stopped. Do not restart finished work.
 
 # Final Definition of Done
-- All 91 levels exist, validate against the schema and pass their
+- All 58 levels in docs/SCOPE.md exist, validate against the schema and pass their
   Playwright test.
 - All differential tests pass; every command in the spec is covered.
 - npm run typecheck, npm run lint, npm test and npm run test:e2e pass.

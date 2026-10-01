@@ -24,14 +24,18 @@ describe('level schema', () => {
     expect(JSON.parse(readFileSync(schemaPath, 'utf8'))).toEqual(JSON.parse(JSON.stringify(buildLevelJsonSchema())));
   });
 
-  it('chapters.json lists 12 chapters and 91 unique levels', () => {
-    expect(chapters.chapters.map((c) => c.number)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+  it('chapters.json lists the 9 chapters and 58 levels of docs/SCOPE.md', () => {
+    expect(chapters.chapters.map((c) => c.number)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(chapters.chapters.map((c) => c.levels.length)).toEqual([5, 6, 8, 6, 7, 5, 8, 7, 6]);
     const ids = chapters.chapters.flatMap((c) => c.levels.map((l) => l.id));
-    expect(ids.length).toBe(91);
-    expect(new Set(ids).size).toBe(91);
+    expect(ids.length).toBe(58);
+    expect(new Set(ids).size).toBe(58);
     for (const c of chapters.chapters) {
       c.levels.forEach((l, i) => expect(l.id).toBe(`${c.number}.${i + 1}`));
-      expect(c.levels[c.levels.length - 1].boss).toBe(true);
+      // Exactly one boss per chapter; it ends the chapter except in chapter 8,
+      // where "Leaving the simulator" follows the boss.
+      const bosses = c.levels.filter((l) => l.boss).map((l) => l.id);
+      expect(bosses).toEqual([c.number === 8 ? '8.5' : c.levels[c.levels.length - 1].id]);
     }
   });
 
