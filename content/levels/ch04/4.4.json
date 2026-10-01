@@ -1,0 +1,119 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "4.4",
+  "chapter": 4,
+  "number": 4,
+  "title": "The easy merge",
+  "concept": "Fast-forward git merge",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "The schedule is ready! Let's bring it into `main`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "To merge a branch, first you move to the receiving branch. Type `git switch main`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then use `git merge schedule` to bring those commits in."
+    }
+  ],
+  "workdir": "festival",
+  "setup": {
+    "machine": {
+      "cwd": "festival"
+    },
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      },
+      {
+        "run": "cd festival && git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "run": "cd festival && git switch -c schedule"
+      },
+      {
+        "commit": {
+          "message": "Add schedule",
+          "files": {
+            "schedule.html": "Events\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Merge schedule into main",
+        "checks": [
+          {
+            "type": "currentBranch",
+            "name": "main"
+          },
+          {
+            "type": "refsEqual",
+            "a": "main",
+            "b": "schedule"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": [
+    "git switch",
+    "git checkout",
+    "git merge"
+  ],
+  "hints": [
+    "Switch to main, then merge schedule.",
+    "Type `git switch main` followed by `git merge schedule`.",
+    "Additional hint"
+  ],
+  "predict": {
+    "trigger": "git merge",
+    "question": "You are on main. What will the graph look like after `git merge schedule`?",
+    "choices": [
+      {
+        "text": "main moves forward to the schedule commit"
+      },
+      {
+        "text": "A new merge commit is created"
+      }
+    ],
+    "answer": 0,
+    "explanation": "Because main had no new commits, git just slides the main label forward to catch up. That is a fast-forward."
+  },
+  "recap": "`git merge <branch>` brings commits from that branch into your current branch.",
+  "glossary": [
+    "merge",
+    "fast-forward"
+  ],
+  "cheatSheet": [
+    {
+      "command": "git merge <branch>",
+      "summary": "Merge another branch into your current one"
+    }
+  ],
+  "solution": [
+    {
+      "run": "git switch main"
+    },
+    {
+      "run": "git merge schedule"
+    }
+  ]
+}

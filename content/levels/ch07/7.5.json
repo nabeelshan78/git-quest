@@ -1,0 +1,64 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "7.5",
+  "chapter": 7,
+  "number": 5,
+  "title": "The merge button",
+  "concept": "Merge the pull request, delete the branch, update local main",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Your PR is approved! Click the green Merge button on GitHub. Then delete the branch and pull main locally."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Answer the question",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": null,
+  "hints": [
+    "Click the merge button.",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What do you do locally after merging a PR?",
+      "choices": [
+        {
+          "text": "Switch to main and pull"
+        },
+        {
+          "text": "Keep working on the old branch"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Update main and delete the feature branch."
+    }
+  ],
+  "recap": "After merging a PR, switch to main and pull to get the new merge commit.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

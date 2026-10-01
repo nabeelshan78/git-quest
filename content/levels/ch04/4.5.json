@@ -1,0 +1,125 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "4.5",
+  "chapter": 4,
+  "number": 5,
+  "title": "The real merge",
+  "concept": "Three-way merge and merge commits",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Let's merge the `map` branch into `main`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "But `main` has a new commit, so git can't just slide forward."
+    },
+    {
+      "speaker": "Ada",
+      "text": "It will create a **merge commit** to tie the two paths together. Try `git merge map`."
+    }
+  ],
+  "workdir": "festival",
+  "setup": {
+    "machine": {
+      "cwd": "festival"
+    },
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      },
+      {
+        "run": "cd festival && git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "run": "cd festival && git switch -c map"
+      },
+      {
+        "commit": {
+          "message": "Add map",
+          "files": {
+            "map.html": "Map\n"
+          }
+        }
+      },
+      {
+        "run": "cd festival && git switch main"
+      },
+      {
+        "commit": {
+          "message": "Fix typo",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Merge map into main",
+        "checks": [
+          {
+            "type": "currentBranch",
+            "name": "main"
+          },
+          {
+            "type": "isAncestor",
+            "ancestor": "map",
+            "descendant": "main"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git merge"
+  ],
+  "hints": [
+    "You are already on main, just run the merge command.",
+    "Type `git merge map`. Then save and close the editor for the commit message.",
+    "Additional hint"
+  ],
+  "predict": {
+    "trigger": "git merge",
+    "question": "What will happen to the graph when you merge?",
+    "choices": [
+      {
+        "text": "main moves forward to the map commit"
+      },
+      {
+        "text": "A new merge commit is created"
+      }
+    ],
+    "answer": 1,
+    "explanation": "Because both branches have new commits, git must create a merge commit to tie them together."
+  },
+  "recap": "A merge commit joins two branches together when both have new commits.",
+  "glossary": [
+    "merge-commit"
+  ],
+  "cheatSheet": [],
+  "solution": [
+    {
+      "run": "git merge map"
+    },
+    {
+      "editor": {
+        "action": "save",
+        "content": "Merge branch 'map'"
+      }
+    }
+  ]
+}

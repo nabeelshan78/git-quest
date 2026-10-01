@@ -1,0 +1,100 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "2.1",
+  "chapter": 2,
+  "number": 1,
+  "title": "Three boxes",
+  "concept": "Working folder, staging area, repository",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Before we start saving, you need to know how git organizes things."
+    },
+    {
+      "speaker": "Ada",
+      "text": "It uses three areas, like boxes. The first is your **working folder**, where you edit files normally."
+    },
+    {
+      "speaker": "Ada",
+      "text": "The third is the **repository**, where your permanent commits live."
+    },
+    {
+      "speaker": "Ada",
+      "text": "In between is the **staging area**. It's like a loading dock where you prepare your next commit."
+    }
+  ],
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "files": {
+          "index.html": "<h1>Lantern Festival</h1>\n",
+          "notes.txt": "Idea: more lights\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "First commit",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Understand the three boxes",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Which area holds the commit you are currently preparing?",
+      "choices": [
+        {
+          "text": "The repository"
+        },
+        {
+          "text": "The staging area"
+        },
+        {
+          "text": "The working folder"
+        }
+      ],
+      "answer": 1,
+      "explanation": "The staging area is where you pick and choose files for the next commit."
+    }
+  ],
+  "par": null,
+  "recap": "Git has three areas: the working folder (your desk), the staging area (the loading dock), and the repository (the vault).",
+  "glossary": [
+    "working-folder",
+    "staging-area",
+    "repository"
+  ],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ],
+  "hints": [
+    "Nudge",
+    "Concept",
+    "Exact command"
+  ],
+  "allowedCommands": null
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "0.1",
+  "chapter": 0,
+  "number": 1,
+  "title": "The final_v2_REALLY_final problem",
+  "concept": "Why version control exists",
+  "boss": false,
+  "workdir": "~",
+  "setup": {
+    "steps": [
+      {
+        "files": {
+          "festival_v1.txt": "Festival plan",
+          "festival_v2.txt": "Festival plan updated",
+          "festival_final.txt": "Festival plan final",
+          "festival_final_REALLY_final.txt": "Festival plan final finally"
+        }
+      }
+    ]
+  },
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Welcome to Lantern Labs! You're our new intern. We're building the website for the Riverside Lantern Festival."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Look at these files. Have you ever named a file 'final_v2_REALLY_final.txt'?"
+    },
+    {
+      "speaker": "Ada",
+      "text": "It gets confusing fast. Version control systems like git solve this by keeping a history of your changes safely."
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Why do we use version control?",
+      "choices": [
+        {
+          "text": "To keep track of file history without weird names"
+        },
+        {
+          "text": "To make files run faster"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Version control remembers history for you, so your files stay clean."
+    }
+  ],
+  "goal": {
+    "items": [
+      {
+        "text": "Answer the question",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "recap": "Version control tracks your changes so you don't have to rename files.",
+  "glossary": [
+    "version-control"
+  ],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ],
+  "hints": [
+    "Nudge",
+    "Concept",
+    "Exact command"
+  ],
+  "allowedCommands": null
+}

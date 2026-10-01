@@ -1,0 +1,87 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "2.2",
+  "chapter": 2,
+  "number": 2,
+  "title": "Choose what to save",
+  "concept": "git add file, git add .",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "I added a menu and a map, but the schedule needs updating."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Let's save them all in one commit. Use `git add .` to stage everything."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then commit them."
+    }
+  ],
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "First commit",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "files": {
+          "menu.html": "Food stalls\n",
+          "map.html": "Festival map\n",
+          "schedule.html": "Opening times: 10am\n"
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Commit all three new files together",
+        "checks": [
+          {
+            "type": "commit",
+            "messageContains": "Add",
+            "changesExactly": [
+              "map.html",
+              "menu.html",
+              "schedule.html"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "hints": [
+    "How do you add all files at once?",
+    "Use `git add .` followed by a commit.",
+    "Run `git add .` then `git commit -m \"Add pages\"`."
+  ],
+  "par": 2,
+  "allowedCommands": [
+    "git add",
+    "git commit"
+  ],
+  "recap": "`git add .` stages all changed and new files in the folder at once.",
+  "cheatSheet": [
+    {
+      "command": "git add .",
+      "summary": "Put all changes in the staging area"
+    }
+  ],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

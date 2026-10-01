@@ -1,0 +1,66 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "8.4",
+  "chapter": 8,
+  "number": 4,
+  "title": "Git's secret diary",
+  "concept": "git reflog brings back a lost commit",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "A commit seems lost! Use git reflog to find its hash, then cherry-pick it or reset to it."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Find the lost commit",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": [
+    "git reflog"
+  ],
+  "hints": [
+    "Run git reflog",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What does reflog record?",
+      "choices": [
+        {
+          "text": "Every time HEAD moves"
+        },
+        {
+          "text": "Only commits you push"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Reflog is a diary of everywhere you've been."
+    }
+  ],
+  "recap": "git reflog shows everywhere HEAD has been, so you can recover lost commits.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "0.2",
+  "chapter": 0,
+  "number": 2,
+  "title": "Where am I?",
+  "concept": "What a terminal is; pwd, ls, cd",
+  "boss": false,
+  "workdir": "~",
+  "setup": {
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      }
+    ]
+  },
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "This black box is a terminal. It is a way to talk to your computer with text instead of clicks."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Let's find out where we are. Type `pwd` (print working directory)."
+    }
+  ],
+  "hints": [
+    "Type the command to see your current folder.",
+    "`pwd` tells you your location.",
+    "Type `pwd` and press Enter."
+  ],
+  "goal": {
+    "items": [
+      {
+        "text": "Find where you are",
+        "checks": [
+          {
+            "type": "ranCommand",
+            "command": "pwd"
+          }
+        ]
+      },
+      {
+        "text": "List the files here",
+        "checks": [
+          {
+            "type": "ranCommand",
+            "command": "ls"
+          }
+        ]
+      },
+      {
+        "text": "Move into the festival folder",
+        "checks": [
+          {
+            "type": "cwd",
+            "path": "festival"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 3,
+  "allowedCommands": [
+    "pwd",
+    "ls",
+    "cd"
+  ],
+  "recap": "`pwd` shows your folder, `ls` lists files, and `cd <folder>` moves you there.",
+  "cheatSheet": [
+    {
+      "command": "pwd",
+      "summary": "Print working directory"
+    },
+    {
+      "command": "ls",
+      "summary": "List files in the current directory"
+    },
+    {
+      "command": "cd <folder>",
+      "summary": "Change directory"
+    }
+  ],
+  "glossary": [
+    "terminal",
+    "directory"
+  ],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

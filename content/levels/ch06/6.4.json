@@ -1,0 +1,73 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "6.4",
+  "chapter": 6,
+  "number": 4,
+  "title": "Download a project",
+  "concept": "git clone",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "You lost your laptop! Luckily it's on GitHub. Clone it to your new computer."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "initialFiles": {
+            "README.md": "# Festival\n"
+          },
+          "initialMessage": "Init",
+          "initialAuthor": "Ada"
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Clone the repository",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git clone"
+  ],
+  "hints": [
+    "git clone https://github.com/lantern-labs/festival-site.git",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What happens when you clone?",
+      "choices": [
+        {
+          "text": "Downloads the files and the entire git history"
+        },
+        {
+          "text": "Just downloads the files"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Clone gives you a full local repository."
+    }
+  ],
+  "recap": "git clone downloads a full repository from GitHub.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

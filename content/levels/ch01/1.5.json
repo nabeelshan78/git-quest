@@ -1,0 +1,59 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "1.5",
+  "chapter": 1,
+  "number": 5,
+  "title": "Look back",
+  "concept": "git log",
+  "setup": {
+    "machine": { "cwd": "~/festival" },
+    "steps": [
+      { "mkdir": ["~/festival"] },
+      { "files": { "notes.txt": "Festival ideas" } },
+      { "run": "git init" },
+      { "commit": { "message": "Add notes", "files": { "notes.txt": "Festival ideas" } } }
+    ]
+  },
+  "story": [
+    { "speaker": "Ada", "text": "Great! Now you have a commit." },
+    { "speaker": "Ada", "text": "Use `git log` to see the history of your saves." }
+  ],
+  "goal": {
+    "items": [
+      {
+        "text": "What is the message of the last commit?",
+        "checks": [ { "type": "answered", "question": "q1" } ]
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What is the commit message shown in git log?",
+      "choices": [
+        { "text": "Initial commit" },
+        { "text": "Add notes" },
+        { "text": "Festival ideas" }
+      ],
+      "answer": 1,
+      "explanation": "git log shows the author, date, and your message 'Add notes'."
+    }
+  ],
+  "par": null,
+  "allowedCommands": ["git log"],
+  "hints": [
+    "Which command shows your commit history?",
+    "Run `git log` to see past commits.",
+    "Type `git log` and read the commit message."
+  ],
+  "predict": null,
+  "recap": "`git log` lists all commits in this repository in reverse chronological order.",
+  "glossary": [],
+  "cheatSheet": [
+    { "command": "git log", "summary": "View your commit history" }
+  ],
+  "solution": [
+    { "run": "git log" },
+    { "answer": { "question": "q1", "choice": 1 } }
+  ]
+}

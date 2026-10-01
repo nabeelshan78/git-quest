@@ -1,0 +1,90 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "2.7",
+  "chapter": 2,
+  "number": 7,
+  "title": "Delete and rename",
+  "concept": "git rm, git mv",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "We don't need `old.txt` anymore, and `main.html` should be `index.html`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Use `git rm old.txt` to delete it and stage the deletion."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Use `git mv main.html index.html` to rename the file and stage the rename."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then commit the changes."
+    }
+  ],
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "First commit",
+          "files": {
+            "main.html": "<h1>Festival</h1>\n",
+            "old.txt": "Old notes\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Delete old.txt and rename main.html",
+        "checks": [
+          {
+            "type": "commit",
+            "messageContains": "Clean",
+            "changesExactly": [
+              "index.html",
+              "main.html",
+              "old.txt"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "hints": [
+    "How do you delete and rename files?",
+    "Use `git rm` and `git mv`.",
+    "Run `git rm old.txt`, `git mv main.html index.html`, then `git commit -m \"Clean\"`."
+  ],
+  "par": 3,
+  "allowedCommands": [
+    "git rm",
+    "git mv",
+    "git commit"
+  ],
+  "recap": "`git rm` deletes a file and stages the deletion. `git mv` renames a file and stages the rename.",
+  "cheatSheet": [
+    {
+      "command": "git rm <file>",
+      "summary": "Delete a file"
+    },
+    {
+      "command": "git mv <old> <new>",
+      "summary": "Rename a file"
+    }
+  ],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

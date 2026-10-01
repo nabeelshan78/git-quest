@@ -1,0 +1,64 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "6.7",
+  "chapter": 6,
+  "number": 7,
+  "title": "Proving it is you",
+  "concept": "Signing in to GitHub, explained (automatic in the game)",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "In reality, GitHub will ask you to sign in via your browser so it knows who you are. In this game, you're already signed in!"
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Read the story and answer",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": null,
+  "hints": [
+    "Just answer the question.",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Do you need to configure SSH keys or tokens in this game?",
+      "choices": [
+        {
+          "text": "Yes"
+        },
+        {
+          "text": "No, sign-in is automatic"
+        }
+      ],
+      "answer": 1,
+      "explanation": "We keep it simple here."
+    }
+  ],
+  "recap": "On a real computer, GitHub uses your browser to sign you in.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

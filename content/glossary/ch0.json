@@ -1,0 +1,5 @@
+[
+  { "id": "version-control", "term": "Version control", "definition": "A system that records changes to a file or set of files over time so that you can recall specific versions later.", "chapter": 0 },
+  { "id": "terminal", "term": "Terminal", "definition": "A text-based interface to talk to your computer.", "chapter": 0 },
+  { "id": "directory", "term": "Directory", "definition": "Another word for a folder.", "chapter": 0 }
+]

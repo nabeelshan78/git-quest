@@ -1,0 +1,63 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "8.1",
+  "chapter": 8,
+  "number": 1,
+  "title": "Park your work",
+  "concept": "git stash, git stash pop",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "You're in the middle of a messy edit when a critical bug comes in. Stash your work to park it."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Init",
+          "files": {
+            "index.html": "Hello\n"
+          }
+        }
+      },
+      {
+        "files": {
+          "index.html": "Hello World!\n"
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Stash your changes",
+        "checks": [
+          {
+            "type": "clean"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git stash"
+  ],
+  "hints": [
+    "Run git stash",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [],
+  "recap": "git stash parks your uncommitted changes so you can switch tasks.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

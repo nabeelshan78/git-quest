@@ -1,0 +1,105 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "2.8",
+  "chapter": 2,
+  "number": 8,
+  "title": "Boss: one messy day, three clean commits",
+  "concept": "Stage selectively",
+  "boss": true,
+  "story": [
+    {
+      "speaker": "Sam",
+      "text": "I worked on three things at once: added a map, updated the menu, and wrote a draft poster."
+    },
+    {
+      "speaker": "Sam",
+      "text": "Can you commit the map, then the menu separately, and ignore the draft poster completely?"
+    },
+    {
+      "speaker": "Sam",
+      "text": "No pressure!"
+    }
+  ],
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "First commit",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n",
+            "menu.html": "Food\n"
+          }
+        }
+      },
+      {
+        "files": {
+          "map.html": "Map\n",
+          "menu.html": "Food and Drinks\n",
+          "poster.txt": "DRAFT\n"
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Commit only the map",
+        "checks": [
+          {
+            "type": "commit",
+            "messageContains": "map",
+            "changesExactly": [
+              "map.html"
+            ]
+          }
+        ]
+      },
+      {
+        "text": "Commit only the menu update",
+        "checks": [
+          {
+            "type": "commit",
+            "messageContains": "menu",
+            "changesExactly": [
+              "menu.html"
+            ]
+          }
+        ]
+      },
+      {
+        "text": "Ignore the poster",
+        "checks": [
+          {
+            "type": "commit",
+            "messageContains": "ignore",
+            "changesExactly": [
+              ".gitignore"
+            ]
+          },
+          {
+            "type": "clean"
+          }
+        ]
+      }
+    ]
+  },
+  "hints": [
+    "Additional hint",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "par": 6,
+  "allowedCommands": null,
+  "recap": "You used the staging area to split your messy work into logical commits.",
+  "cheatSheet": [],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

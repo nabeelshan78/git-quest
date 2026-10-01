@@ -1,0 +1,20 @@
+[
+  {
+    "id": "issue",
+    "term": "Issue",
+    "definition": "A way to track bugs, tasks, or feature requests on GitHub.",
+    "chapter": 7
+  },
+  {
+    "id": "pull-request",
+    "term": "Pull Request (PR)",
+    "definition": "A request for your team to review and merge your branch into the main project.",
+    "chapter": 7
+  },
+  {
+    "id": "code-review",
+    "term": "Code Review",
+    "definition": "When teammates read your code, ask questions, and suggest changes before it is merged.",
+    "chapter": 7
+  }
+]

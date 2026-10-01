@@ -1,0 +1,65 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "8.5",
+  "chapter": 8,
+  "number": 5,
+  "title": "Boss: the site is down at midnight",
+  "concept": "Rescue the festival site with every tool",
+  "boss": true,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "The site is down! Use everything you've learned to fix it and push."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Answer the question",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": null,
+  "hints": [
+    "Just answer.",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "If a commit broke the site, what's a safe way to undo it?",
+      "choices": [
+        {
+          "text": "git revert <commit>"
+        },
+        {
+          "text": "git reset --hard"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Revert creates a new commit that undoes the changes, which is safe to push."
+    }
+  ],
+  "recap": "You are ready to handle real-world git emergencies.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

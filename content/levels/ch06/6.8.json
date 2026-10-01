@@ -1,0 +1,72 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "6.8",
+  "chapter": 6,
+  "number": 8,
+  "title": "Boss: set up a second laptop",
+  "concept": "Clone, change, push, sync the first",
+  "boss": true,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "You're at the cafe on your second laptop. Clone the repo, make a commit, push, then switch back to your first laptop and sync it."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "initialFiles": {
+            "README.md": "Festival"
+          },
+          "initialMessage": "Init",
+          "initialAuthor": "Sam"
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Complete the sync loop",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 4,
+  "allowedCommands": null,
+  "hints": [
+    "Clone the repo.",
+    "Make a commit.",
+    "Push it."
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "How do you sync the first laptop?",
+      "choices": [
+        {
+          "text": "git fetch"
+        },
+        {
+          "text": "git pull"
+        }
+      ],
+      "answer": 1,
+      "explanation": "git pull brings the changes into your local branch."
+    }
+  ],
+  "recap": "Clone, edit, push on laptop B. Pull on laptop A.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

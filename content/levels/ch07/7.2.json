@@ -1,0 +1,94 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "7.2",
+  "chapter": 7,
+  "number": 2,
+  "title": "Your first pull request",
+  "concept": "Push a branch, open a PR",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Now push your branch and open a Pull Request (PR)."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Init",
+          "files": {
+            "index.html": "Lantren\n"
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "fromLocal": {
+            "remoteName": "origin",
+            "setUpstream": true
+          }
+        }
+      },
+      {
+        "run": "git switch -c fix-typo"
+      },
+      {
+        "commit": {
+          "message": "Fix typo",
+          "files": {
+            "index.html": "Lantern\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Push the branch and open a PR",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git push"
+  ],
+  "hints": [
+    "Run git push -u origin fix-typo",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What does a Pull Request do?",
+      "choices": [
+        {
+          "text": "Asks the team to review and merge your branch"
+        },
+        {
+          "text": "Pulls code to your laptop"
+        }
+      ],
+      "answer": 0,
+      "explanation": "A PR is a request to merge your branch into main."
+    }
+  ],
+  "recap": "Push your branch and open a PR to get your code reviewed.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "stash",
+    "term": "Stash",
+    "definition": "Temporarily park your uncommitted changes so you can switch branches or do other work.",
+    "chapter": 8,
+    "command": "git stash"
+  },
+  {
+    "id": "amend",
+    "term": "Amend",
+    "definition": "Modify the most recent commit (e.g. to fix a typo in the message or add a forgotten file).",
+    "chapter": 8,
+    "command": "git commit --amend"
+  },
+  {
+    "id": "soft-reset",
+    "term": "Soft Reset",
+    "definition": "Undo a commit but keep the file changes in your staging area.",
+    "chapter": 8,
+    "command": "git reset --soft"
+  },
+  {
+    "id": "reflog",
+    "term": "Reflog",
+    "definition": "Git's secret diary of everywhere HEAD has been. Useful for finding lost commits.",
+    "chapter": 8,
+    "command": "git reflog"
+  }
+]

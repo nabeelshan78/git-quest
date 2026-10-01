@@ -1,0 +1,79 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "6.1",
+  "chapter": 6,
+  "number": 1,
+  "title": "Git is not GitHub",
+  "concept": "Local tool vs hosting website; your first GitHub repo and README",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Git is on your computer. GitHub is a website that hosts git repositories. Let's make a README and create a repo."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "files": {
+          "README.md": "# Lantern Festival\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add README",
+          "files": {
+            "README.md": "# Lantern Festival\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Check the status",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": [
+    "git status"
+  ],
+  "hints": [
+    "Run git status.",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Is this local repository connected to GitHub yet?",
+      "choices": [
+        {
+          "text": "Yes"
+        },
+        {
+          "text": "No"
+        }
+      ],
+      "answer": 1,
+      "explanation": "We haven't connected it to any remote server yet."
+    }
+  ],
+  "recap": "Git lives on your computer. GitHub is a website where you can host a copy of your project.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

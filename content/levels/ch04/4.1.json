@@ -1,0 +1,84 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "4.1",
+  "chapter": 4,
+  "number": 1,
+  "title": "Why branches?",
+  "concept": "Try an idea without breaking main; git branch",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "We need to add a map to the site, but we can't break the main page."
+    },
+    {
+      "speaker": "Ada",
+      "text": "A **branch** is a safe place to try an idea. `git branch` lists your branches."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Type `git branch map` to make a new branch named map."
+    }
+  ],
+  "workdir": "festival",
+  "setup": {
+    "machine": {
+      "cwd": "festival"
+    },
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      },
+      {
+        "run": "cd festival && git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Create a new branch called map",
+        "checks": [
+          {
+            "type": "branchExists",
+            "name": "map"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git branch"
+  ],
+  "hints": [
+    "Make a branch called map.",
+    "Use the `git branch` command with the name of the new branch.",
+    "Type `git branch map` and press Enter."
+  ],
+  "recap": "`git branch <name>` creates a new branch pointing to your current commit.",
+  "glossary": [
+    "branch"
+  ],
+  "cheatSheet": [
+    {
+      "command": "git branch <name>",
+      "summary": "Create a new branch"
+    }
+  ],
+  "solution": [
+    {
+      "run": "git branch map"
+    }
+  ],
+  "predict": null
+}

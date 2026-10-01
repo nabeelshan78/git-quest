@@ -1,0 +1,23 @@
+[
+  {
+    "id": "repository",
+    "term": "Repository",
+    "definition": "A folder tracked by git, containing your files and their entire history.",
+    "chapter": 1,
+    "command": "git init"
+  },
+  {
+    "id": "commit",
+    "term": "Commit",
+    "definition": "A permanent snapshot of your files at a specific point in time.",
+    "chapter": 1,
+    "command": "git commit"
+  },
+  {
+    "id": "untracked",
+    "term": "Untracked file",
+    "definition": "A file in your folder that git sees, but is not yet saving in its history.",
+    "chapter": 1,
+    "command": "git status"
+  }
+]

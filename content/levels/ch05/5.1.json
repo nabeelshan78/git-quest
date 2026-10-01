@@ -1,0 +1,100 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "5.1",
+  "chapter": 5,
+  "number": 1,
+  "title": "Why conflicts happen",
+  "concept": "Two edits to the same lines",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Sam and you both edited the main page today. Try to merge the feature branch into main to see what happens when git tries to combine them."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch -c feature"
+      },
+      {
+        "commit": {
+          "message": "Update title for 2026",
+          "files": {
+            "index.html": "<h1>Lantern Festival 2026</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch main"
+      },
+      {
+        "commit": {
+          "message": "Add Riverside to title",
+          "author": "Sam Lee <sam@lanternlabs.example>",
+          "files": {
+            "index.html": "<h1>Riverside Lantern Festival</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Try to merge the feature branch and answer the question",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": [
+    "git merge"
+  ],
+  "hints": [
+    "You need to bring the feature branch into main.",
+    "Use the git merge command.",
+    "git merge feature"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What did git say when you tried to merge?",
+      "choices": [
+        {
+          "text": "Fast-forward"
+        },
+        {
+          "text": "Merge conflict in index.html"
+        },
+        {
+          "text": "Already up to date"
+        }
+      ],
+      "answer": 1,
+      "explanation": "Because you and Sam changed the exact same line, git doesn't know which edit to keep. This is a merge conflict."
+    }
+  ],
+  "recap": "A merge conflict happens when git cannot automatically merge two edits to the same lines.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

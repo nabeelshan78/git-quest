@@ -1,0 +1,40 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "1.2",
+  "chapter": 1,
+  "number": 2,
+  "title": "Start tracking",
+  "concept": "git init; the hidden .git folder",
+  "setup": {
+    "machine": { "cwd": "~/festival" },
+    "steps": [
+      { "mkdir": ["~/festival"] },
+      { "files": { "notes.txt": "Festival ideas" } }
+    ]
+  },
+  "story": [
+    { "speaker": "Ada", "text": "This folder is just a normal folder right now. Git isn't watching it." },
+    { "speaker": "Ada", "text": "Run `git init` to turn it into a git repository." }
+  ],
+  "goal": {
+    "items": [
+      { "text": "Initialize a git repository", "checks": [ { "type": "repoExists" } ] }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": ["git init", "ls"],
+  "hints": [
+    "How do you initialize an empty repository?",
+    "`git init` creates a hidden folder called `.git`.",
+    "Type `git init` and press enter."
+  ],
+  "predict": null,
+  "recap": "`git init` creates a hidden `.git` folder. Now git is tracking your files.",
+  "glossary": ["repository"],
+  "cheatSheet": [
+    { "command": "git init", "summary": "Create a new git repository in the current folder" }
+  ],
+  "solution": [
+    { "run": "git init" }
+  ]
+}

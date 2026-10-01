@@ -1,0 +1,91 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "5.3",
+  "chapter": 5,
+  "number": 3,
+  "title": "Resolve and finish",
+  "concept": "Edit, git add, git commit",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "To fix a conflict, just edit the file to look exactly how you want it, remove git's markers, then add and commit."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch -c feature"
+      },
+      {
+        "commit": {
+          "message": "Update title for 2026",
+          "files": {
+            "index.html": "<h1>Lantern Festival 2026</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch main"
+      },
+      {
+        "commit": {
+          "message": "Add Riverside to title",
+          "author": "Sam Lee <sam@lanternlabs.example>",
+          "files": {
+            "index.html": "<h1>Riverside Lantern Festival</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git merge feature",
+        "expectFail": true
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Resolve the conflict and finish the merge",
+        "checks": [
+          {
+            "type": "commit",
+            "messageContains": "Merge"
+          },
+          {
+            "type": "clean"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": [
+    "git add",
+    "git commit",
+    "cat",
+    "git status"
+  ],
+  "hints": [
+    "First edit index.html, remove the markers, and save.",
+    "Then stage the file.",
+    "Finally, commit without adding a message (git will make one for you) or with a message."
+  ],
+  "recap": "To resolve a conflict, edit the file, git add it, and git commit it.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

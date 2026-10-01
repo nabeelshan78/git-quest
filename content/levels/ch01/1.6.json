@@ -1,0 +1,59 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "1.6",
+  "chapter": 1,
+  "number": 6,
+  "title": "Boss: start the festival repo",
+  "concept": "Three commits, clean status",
+  "boss": true,
+  "setup": {
+    "machine": { "cwd": "~/festival" },
+    "steps": [
+      { "mkdir": ["~/festival"] },
+      { "files": {
+          "index.html": "<h1>Riverside Lantern Festival</h1>",
+          "menu.html": "Food stalls",
+          "map.html": "Festival map"
+        }
+      }
+    ]
+  },
+  "story": [
+    { "speaker": "Sam", "text": "Hey! I made some files for the new site." },
+    { "speaker": "Sam", "text": "Can you initialize the git repo and commit them? Do `index.html` first, then `menu.html`, then `map.html` in three separate commits so we can track the history clearly." }
+  ],
+  "goal": {
+    "items": [
+      {
+        "text": "Initialize the repository",
+        "checks": [ { "type": "repoExists" } ]
+      },
+      {
+        "text": "Three commits total",
+        "checks": [ { "type": "commitCount", "equals": 3 } ]
+      },
+      {
+        "text": "Clean working tree",
+        "checks": [ { "type": "clean" } ]
+      }
+    ]
+  },
+  "par": 7,
+  "allowedCommands": null,
+  "hints": [
+    "Start with `git init`.",
+    "Add and commit one file at a time: `git add index.html` then `git commit -m \"...\"`.",
+    "Repeat for `menu.html` and `map.html`, then check `git status`."
+  ],
+  "predict": null,
+  "recap": "You've mastered the basics! You can now track your own projects.",
+  "solution": [
+    { "run": "git init" },
+    { "run": "git add index.html" },
+    { "run": "git commit -m \"Add index\"" },
+    { "run": "git add menu.html" },
+    { "run": "git commit -m \"Add menu\"" },
+    { "run": "git add map.html" },
+    { "run": "git commit -m \"Add map\"" }
+  ]
+}

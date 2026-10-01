@@ -1,0 +1,22 @@
+[
+  {
+    "id": "working-folder",
+    "term": "Working folder",
+    "definition": "The normal folder on your computer where you can edit files.",
+    "chapter": 2
+  },
+  {
+    "id": "staging-area",
+    "term": "Staging area",
+    "definition": "The loading dock where you prepare your next commit.",
+    "chapter": 2,
+    "command": "git add"
+  },
+  {
+    "id": "repository",
+    "term": "Repository",
+    "definition": "The vault where git permanently stores your commits.",
+    "chapter": 2,
+    "command": "git commit"
+  }
+]

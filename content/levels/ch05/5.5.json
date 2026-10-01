@@ -1,0 +1,87 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "5.5",
+  "chapter": 5,
+  "number": 5,
+  "title": "Boss: Sam's midnight edits",
+  "concept": "Resolve a conflict in several files",
+  "boss": true,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Sam was up late making edits. You were too. Now you need to merge your feature branch, but there are conflicts everywhere."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Initial site",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n",
+            "menu.html": "<h2>Food</h2>\n",
+            "schedule.html": "<h2>Times</h2>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch -c my-updates"
+      },
+      {
+        "commit": {
+          "message": "My edits",
+          "files": {
+            "index.html": "<h1>Festival!</h1>\n",
+            "menu.html": "<h2>Food!</h2>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch main"
+      },
+      {
+        "commit": {
+          "message": "Sam edits",
+          "author": "Sam Lee <sam@lanternlabs.example>",
+          "files": {
+            "index.html": "<h1>The Festival</h1>\n",
+            "schedule.html": "<h2>Times!</h2>\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Merge my-updates into main and resolve all conflicts",
+        "checks": [
+          {
+            "type": "clean"
+          },
+          {
+            "type": "commit",
+            "messageContains": "Merge"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 3,
+  "allowedCommands": null,
+  "hints": [
+    "First, start the merge.",
+    "Open the conflicting files, edit them, then stage them.",
+    "Commit to finish the merge."
+  ],
+  "recap": "A boss level proves you can resolve conflicts without step-by-step help.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

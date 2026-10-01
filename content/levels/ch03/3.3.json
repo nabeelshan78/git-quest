@@ -1,0 +1,128 @@
+{
+  "$schema": "../../../level.schema.json",
+  "id": "3.3",
+  "chapter": 3,
+  "number": 3,
+  "title": "Visit the past",
+  "concept": "git switch --detach; detached HEAD without fear",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Sam",
+      "text": "I think I deleted the poster text yesterday. Was it any good?"
+    },
+    {
+      "speaker": "Ada",
+      "text": "You can look around in the past safely. Find the commit ID from yesterday."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then type `git switch --detach <commit-ID>` to move your HEAD there."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "files": {
+          "poster.txt": "Come to the festival!\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Draft poster text",
+          "files": {
+            "poster.txt": null
+          }
+        }
+      },
+      {
+        "files": {
+          "index.html": "<h1>Festival</h1>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": null
+          }
+        }
+      },
+      {
+        "delete": [
+          "poster.txt"
+        ]
+      },
+      {
+        "commit": {
+          "message": "Remove draft poster",
+          "files": {
+            "poster.txt": null
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Switch to the 'Draft poster text' commit",
+        "checks": [
+          {
+            "type": "detachedHead",
+            "value": true
+          },
+          {
+            "type": "commit",
+            "ref": "HEAD",
+            "messageContains": "Draft poster"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git switch"
+  ],
+  "hints": [
+    "Run `git log --oneline` to find the commit ID for 'Draft poster text'.",
+    "Once you have the ID, move HEAD there with `git switch`.",
+    "`git switch --detach <commit-ID>`"
+  ],
+  "predict": {
+    "trigger": "git switch",
+    "question": "What happens to your files when you switch to an older commit?",
+    "choices": [
+      {
+        "text": "They stay exactly the same"
+      },
+      {
+        "text": "They instantly change to look exactly as they did back then"
+      }
+    ],
+    "answer": 1,
+    "explanation": "Git changes your working folder to match the past commit you switched to."
+  },
+  "recap": "`git switch --detach <commit-ID>` lets you look at an old commit. Git calls this a \"detached HEAD\". You can return to the present later.",
+  "glossary": [
+    "detached-head"
+  ],
+  "cheatSheet": [
+    {
+      "command": "git switch --detach <commit-ID>",
+      "summary": "Move HEAD to a past commit to look around"
+    }
+  ],
+  "solution": [
+    {
+      "run": "git log --oneline"
+    },
+    {
+      "run": "git switch --detach HEAD~2"
+    }
+  ]
+}

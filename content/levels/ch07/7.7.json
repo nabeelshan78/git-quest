@@ -1,0 +1,65 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "7.7",
+  "chapter": 7,
+  "number": 7,
+  "title": "Boss: festival launch sprint",
+  "concept": "Several PRs, one conflict, one review",
+  "boss": true,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "It's launch day! Handle a PR, fix a conflict, and merge."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Finish the sprint",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": null,
+  "hints": [
+    "Just answer the question.",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What is the best way to handle multiple tasks?",
+      "choices": [
+        {
+          "text": "One branch per task, one PR per task"
+        },
+        {
+          "text": "One giant branch for everything"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Keep tasks separate."
+    }
+  ],
+  "recap": "One branch, one task, one PR.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

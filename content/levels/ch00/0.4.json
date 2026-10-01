@@ -1,0 +1,93 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "0.4",
+  "chapter": 0,
+  "number": 4,
+  "title": "Reading and writing",
+  "concept": "cat, echo \"text\" > file",
+  "boss": false,
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      },
+      {
+        "files": {
+          "festival/notes.txt": "Launch time: 21:00\n"
+        }
+      },
+      {
+        "run": "cd festival"
+      }
+    ]
+  },
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "We need to read the notes. Use `cat notes.txt` to print them on the screen."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then write our title to the index using `echo \"<h1>Festival</h1>\" > index.html`."
+    }
+  ],
+  "hints": [
+    "Use cat and echo.",
+    "cat notes.txt, then echo.",
+    "Type `cat notes.txt`, then `echo \"<h1>Festival</h1>\" > index.html`."
+  ],
+  "goal": {
+    "items": [
+      {
+        "text": "Read the notes file",
+        "checks": [
+          {
+            "type": "ranCommand",
+            "command": "cat notes.txt"
+          }
+        ]
+      },
+      {
+        "text": "Write the title to index.html",
+        "checks": [
+          {
+            "type": "fileContent",
+            "path": "index.html",
+            "contains": "<h1>Festival</h1>"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": [
+    "pwd",
+    "ls",
+    "cd",
+    "mkdir",
+    "touch",
+    "cat",
+    "echo"
+  ],
+  "recap": "`cat` reads a file, and `echo \"text\" > file` writes text into it.",
+  "cheatSheet": [
+    {
+      "command": "cat <file>",
+      "summary": "Read a file"
+    },
+    {
+      "command": "echo \"text\" > <file>",
+      "summary": "Write text into a file"
+    }
+  ],
+  "glossary": [],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

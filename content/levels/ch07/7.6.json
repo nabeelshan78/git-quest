@@ -1,0 +1,99 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "7.6",
+  "chapter": 7,
+  "number": 6,
+  "title": "Conflicts in a PR",
+  "concept": "Bring main into your branch and resolve",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Your PR has a conflict with main! Switch to your branch, merge main into it, and resolve."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Init",
+          "files": {
+            "index.html": "A\n"
+          }
+        }
+      },
+      {
+        "run": "git switch -c feature"
+      },
+      {
+        "commit": {
+          "message": "My feature",
+          "files": {
+            "index.html": "A\nB\n"
+          }
+        }
+      },
+      {
+        "run": "git switch main"
+      },
+      {
+        "commit": {
+          "message": "Someone else's edit",
+          "files": {
+            "index.html": "A\nC\n"
+          }
+        }
+      },
+      {
+        "run": "git switch feature"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Merge main into feature and resolve",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git merge"
+  ],
+  "hints": [
+    "git merge main",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Why merge main into feature?",
+      "choices": [
+        {
+          "text": "To resolve the conflict locally before pushing"
+        },
+        {
+          "text": "To break main"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Resolve conflicts locally so the PR can be merged cleanly."
+    }
+  ],
+  "recap": "If a PR conflicts with main, merge main into your branch and resolve.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

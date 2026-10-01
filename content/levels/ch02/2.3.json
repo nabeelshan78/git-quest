@@ -1,0 +1,108 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "2.3",
+  "chapter": 2,
+  "number": 3,
+  "title": "What did I change?",
+  "concept": "git diff and git diff --staged",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "I can't remember what I just typed in the menu."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Use `git diff` to see what changed in your working folder since the last commit."
+    },
+    {
+      "speaker": "Ada",
+      "text": "If a file is already staged, use `git diff --staged` to see it."
+    }
+  ],
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add schedule",
+          "files": {
+            "schedule.html": "Opening times: 10am\n"
+          }
+        }
+      },
+      {
+        "files": {
+          "schedule.html": "Opening times: 10am\nClosing times: 10pm\n"
+        }
+      },
+      {
+        "run": "git add schedule.html"
+      },
+      {
+        "files": {
+          "menu.html": "Food stalls:\n- Noodles\n"
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Check what changed",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What did we add to the menu?",
+      "choices": [
+        {
+          "text": "Burgers"
+        },
+        {
+          "text": "Noodles"
+        },
+        {
+          "text": "Pizza"
+        }
+      ],
+      "answer": 1,
+      "explanation": "`git diff` shows you added Noodles."
+    }
+  ],
+  "par": null,
+  "recap": "`git diff` shows working folder changes. `git diff --staged` shows what is ready to be committed.",
+  "cheatSheet": [
+    {
+      "command": "git diff",
+      "summary": "See changes in the working folder"
+    },
+    {
+      "command": "git diff --staged",
+      "summary": "See changes in the staging area"
+    }
+  ],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ],
+  "hints": [
+    "Nudge",
+    "Concept",
+    "Exact command"
+  ],
+  "allowedCommands": null
+}

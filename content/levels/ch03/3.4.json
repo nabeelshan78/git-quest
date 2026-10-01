@@ -1,0 +1,108 @@
+{
+  "$schema": "../../../level.schema.json",
+  "id": "3.4",
+  "chapter": 3,
+  "number": 4,
+  "title": "Bring back an old file",
+  "concept": "git restore --source=<commit> file",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Sam",
+      "text": "I definitely deleted the poster file, but now we need it back."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Instead of travelling back, you can grab a single file from the past."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Use `git restore --source=<commit-ID> <file>` to put an old file straight into your working folder."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "files": {
+          "poster.txt": "Come to the festival!\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Draft poster text",
+          "files": {
+            "poster.txt": null
+          }
+        }
+      },
+      {
+        "files": {
+          "index.html": "<h1>Festival</h1>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": null
+          }
+        }
+      },
+      {
+        "delete": [
+          "poster.txt"
+        ]
+      },
+      {
+        "commit": {
+          "message": "Remove draft poster",
+          "files": {
+            "poster.txt": null
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Bring back the poster text",
+        "checks": [
+          {
+            "type": "fileExists",
+            "path": "poster.txt"
+          }
+        ]
+      }
+    ]
+  },
+  "hints": [
+    "You need to know the commit ID where the poster was drafted.",
+    "Run `git log --oneline` to find the ID, then use `git restore`.",
+    "`git log --oneline` then `git restore --source=<commit-ID> poster.txt`."
+  ],
+  "par": 1,
+  "allowedCommands": [
+    "git restore"
+  ],
+  "predict": null,
+  "recap": "`git restore --source=<commit-ID> <file>` takes a file from a past commit and puts it in your working folder.",
+  "glossary": [],
+  "cheatSheet": [
+    {
+      "command": "git restore --source=<commit-ID> <file>",
+      "summary": "Bring a specific file from the past into your working folder"
+    }
+  ],
+  "solution": [
+    {
+      "run": "git log --oneline"
+    },
+    {
+      "run": "git restore --source=HEAD~2 poster.txt"
+    }
+  ]
+}

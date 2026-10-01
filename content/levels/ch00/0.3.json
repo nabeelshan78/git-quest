@@ -1,0 +1,85 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "0.3",
+  "chapter": 0,
+  "number": 3,
+  "title": "Making things",
+  "concept": "mkdir, touch",
+  "boss": false,
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      },
+      {
+        "run": "cd festival"
+      }
+    ]
+  },
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "We need a place to put our website files. Use `mkdir` to make a folder named 'css'."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then use `touch` to create an empty file named 'index.html'."
+    }
+  ],
+  "hints": [
+    "Use mkdir and touch.",
+    "mkdir css, then touch index.html.",
+    "Type `mkdir css`, then `touch index.html`."
+  ],
+  "goal": {
+    "items": [
+      {
+        "text": "Create the css folder",
+        "checks": [
+          {
+            "type": "dirExists",
+            "path": "css"
+          }
+        ]
+      },
+      {
+        "text": "Create the index.html file",
+        "checks": [
+          {
+            "type": "fileExists",
+            "path": "index.html"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": [
+    "pwd",
+    "ls",
+    "cd",
+    "mkdir",
+    "touch"
+  ],
+  "recap": "`mkdir` makes a new folder, and `touch` makes a new empty file.",
+  "cheatSheet": [
+    {
+      "command": "mkdir <folder>",
+      "summary": "Make a new directory"
+    },
+    {
+      "command": "touch <file>",
+      "summary": "Create a new empty file"
+    }
+  ],
+  "glossary": [],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

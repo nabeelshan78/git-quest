@@ -1,0 +1,88 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "2.6",
+  "chapter": 2,
+  "number": 6,
+  "title": "Files git should ignore",
+  "concept": ".gitignore",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Sam",
+      "text": "My laptop keeps generating a `thumbs.db` file."
+    },
+    {
+      "speaker": "Ada",
+      "text": "We don't want those in the repository. We can tell git to ignore them."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Create a file named `.gitignore` and write `thumbs.db` inside it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then commit the `.gitignore` file."
+    }
+  ],
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "First commit",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "files": {
+          "thumbs.db": "binary junk\n"
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Ignore thumbs.db and commit .gitignore",
+        "checks": [
+          {
+            "type": "commit",
+            "messageContains": "ignore",
+            "changesExactly": [
+              ".gitignore"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "hints": [
+    "How do you tell git to ignore a file?",
+    "Create a file called `.gitignore` and add the filename to it.",
+    "Run `echo \"thumbs.db\" > .gitignore`, then `git add .gitignore` and commit."
+  ],
+  "par": 3,
+  "allowedCommands": [
+    "echo",
+    "git add",
+    "git commit"
+  ],
+  "recap": "A `.gitignore` file lists files that git should never track.",
+  "cheatSheet": [
+    {
+      "command": "echo \"name\" > .gitignore",
+      "summary": "Tell git to ignore a file"
+    }
+  ],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

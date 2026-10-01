@@ -1,0 +1,64 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "8.6",
+  "chapter": 8,
+  "number": 6,
+  "title": "Leaving the simulator",
+  "concept": "Install git; same commands in a real terminal; the final project",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "You've finished Git Quest! Now install git on your real computer."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Graduate",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": null,
+  "hints": [
+    "Answer the question.",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Will the commands you learned here work in a real terminal?",
+      "choices": [
+        {
+          "text": "Yes"
+        },
+        {
+          "text": "No"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Git Quest uses the exact same commands as real git!"
+    }
+  ],
+  "recap": "Congratulations! You are now ready to use real git.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

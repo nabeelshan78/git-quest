@@ -1,0 +1,135 @@
+{
+  "$schema": "../../../level.schema.json",
+  "id": "3.6",
+  "chapter": 3,
+  "number": 6,
+  "title": "Boss: the logo broke five commits ago",
+  "concept": "Find it and undo it",
+  "boss": true,
+  "story": [
+    {
+      "speaker": "Sam",
+      "text": "Someone broke the logo on the homepage!"
+    },
+    {
+      "speaker": "Sam",
+      "text": "It was fine yesterday. I have no idea when it broke."
+    },
+    {
+      "speaker": "Ada",
+      "text": "You'll have to find the bad commit and revert it. Good luck."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "files": {
+          "index.html": "<img src=\"logo.png\">\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add homepage with logo",
+          "files": {
+            "index.html": null
+          }
+        }
+      },
+      {
+        "files": {
+          "menu.html": "<p>Food</p>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add menu",
+          "files": {
+            "menu.html": null
+          }
+        }
+      },
+      {
+        "files": {
+          "index.html": "<img src=\"logo.jpg\">\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Optimize images",
+          "files": {
+            "index.html": null
+          },
+          "author": "Sam Lee <sam@lanternlabs.example>"
+        }
+      },
+      {
+        "files": {
+          "schedule.html": "<p>Times</p>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add schedule",
+          "files": {
+            "schedule.html": null
+          }
+        }
+      },
+      {
+        "files": {
+          "style.css": "body { color: black; }\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add styles",
+          "files": {
+            "style.css": null
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Find and revert the commit that broke the logo",
+        "checks": [
+          {
+            "type": "commitExists",
+            "messageContains": "Revert \"Optimize images\""
+          },
+          {
+            "type": "fileContent",
+            "path": "index.html",
+            "contains": "logo.png"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": null,
+  "hints": [
+    "Run `git log --oneline` to see the recent commits.",
+    "The commit 'Optimize images' by Sam probably broke it.",
+    "Use `git show` to be sure, then `git revert` the ID for that commit."
+  ],
+  "predict": null,
+  "recap": "You can use `git log` and `git show` to track down a bug, and `git revert` to undo it cleanly.",
+  "glossary": [],
+  "cheatSheet": [],
+  "solution": [
+    {
+      "run": "git revert HEAD~2"
+    },
+    {
+      "editor": {
+        "action": "save"
+      }
+    }
+  ]
+}

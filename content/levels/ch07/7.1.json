@@ -1,0 +1,75 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "7.1",
+  "chapter": 7,
+  "number": 1,
+  "title": "Issues and one branch per task",
+  "concept": "Report a bug, assign it; one branch per task",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "We track work using Issues. Make a branch for issue #1: fix the typo."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Init",
+          "files": {
+            "index.html": "Lantren\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Create and switch to a branch named 'fix-typo'",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git switch",
+    "git checkout"
+  ],
+  "hints": [
+    "git switch -c fix-typo",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Why use a branch for a task?",
+      "choices": [
+        {
+          "text": "To keep main safe while you work"
+        },
+        {
+          "text": "To backup the code"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Branches isolate your work."
+    }
+  ],
+  "recap": "Always create a new branch for a specific task or issue.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

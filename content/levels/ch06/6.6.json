@@ -1,0 +1,104 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "6.6",
+  "chapter": 6,
+  "number": 6,
+  "title": "Push rejected!",
+  "concept": "Why, then pull and push again",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Your push was rejected because Sam pushed first. You need to pull their changes, merge, and then push."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Init",
+          "files": {
+            "index.html": "Hello\n"
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "fromLocal": {
+            "remoteName": "origin",
+            "setUpstream": true
+          }
+        }
+      },
+      {
+        "teammate": {
+          "type": "push",
+          "actor": "Sam",
+          "repo": "lantern-labs/festival-site",
+          "branch": "main",
+          "message": "Sam's update",
+          "files": {
+            "menu.html": "Menu\n"
+          }
+        }
+      },
+      {
+        "commit": {
+          "message": "My update",
+          "files": {
+            "map.html": "Map\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Pull, then push",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": [
+    "git pull",
+    "git push"
+  ],
+  "hints": [
+    "Run git pull, then git push.",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Why was the push rejected initially?",
+      "choices": [
+        {
+          "text": "GitHub was down"
+        },
+        {
+          "text": "The remote has commits you don't have"
+        }
+      ],
+      "answer": 1,
+      "explanation": "You can't push if it would overwrite someone else's work."
+    }
+  ],
+  "recap": "If a push is rejected, pull the latest changes, merge, and push again.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "0.5",
+  "chapter": 0,
+  "number": 5,
+  "title": "Boss: tidy the festival folder",
+  "concept": "Use the terminal commands together",
+  "boss": true,
+  "workdir": "~",
+  "setup": {
+    "steps": [
+      {
+        "mkdir": [
+          "messy_dir"
+        ]
+      },
+      {
+        "files": {
+          "messy_dir/clue.txt": "Make a folder called 'festival' and put a file 'plan.txt' in it.\n"
+        }
+      }
+    ]
+  },
+  "story": [
+    {
+      "speaker": "Sam",
+      "text": "I left a clue in `messy_dir/clue.txt`. Read it and do what it says!"
+    }
+  ],
+  "hints": [
+    "Additional hint",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "goal": {
+    "items": [
+      {
+        "text": "Make the festival folder",
+        "checks": [
+          {
+            "type": "dirExists",
+            "path": "festival"
+          }
+        ]
+      },
+      {
+        "text": "Create plan.txt inside festival",
+        "checks": [
+          {
+            "type": "fileExists",
+            "path": "festival/plan.txt"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 4,
+  "allowedCommands": null,
+  "recap": "You used the terminal to navigate, read files, and create new folders and files.",
+  "cheatSheet": [],
+  "glossary": [],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

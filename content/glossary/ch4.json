@@ -1,0 +1,28 @@
+[
+  {
+    "id": "branch",
+    "term": "Branch",
+    "definition": "A movable label that points to a commit. It allows you to work on an idea without affecting the main history.",
+    "chapter": 4,
+    "command": "git branch"
+  },
+  {
+    "id": "merge",
+    "term": "Merge",
+    "definition": "Bringing the commits from one branch into another, combining the two histories.",
+    "chapter": 4,
+    "command": "git merge"
+  },
+  {
+    "id": "fast-forward",
+    "term": "Fast-forward",
+    "definition": "A simple merge where git just moves the branch label forward to the new commits, because no new work was done on the receiving branch.",
+    "chapter": 4
+  },
+  {
+    "id": "merge-commit",
+    "term": "Merge commit",
+    "definition": "A special commit with two parents that ties two diverging branch histories together.",
+    "chapter": 4
+  }
+]

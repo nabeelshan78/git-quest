@@ -1,0 +1,102 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "4.2",
+  "chapter": 4,
+  "number": 2,
+  "title": "Move between branches",
+  "concept": "git switch, git switch -c (and checkout -b)",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Now that we have a `map` branch, let's move to it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "`git switch map` moves your HEAD to the map branch."
+    },
+    {
+      "speaker": "Ada",
+      "text": "And `git switch -c <name>` makes a new branch and moves to it in one go."
+    }
+  ],
+  "workdir": "festival",
+  "setup": {
+    "machine": {
+      "cwd": "festival"
+    },
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      },
+      {
+        "run": "cd festival && git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "run": "cd festival && git branch map"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Move to the map branch",
+        "checks": [
+          {
+            "type": "currentBranch",
+            "name": "map"
+          }
+        ]
+      },
+      {
+        "text": "Create and move to a schedule branch",
+        "checks": [
+          {
+            "type": "currentBranch",
+            "name": "schedule"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": [
+    "git switch",
+    "git checkout"
+  ],
+  "hints": [
+    "Move to map with `git switch map`.",
+    "Then make and move to schedule with `git switch -c schedule`.",
+    "Additional hint"
+  ],
+  "recap": "`git switch <branch>` moves you to a branch. `git switch -c <branch>` creates and moves in one go.",
+  "glossary": [],
+  "cheatSheet": [
+    {
+      "command": "git switch <branch>",
+      "summary": "Move to an existing branch"
+    },
+    {
+      "command": "git switch -c <branch>",
+      "summary": "Create and move to a new branch"
+    }
+  ],
+  "solution": [
+    {
+      "run": "git switch map"
+    },
+    {
+      "run": "git switch -c schedule"
+    }
+  ],
+  "predict": null
+}

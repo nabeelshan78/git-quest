@@ -1,0 +1,82 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "2.5",
+  "chapter": 2,
+  "number": 5,
+  "title": "Throw away an edit",
+  "concept": "git restore",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Sam",
+      "text": "I was messing around with the colors but it looks awful."
+    },
+    {
+      "speaker": "Sam",
+      "text": "Can you just throw away my changes to `style.css`?"
+    },
+    {
+      "speaker": "Ada",
+      "text": "To destroy changes in the working folder and go back to the last commit, use `git restore <file>`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Careful! You cannot undo this."
+    }
+  ],
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add style",
+          "files": {
+            "style.css": "body { color: black; }\n"
+          }
+        }
+      },
+      {
+        "files": {
+          "style.css": "body { color: neon-green; }\n"
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Restore style.css",
+        "checks": [
+          {
+            "type": "clean"
+          }
+        ]
+      }
+    ]
+  },
+  "hints": [
+    "How do you throw away changes in the working folder?",
+    "Use `git restore` on the file.",
+    "Run `git restore style.css`."
+  ],
+  "par": 1,
+  "allowedCommands": [
+    "git restore"
+  ],
+  "recap": "`git restore <file>` throws away your working folder edits. The file goes back to exactly how it was in the last commit.",
+  "cheatSheet": [
+    {
+      "command": "git restore <file>",
+      "summary": "Throw away working folder edits"
+    }
+  ],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

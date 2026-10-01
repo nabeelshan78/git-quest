@@ -1,0 +1,128 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "4.6",
+  "chapter": 4,
+  "number": 6,
+  "title": "Clean up",
+  "concept": "git branch -d",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Now that our features are safely in `main`, we don't need the old labels."
+    },
+    {
+      "speaker": "Ada",
+      "text": "`git branch -d <name>` deletes a branch."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Git will refuse to delete it if the work hasn't been merged."
+    }
+  ],
+  "workdir": "festival",
+  "setup": {
+    "machine": {
+      "cwd": "festival"
+    },
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      },
+      {
+        "run": "cd festival && git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "run": "cd festival && git switch -c map"
+      },
+      {
+        "commit": {
+          "message": "Add map",
+          "files": {
+            "map.html": "Map\n"
+          }
+        }
+      },
+      {
+        "run": "cd festival && git switch main"
+      },
+      {
+        "run": "cd festival && git switch -c schedule"
+      },
+      {
+        "commit": {
+          "message": "Add schedule",
+          "files": {
+            "schedule.html": "Events\n"
+          }
+        }
+      },
+      {
+        "run": "cd festival && git switch main"
+      },
+      {
+        "run": "cd festival && git merge map"
+      },
+      {
+        "run": "cd festival && git merge schedule"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Delete the map branch",
+        "checks": [
+          {
+            "type": "branchMissing",
+            "name": "map"
+          }
+        ]
+      },
+      {
+        "text": "Delete the schedule branch",
+        "checks": [
+          {
+            "type": "branchMissing",
+            "name": "schedule"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": [
+    "git branch"
+  ],
+  "hints": [
+    "Delete map with `git branch -d map`.",
+    "Do the same for schedule.",
+    "Additional hint"
+  ],
+  "recap": "`git branch -d <name>` deletes a branch label, keeping your workspace tidy.",
+  "glossary": [],
+  "cheatSheet": [
+    {
+      "command": "git branch -d <branch>",
+      "summary": "Delete a branch"
+    }
+  ],
+  "solution": [
+    {
+      "run": "git branch -d map"
+    },
+    {
+      "run": "git branch -d schedule"
+    }
+  ],
+  "predict": null
+}

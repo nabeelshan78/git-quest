@@ -1,0 +1,36 @@
+[
+  {
+    "id": "github",
+    "term": "GitHub",
+    "definition": "A website that hosts git repositories, allowing you to share code and collaborate with others.",
+    "chapter": 6
+  },
+  {
+    "id": "remote",
+    "term": "Remote",
+    "definition": "A version of your repository that is hosted on the internet or another network, like GitHub.",
+    "chapter": 6,
+    "command": "git remote add origin"
+  },
+  {
+    "id": "push",
+    "term": "Push",
+    "definition": "Upload your local commits to a remote repository.",
+    "chapter": 6,
+    "command": "git push"
+  },
+  {
+    "id": "clone",
+    "term": "Clone",
+    "definition": "Download a full copy of a remote repository onto your computer.",
+    "chapter": 6,
+    "command": "git clone"
+  },
+  {
+    "id": "pull",
+    "term": "Pull",
+    "definition": "Download new commits from the remote repository and merge them into your local branch.",
+    "chapter": 6,
+    "command": "git pull"
+  }
+]

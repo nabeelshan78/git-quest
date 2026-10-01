@@ -1,0 +1,22 @@
+[
+  {
+    "id": "merge-conflict",
+    "term": "Merge conflict",
+    "definition": "When git cannot automatically combine two edits to the same lines of code. You must resolve it manually.",
+    "chapter": 5,
+    "command": "git merge"
+  },
+  {
+    "id": "conflict-markers",
+    "term": "Conflict markers",
+    "definition": "<<<<<<<, =======, >>>>>>>. Git inserts these into files to show you both versions of the conflicting code.",
+    "chapter": 5
+  },
+  {
+    "id": "merge-abort",
+    "term": "Merge abort",
+    "definition": "A command that stops a conflict resolution and puts your files back how they were before the merge.",
+    "chapter": 5,
+    "command": "git merge --abort"
+  }
+]

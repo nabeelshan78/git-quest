@@ -1,0 +1,89 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "5.4",
+  "chapter": 5,
+  "number": 4,
+  "title": "Back out",
+  "concept": "git merge --abort",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "This merge is a disaster. Let's just back out and pretend it never happened."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch -c feature"
+      },
+      {
+        "commit": {
+          "message": "Complete redesign",
+          "files": {
+            "index.html": "<html><body><div>Wow</div></body></html>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch main"
+      },
+      {
+        "commit": {
+          "message": "Small tweak",
+          "author": "Sam Lee <sam@lanternlabs.example>",
+          "files": {
+            "index.html": "<h1>Riverside Lantern Festival</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git merge feature",
+        "expectFail": true
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Abort the merge",
+        "checks": [
+          {
+            "type": "clean"
+          },
+          {
+            "type": "fileContent",
+            "path": "index.html",
+            "equals": "<h1>Riverside Lantern Festival</h1>\n<p>Coming soon!</p>\n"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git merge"
+  ],
+  "hints": [
+    "There is a flag for git merge to abort.",
+    "It stops the merge and puts everything back.",
+    "git merge --abort"
+  ],
+  "recap": "git merge --abort stops a conflict resolution and puts your files back how they were.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

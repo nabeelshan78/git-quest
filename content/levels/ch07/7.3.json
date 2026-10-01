@@ -1,0 +1,64 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "7.3",
+  "chapter": 7,
+  "number": 3,
+  "title": "Code review",
+  "concept": "Read Priya's comments, reply, request changes",
+  "story": [
+    {
+      "speaker": "Priya",
+      "text": "I reviewed your PR. I left a comment."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Read the comment and answer",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": null,
+  "hints": [
+    "Look at Priya's comment in the GitHub view.",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What should you do when changes are requested?",
+      "choices": [
+        {
+          "text": "Make the changes and push to the same branch"
+        },
+        {
+          "text": "Close the PR and give up"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Just add more commits to the branch."
+    }
+  ],
+  "recap": "Code review is a normal part of working in a team.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

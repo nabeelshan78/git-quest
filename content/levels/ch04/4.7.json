@@ -1,0 +1,159 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "4.7",
+  "chapter": 4,
+  "number": 7,
+  "title": "Boss: two features at once",
+  "concept": "Build, merge, delete",
+  "boss": true,
+  "story": [
+    {
+      "speaker": "Sam",
+      "text": "We need a contact page and an FAQ. Fast!"
+    },
+    {
+      "speaker": "Ada",
+      "text": "Use branches to keep things organized. Create a `contact` branch and an `faq` branch."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Commit your files, merge both into `main`, and delete the branches."
+    }
+  ],
+  "workdir": "festival",
+  "setup": {
+    "machine": {
+      "cwd": "festival"
+    },
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      },
+      {
+        "run": "cd festival && git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Add contact.html to main",
+        "checks": [
+          {
+            "type": "currentBranch",
+            "name": "main"
+          },
+          {
+            "type": "fileExists",
+            "path": "contact.html"
+          },
+          {
+            "type": "commitExists",
+            "messageContains": "contact"
+          }
+        ]
+      },
+      {
+        "text": "Add faq.html to main",
+        "checks": [
+          {
+            "type": "currentBranch",
+            "name": "main"
+          },
+          {
+            "type": "fileExists",
+            "path": "faq.html"
+          },
+          {
+            "type": "commitExists",
+            "messageContains": "faq"
+          }
+        ]
+      },
+      {
+        "text": "Clean up your branches",
+        "checks": [
+          {
+            "type": "branchMissing",
+            "name": "contact"
+          },
+          {
+            "type": "branchMissing",
+            "name": "faq"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 10,
+  "allowedCommands": null,
+  "hints": [
+    "Create the contact branch, add contact.html, and commit.",
+    "Go back to main. Create the faq branch, add faq.html, and commit.",
+    "Switch back to main. Merge both branches, then delete them with `git branch -d`."
+  ],
+  "recap": "Branches let you juggle multiple tasks cleanly.",
+  "glossary": [],
+  "cheatSheet": [],
+  "solution": [
+    {
+      "run": "git switch -c contact"
+    },
+    {
+      "run": "echo 'contact' > contact.html"
+    },
+    {
+      "run": "git add contact.html"
+    },
+    {
+      "run": "git commit -m 'Add contact'"
+    },
+    {
+      "run": "git switch main"
+    },
+    {
+      "run": "git switch -c faq"
+    },
+    {
+      "run": "echo 'faq' > faq.html"
+    },
+    {
+      "run": "git add faq.html"
+    },
+    {
+      "run": "git commit -m 'Add faq'"
+    },
+    {
+      "run": "git switch main"
+    },
+    {
+      "run": "git merge contact"
+    },
+    {
+      "run": "git merge faq"
+    },
+    {
+      "editor": {
+        "action": "save",
+        "content": "Merge branch 'faq'"
+      }
+    },
+    {
+      "run": "git branch -d contact"
+    },
+    {
+      "run": "git branch -d faq"
+    }
+  ],
+  "predict": null
+}

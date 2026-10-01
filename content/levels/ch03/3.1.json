@@ -1,0 +1,173 @@
+{
+  "$schema": "../../../level.schema.json",
+  "id": "3.1",
+  "chapter": 3,
+  "number": 1,
+  "title": "Every commit has an ID",
+  "concept": "git log --oneline, hashes and git show",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "As the festival grows, our history gets longer."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Try `git log --oneline` to see a quick list."
+    },
+    {
+      "speaker": "Ada",
+      "text": "See those short codes at the start? They are commit IDs (or hashes)."
+    },
+    {
+      "speaker": "Ada",
+      "text": "You can look closely at any past commit by typing `git show` and its ID."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "files": {
+          "index.html": "<h1>Festival</h1>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": null
+          }
+        }
+      },
+      {
+        "files": {
+          "menu.html": "<p>Food</p>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add menu",
+          "files": {
+            "menu.html": null
+          }
+        }
+      },
+      {
+        "files": {
+          "schedule.html": "<p>Times</p>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add schedule",
+          "files": {
+            "schedule.html": null
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Check the short log",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      },
+      {
+        "text": "Find out what changed in the middle commit",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q2"
+          }
+        ]
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Run `git log --oneline`. What does every line start with?",
+      "choices": [
+        {
+          "text": "My name"
+        },
+        {
+          "text": "A short mix of numbers and letters (the commit ID or hash)"
+        },
+        {
+          "text": "The date"
+        }
+      ],
+      "answer": 1,
+      "explanation": "That short code is the commit ID or hash. It's how git names your save points."
+    },
+    {
+      "id": "q2",
+      "prompt": "Run `git log --oneline` to find the ID for \"Add menu\". Then run `git show <that-id>`. Which file was added?",
+      "choices": [
+        {
+          "text": "index.html"
+        },
+        {
+          "text": "menu.html"
+        },
+        {
+          "text": "schedule.html"
+        }
+      ],
+      "answer": 1,
+      "explanation": "`git show` tells you exactly what a specific commit did."
+    }
+  ],
+  "par": null,
+  "allowedCommands": null,
+  "hints": [
+    "Run `git log --oneline` to answer the first question.",
+    "Look for the commit message 'Add menu' in the log, take its ID, and run `git show <ID>`.",
+    "Click the choices to answer."
+  ],
+  "predict": null,
+  "recap": "`git log --oneline` shows a summary. `git show <commit-ID>` shows the exact changes in that save point.",
+  "glossary": [
+    "commit-hash"
+  ],
+  "cheatSheet": [
+    {
+      "command": "git log --oneline",
+      "summary": "View history as a short list with commit IDs"
+    },
+    {
+      "command": "git show <commit-ID>",
+      "summary": "View the exact changes in a specific commit"
+    }
+  ],
+  "solution": [
+    {
+      "run": "git log --oneline"
+    },
+    {
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
+    },
+    {
+      "run": "git show HEAD~1"
+    },
+    {
+      "answer": {
+        "question": "q2",
+        "choice": 1
+      }
+    }
+  ]
+}

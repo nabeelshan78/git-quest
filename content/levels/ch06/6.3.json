@@ -1,0 +1,82 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "6.3",
+  "chapter": 6,
+  "number": 3,
+  "title": "Upload",
+  "concept": "git push -u origin main",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Now push your code up to GitHub."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Initial commit",
+          "files": {
+            "README.md": "# Festival\n"
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site"
+        }
+      },
+      {
+        "run": "git remote add origin https://github.com/lantern-labs/festival-site.git"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Push to origin main",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git push"
+  ],
+  "hints": [
+    "Run git push -u origin main",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What does -u do?",
+      "choices": [
+        {
+          "text": "Uploads"
+        },
+        {
+          "text": "Sets upstream tracking"
+        }
+      ],
+      "answer": 1,
+      "explanation": "It remembers where to push next time."
+    }
+  ],
+  "recap": "git push -u origin main sends your commits to GitHub.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

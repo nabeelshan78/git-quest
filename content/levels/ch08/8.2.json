@@ -1,0 +1,59 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "8.2",
+  "chapter": 8,
+  "number": 2,
+  "title": "Fix the last commit",
+  "concept": "git commit --amend",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "You made a typo in the commit message! Let's amend it."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add menoo page",
+          "files": {
+            "menu.html": "Menu\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Amend the commit message to say 'Add menu page'",
+        "checks": [
+          {
+            "type": "commit",
+            "messageContains": "menu"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git commit"
+  ],
+  "hints": [
+    "Run git commit --amend -m 'Add menu page'",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [],
+  "recap": "git commit --amend changes the last commit.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

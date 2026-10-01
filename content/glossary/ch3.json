@@ -1,0 +1,30 @@
+[
+  {
+    "id": "commit-hash",
+    "term": "Commit hash",
+    "definition": "A short mix of numbers and letters that uniquely identifies a commit.",
+    "chapter": 3,
+    "command": "git log"
+  },
+  {
+    "id": "head",
+    "term": "HEAD",
+    "definition": "A special label that points to the commit you are currently looking at in your working folder.",
+    "chapter": 3,
+    "command": ""
+  },
+  {
+    "id": "detached-head",
+    "term": "Detached HEAD",
+    "definition": "When HEAD points directly to a commit ID instead of a branch name. You are in \"time travel\" mode.",
+    "chapter": 3,
+    "command": "git switch"
+  },
+  {
+    "id": "revert",
+    "term": "Revert",
+    "definition": "To undo a past commit by creating a new commit that does the exact opposite.",
+    "chapter": 3,
+    "command": "git revert"
+  }
+]

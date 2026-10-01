@@ -1,0 +1,79 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "6.2",
+  "chapter": 6,
+  "number": 2,
+  "title": "Connect the two",
+  "concept": "git remote add origin, git remote -v",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "We need to connect your local folder to GitHub. We'll add a 'remote' server named 'origin'."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Initial commit",
+          "files": {
+            "README.md": "# Festival\n"
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site"
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Add a remote named origin",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git remote"
+  ],
+  "hints": [
+    "Use git remote add origin <url>.",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What command checks your remotes?",
+      "choices": [
+        {
+          "text": "git remote -v"
+        },
+        {
+          "text": "git check remote"
+        }
+      ],
+      "answer": 0,
+      "explanation": "git remote -v shows the URL of the remote."
+    }
+  ],
+  "recap": "git remote add origin <url> connects your local git repo to GitHub.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

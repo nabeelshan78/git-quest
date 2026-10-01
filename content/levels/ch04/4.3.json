@@ -1,0 +1,119 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "4.3",
+  "chapter": 4,
+  "number": 3,
+  "title": "Two paths",
+  "concept": "Commits on two branches; the graph splits",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Let's add the map file to our `map` branch."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Wait, Sam just added an emergency fix to `main` while you were working!"
+    },
+    {
+      "speaker": "Ada",
+      "text": "Now our branch and `main` have split into two paths. Make your commit and watch the graph."
+    }
+  ],
+  "workdir": "festival",
+  "setup": {
+    "machine": {
+      "cwd": "festival"
+    },
+    "steps": [
+      {
+        "mkdir": [
+          "festival"
+        ]
+      },
+      {
+        "run": "cd festival && git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "run": "cd festival && git switch -c map"
+      },
+      {
+        "run": "cd festival && git switch main"
+      },
+      {
+        "commit": {
+          "message": "Fix typo",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "run": "cd festival && git switch map"
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Add and commit map.html on the map branch",
+        "checks": [
+          {
+            "type": "currentBranch",
+            "name": "map"
+          },
+          {
+            "type": "commitExists",
+            "messageContains": "map"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": [
+    "git add",
+    "git commit",
+    "echo"
+  ],
+  "hints": [
+    "Create or stage map.html, then commit it.",
+    "Use `echo 'map' > map.html`, then `git add map.html` and `git commit -m 'Add map'`.",
+    "Additional hint"
+  ],
+  "predict": {
+    "trigger": "git commit",
+    "question": "You are on the map branch. What will happen to the graph when you commit?",
+    "choices": [
+      {
+        "text": "The commit is added to the map branch, creating a split."
+      },
+      {
+        "text": "The commit goes to main."
+      }
+    ],
+    "answer": 0,
+    "explanation": "Commits always go to your current branch (HEAD). The graph splits into two paths from the common ancestor."
+  },
+  "recap": "Branches allow you to work on an idea while the main branch continues to receive updates.",
+  "glossary": [],
+  "cheatSheet": [],
+  "solution": [
+    {
+      "run": "echo 'map' > map.html"
+    },
+    {
+      "run": "git add map.html"
+    },
+    {
+      "run": "git commit -m 'Add map'"
+    }
+  ]
+}

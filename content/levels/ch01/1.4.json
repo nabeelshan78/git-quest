@@ -1,0 +1,55 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "1.4",
+  "chapter": 1,
+  "number": 4,
+  "title": "Your first save point",
+  "concept": "git add then git commit -m",
+  "setup": {
+    "machine": { "cwd": "~/festival" },
+    "steps": [
+      { "mkdir": ["~/festival"] },
+      { "files": { "notes.txt": "Festival ideas" } },
+      { "run": "git init" }
+    ]
+  },
+  "story": [
+    { "speaker": "Ada", "text": "Let's save this file into git." },
+    { "speaker": "Ada", "text": "First, use `git add` to prepare it. Then, use `git commit -m` to save it with a short message." }
+  ],
+  "goal": {
+    "items": [
+      {
+        "text": "Commit notes.txt",
+        "checks": [ { "type": "commit", "changesExactly": ["notes.txt"] } ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": ["git add", "git commit", "git status"],
+  "hints": [
+    "You need two commands to make a commit.",
+    "First `git add notes.txt`, then `git commit -m \"message\"`.",
+    "Type `git add notes.txt` followed by `git commit -m \"Add notes\"`."
+  ],
+  "predict": {
+    "trigger": "git commit",
+    "question": "What happens when you run git commit?",
+    "choices": [
+      { "text": "The file is uploaded to the internet" },
+      { "text": "Git saves a snapshot of the prepared files with your message" }
+    ],
+    "answer": 1,
+    "explanation": "A commit is a local save point. Nothing is uploaded yet."
+  },
+  "recap": "`git add` prepares files. `git commit -m` saves them as a permanent snapshot.",
+  "glossary": ["commit"],
+  "cheatSheet": [
+    { "command": "git add <file>", "summary": "Prepare a file to be saved" },
+    { "command": "git commit -m \"...\"", "summary": "Save prepared files as a permanent snapshot" }
+  ],
+  "solution": [
+    { "run": "git add notes.txt" },
+    { "run": "git commit -m \"Add notes\"" }
+  ]
+}

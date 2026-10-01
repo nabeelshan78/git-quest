@@ -1,0 +1,109 @@
+{
+  "$schema": "../../../level.schema.json",
+  "id": "3.2",
+  "chapter": 3,
+  "number": 2,
+  "title": "You are here",
+  "concept": "What HEAD means",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "When you look at the commit graph, how does git know where you are?"
+    },
+    {
+      "speaker": "Ada",
+      "text": "It uses a special label called HEAD."
+    },
+    {
+      "speaker": "Ada",
+      "text": "HEAD always points to the commit you are currently looking at in your working folder."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "files": {
+          "index.html": "<h1>Festival</h1>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": null
+          }
+        }
+      },
+      {
+        "files": {
+          "menu.html": "<p>Food</p>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add menu",
+          "files": {
+            "menu.html": null
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Check where HEAD is",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Run `git log --oneline`. What commit is HEAD pointing to?",
+      "choices": [
+        {
+          "text": "Add homepage"
+        },
+        {
+          "text": "Add menu"
+        }
+      ],
+      "answer": 1,
+      "explanation": "Right now, HEAD is pointing to the latest commit. It is your \"You are here\" marker."
+    }
+  ],
+  "par": null,
+  "allowedCommands": null,
+  "hints": [
+    "Run `git log --oneline` and look at the first line.",
+    "You will see `(HEAD -> main)` next to the latest commit.",
+    "Select 'Add menu'."
+  ],
+  "predict": null,
+  "recap": "HEAD is a pointer that tells git where you are in the history. It usually points to the newest commit.",
+  "glossary": [
+    "head"
+  ],
+  "cheatSheet": [],
+  "solution": [
+    {
+      "run": "git log --oneline"
+    },
+    {
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
+    }
+  ]
+}

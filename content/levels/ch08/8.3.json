@@ -1,0 +1,82 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "8.3",
+  "chapter": 8,
+  "number": 3,
+  "title": "Undo the last commit",
+  "concept": "git reset --soft HEAD~1 keeps your changes",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "You committed too early! Let's undo the commit but keep the file changes."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Init",
+          "files": {
+            "index.html": "Hello\n"
+          }
+        }
+      },
+      {
+        "commit": {
+          "message": "WIP",
+          "files": {
+            "index.html": "Hello World\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Undo the commit softly",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git reset"
+  ],
+  "hints": [
+    "Run git reset --soft HEAD~1",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What does --soft do?",
+      "choices": [
+        {
+          "text": "Keeps your file changes"
+        },
+        {
+          "text": "Deletes your file changes"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Soft reset removes the commit but leaves the files in the staging area."
+    }
+  ],
+  "recap": "git reset --soft HEAD~1 undoes the last commit but keeps your edits safe.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

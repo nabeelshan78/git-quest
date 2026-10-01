@@ -1,0 +1,96 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "2.4",
+  "chapter": 2,
+  "number": 4,
+  "title": "Oops, not that file",
+  "concept": "git restore --staged",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Wait, the poster isn't finished yet, but it's in the staging area."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Use `git restore --staged poster.txt` to take it off the loading dock."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Your edits will stay safe. After that, just commit the menu."
+    }
+  ],
+  "workdir": "~/festival",
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "First commit",
+          "files": {
+            "index.html": "<h1>Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "files": {
+          "menu.html": "Food stalls\n",
+          "poster.txt": "DRAFT: Festival at 8pm?\n"
+        }
+      },
+      {
+        "run": "git add ."
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Commit only the menu page",
+        "checks": [
+          {
+            "type": "commit",
+            "messageContains": "menu",
+            "changesExactly": [
+              "menu.html"
+            ]
+          }
+        ]
+      },
+      {
+        "text": "Leave the draft poster uncommitted",
+        "checks": [
+          {
+            "type": "untracked",
+            "path": "poster.txt"
+          }
+        ]
+      }
+    ]
+  },
+  "hints": [
+    "How do you remove a file from the staging area?",
+    "Use `git restore --staged`.",
+    "Run `git restore --staged poster.txt` then `git commit -m \"Add menu\"`."
+  ],
+  "par": 2,
+  "allowedCommands": [
+    "git restore",
+    "git commit"
+  ],
+  "recap": "`git restore --staged <file>` takes a file out of the staging area. Your edits stay safe.",
+  "cheatSheet": [
+    {
+      "command": "git restore --staged <file>",
+      "summary": "Remove a file from the staging area"
+    }
+  ],
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "$schema": "../../../level.schema.json",
+  "id": "3.5",
+  "chapter": 3,
+  "number": 5,
+  "title": "Undo safely",
+  "concept": "git revert",
+  "boss": false,
+  "story": [
+    {
+      "speaker": "Sam",
+      "text": "I changed the colours, but everyone hates it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "We shouldn't rewrite history, but we can make a new commit that does the exact opposite."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Find the bad commit ID and type `git revert <commit-ID>`."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "files": {
+          "style.css": "body { background: white; }\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add style",
+          "files": {
+            "style.css": null
+          }
+        }
+      },
+      {
+        "files": {
+          "style.css": "body { background: neon-green; }\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Make it neon green",
+          "files": {
+            "style.css": null
+          }
+        }
+      },
+      {
+        "files": {
+          "index.html": "<h1>Festival</h1>\n"
+        }
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": null
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Revert the neon green commit",
+        "checks": [
+          {
+            "type": "commitExists",
+            "messageContains": "Revert \"Make it neon green\""
+          }
+        ]
+      }
+    ]
+  },
+  "hints": [
+    "Find the ID for the neon green commit first.",
+    "Run `git log --oneline`, then use `git revert` with that ID.",
+    "`git revert <commit-ID>` (and save the commit message it gives you)."
+  ],
+  "par": 1,
+  "allowedCommands": [
+    "git revert"
+  ],
+  "predict": null,
+  "recap": "`git revert <commit-ID>` safely undoes a past commit by adding a new one that does the exact opposite.",
+  "glossary": [
+    "revert"
+  ],
+  "cheatSheet": [
+    {
+      "command": "git revert <commit-ID>",
+      "summary": "Undo a past commit safely by creating an opposite commit"
+    }
+  ],
+  "solution": [
+    {
+      "run": "git log --oneline"
+    },
+    {
+      "run": "git revert HEAD~1"
+    },
+    {
+      "editor": {
+        "action": "save"
+      }
+    }
+  ]
+}

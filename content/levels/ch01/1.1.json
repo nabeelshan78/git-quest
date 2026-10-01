@@ -1,0 +1,52 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "1.1",
+  "chapter": 1,
+  "number": 1,
+  "title": "Tell git who you are",
+  "concept": "git config --global user.name and user.email",
+  "setup": {
+    "machine": {
+      "identity": false,
+      "cwd": "~/festival"
+    },
+    "steps": [
+      { "mkdir": ["~/festival"] }
+    ]
+  },
+  "story": [
+    { "speaker": "Narrator", "text": "Welcome to Lantern Labs!" },
+    { "speaker": "Ada", "text": "Before you can save changes, Git needs to know who you are so it can label your work." },
+    { "speaker": "Ada", "text": "Set your name and email using `git config --global user.name` and `user.email`." }
+  ],
+  "goal": {
+    "items": [
+      {
+        "text": "Set your global user.name",
+        "checks": [ { "type": "configValue", "key": "user.name", "scope": "global", "exists": true } ]
+      },
+      {
+        "text": "Set your global user.email",
+        "checks": [ { "type": "configValue", "key": "user.email", "scope": "global", "exists": true } ]
+      }
+    ]
+  },
+  "par": 2,
+  "allowedCommands": ["git config"],
+  "hints": [
+    "What command sets your git settings?",
+    "Use `git config --global` for both `user.name` and `user.email`.",
+    "Type `git config --global user.name \"Your Name\"` and then `git config --global user.email \"your@email.com\"`."
+  ],
+  "predict": null,
+  "recap": "`git config --global` sets your identity so everyone knows who made which change.",
+  "glossary": [],
+  "cheatSheet": [
+    { "command": "git config --global user.name \"Name\"", "summary": "Set your git username" },
+    { "command": "git config --global user.email \"email\"", "summary": "Set your git email" }
+  ],
+  "solution": [
+    { "run": "git config --global user.name \"Test User\"" },
+    { "run": "git config --global user.email \"test@example.com\"" }
+  ]
+}

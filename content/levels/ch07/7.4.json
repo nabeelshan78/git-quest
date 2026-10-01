@@ -1,0 +1,94 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "7.4",
+  "chapter": 7,
+  "number": 4,
+  "title": "Update the PR",
+  "concept": "Push new commits to the same branch",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "Add a commit to address Priya's feedback, then push again."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Init",
+          "files": {
+            "index.html": "Hello\n"
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "fromLocal": {
+            "remoteName": "origin",
+            "setUpstream": true
+          }
+        }
+      },
+      {
+        "run": "git switch -c feature"
+      },
+      {
+        "commit": {
+          "message": "WIP feature",
+          "files": {
+            "index.html": "Hello World\n"
+          }
+        }
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Push the update",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": 1,
+  "allowedCommands": [
+    "git push"
+  ],
+  "hints": [
+    "Just git push",
+    "Additional hint",
+    "Additional hint"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "Does a new push update the existing PR?",
+      "choices": [
+        {
+          "text": "Yes"
+        },
+        {
+          "text": "No, you need a new PR"
+        }
+      ],
+      "answer": 0,
+      "explanation": "A PR tracks the branch, so pushing updates it automatically."
+    }
+  ],
+  "recap": "To update a PR, just add commits and push to the same branch.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}

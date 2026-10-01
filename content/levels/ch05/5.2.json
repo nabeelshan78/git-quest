@@ -1,0 +1,104 @@
+{
+  "$schema": "../../level.schema.json",
+  "id": "5.2",
+  "chapter": 5,
+  "number": 2,
+  "title": "Reading the markers",
+  "concept": "<<<<<<<, =======, >>>>>>>",
+  "story": [
+    {
+      "speaker": "Ada",
+      "text": "When there's a conflict, git adds markers to the file to show you both versions. Let's look at index.html."
+    }
+  ],
+  "setup": {
+    "steps": [
+      {
+        "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch -c feature"
+      },
+      {
+        "commit": {
+          "message": "Update title for 2026",
+          "files": {
+            "index.html": "<h1>Lantern Festival 2026</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git switch main"
+      },
+      {
+        "commit": {
+          "message": "Add Riverside to title",
+          "author": "Sam Lee <sam@lanternlabs.example>",
+          "files": {
+            "index.html": "<h1>Riverside Lantern Festival</h1>\n<p>Coming soon!</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git merge feature",
+        "expectFail": true
+      }
+    ]
+  },
+  "goal": {
+    "items": [
+      {
+        "text": "Open index.html and answer the question",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      }
+    ]
+  },
+  "par": null,
+  "allowedCommands": [
+    "cat"
+  ],
+  "hints": [
+    "Look at the contents of the file.",
+    "Use the cat command to read index.html.",
+    "cat index.html"
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "What separates the two conflicting versions in the file?",
+      "choices": [
+        {
+          "text": "A blank line"
+        },
+        {
+          "text": "======="
+        },
+        {
+          "text": "-------"
+        }
+      ],
+      "answer": 1,
+      "explanation": "The ======= line separates your version (above it) from the branch you are merging in (below it)."
+    }
+  ],
+  "recap": "Git marks conflicts with <<<<<<< HEAD, =======, and >>>>>>> branch-name.",
+  "predict": null,
+  "solution": [
+    {
+      "run": "clear"
+    }
+  ]
+}
