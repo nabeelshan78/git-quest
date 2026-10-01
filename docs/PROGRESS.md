@@ -23,7 +23,7 @@ committed code works; not extended).
 | 0b | Scope cut (orchestrator) | main | done | contracts, chapters.json (58 levels), strings file, docs |
 | 1 | Engine A | ws/engine-a | **done** | merged to main (50 diff tests, 16 commands) |
 | 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | in progress | batch 2 agent running |
-| 3 | Remote (remote, clone, fetch, pull, push, teammates) | ws/remote | in progress | batch 2 agent running |
+| 3 | Remote (remote, clone, fetch, pull, push, teammates) | ws/remote | **done** | merged to main (13 tests, 5 commands) |
 | 4 | Parser | ws/parser | **done** | merged to main (66 tests) |
 | 5 | UI | ws/ui | **done** | merged to main (50 files, 8033 lines) |
 | 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub-levels | in progress | combined with Level runner |
