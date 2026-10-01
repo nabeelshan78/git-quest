@@ -23,7 +23,7 @@ class FakeTerm implements TermLike {
   }
 }
 
-const roles = TERMINAL_THEMES[0].roles;
+const roles = TERMINAL_THEMES.dark.roles;
 const labels = { ada: 'Ada:' };
 const e = (id: number, kind: TerminalEntry['kind'], text: string, extra: Partial<TerminalEntry> = {}): TerminalEntry => ({ id, kind, text, ...extra });
 

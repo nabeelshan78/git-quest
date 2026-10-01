@@ -11,7 +11,7 @@ import { hostedRepoForUrl } from '../../remote';
 import type { LevelDefinition } from '../../shared/level';
 import type { AbsPath, ChangeKind, HostedRepo, Machine, RepoState, StatusSummary, World } from '../../shared/types';
 
-export type FileBadge = 'new' | 'modified' | 'deleted' | 'conflict' | 'staged' | 'ignored';
+export type FileBadge = 'untracked' | 'modified' | 'deleted' | 'conflict' | 'staged' | 'ignored';
 
 export interface WorkingFile {
   /** Repo-relative path. */
@@ -74,12 +74,12 @@ export function deriveRepoView(world: World, machineId: string, root: AbsPath): 
   for (const p of Object.keys(work)) if (!badges.has(p)) badges.set(p, new Set());
   for (const s of status.staged) add(s.path, 'staged');
   for (const u of status.unstaged) add(u.path, u.kind === 'deleted' ? 'deleted' : 'modified');
-  for (const p of status.untracked) add(p, 'new');
+  for (const p of status.untracked) add(p, 'untracked');
   for (const c of status.conflicted) add(c.path, 'conflict');
   for (const p of Object.keys(work)) if (isIgnored(p, status.ignored)) add(p, 'ignored');
   for (const s of status.staged) if (s.kind === 'deleted' && work[s.path] === undefined) add(s.path, 'deleted');
 
-  const order: FileBadge[] = ['conflict', 'new', 'modified', 'deleted', 'staged', 'ignored'];
+  const order: FileBadge[] = ['conflict', 'untracked', 'modified', 'deleted', 'staged', 'ignored'];
   const working: WorkingFile[] = [...badges.entries()]
     .map(([path, set]) => ({ path, exists: work[path] !== undefined, badges: order.filter((b) => set.has(b)) }))
     .filter((f) => f.exists || f.badges.length > 0)

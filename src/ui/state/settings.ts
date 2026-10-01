@@ -1,54 +1,58 @@
 /**
- * Player settings (theme, terminal theme, text size, motion, screen reader)
- * persisted in localStorage under SETTINGS_STORAGE_KEY.
+ * Player settings (theme, text size, motion, screen reader) persisted in
+ * localStorage under SETTINGS_STORAGE_KEY. Themes: light and dark only
+ * (docs/SCOPE.md), plus "system" which follows the computer.
  */
 import { z } from 'zod';
 import { create } from 'zustand';
 import { SETTINGS_STORAGE_KEY } from '../../shared/progress';
 import { safeStorage } from './storage';
 
-export const THEMES = ['system', 'light', 'dark', 'high-contrast'] as const;
+export const THEMES = ['system', 'light', 'dark'] as const;
 export type ThemeSetting = (typeof THEMES)[number];
-export type ResolvedTheme = 'light' | 'dark' | 'high-contrast';
+export type ResolvedTheme = 'light' | 'dark';
 
 export const ANIMATION_SPEEDS = ['slow', 'normal', 'fast'] as const;
 export type AnimationSpeed = (typeof ANIMATION_SPEEDS)[number];
 
 export const FONT_SCALES = [0.9, 1, 1.15, 1.3] as const;
 
-export const LANGUAGES = ['en'] as const;
-
 const SettingsSchema = z.object({
   theme: z.enum(THEMES),
-  terminalTheme: z.string(),
   fontScale: z.number().min(0.8).max(1.5),
   animationSpeed: z.enum(ANIMATION_SPEEDS),
   reducedMotion: z.boolean(),
   screenReader: z.boolean(),
-  language: z.string(),
 });
 
 export type Settings = z.infer<typeof SettingsSchema>;
 
 export const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
-  terminalTheme: 'lantern',
   fontScale: 1,
   animationSpeed: 'normal',
   reducedMotion: false,
   screenReader: false,
-  language: 'en',
 };
 
+/** Parse saved settings; unknown or invalid fields fall back to the defaults one by one. */
 export function parseSettings(raw: string | null): Settings {
   if (!raw) return { ...DEFAULT_SETTINGS };
+  let data: unknown;
   try {
-    const parsed = SettingsSchema.partial().safeParse(JSON.parse(raw));
-    if (!parsed.success) return { ...DEFAULT_SETTINGS };
-    return { ...DEFAULT_SETTINGS, ...parsed.data };
+    data = JSON.parse(raw);
   } catch {
     return { ...DEFAULT_SETTINGS };
   }
+  if (!data || typeof data !== 'object') return { ...DEFAULT_SETTINGS };
+  const out: Settings = { ...DEFAULT_SETTINGS };
+  const shape = SettingsSchema.shape;
+  const obj = data as Record<string, unknown>;
+  for (const key of Object.keys(shape) as (keyof Settings)[]) {
+    const parsed = shape[key].safeParse(obj[key]);
+    if (parsed.success) (out as Record<keyof Settings, unknown>)[key] = parsed.data;
+  }
+  return out;
 }
 
 interface SettingsStore {
@@ -84,18 +88,18 @@ export function speedFactor(speed: AnimationSpeed): number {
   return speed === 'slow' ? 1.8 : speed === 'fast' ? 0.5 : 1;
 }
 
-export function prefersReducedMotion(): boolean {
+function mediaMatches(query: string): boolean {
   try {
-    return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(query).matches;
   } catch {
     return false;
   }
 }
 
+export function prefersReducedMotion(): boolean {
+  return mediaMatches('(prefers-reduced-motion: reduce)');
+}
+
 export function prefersDarkScheme(): boolean {
-  try {
-    return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  } catch {
-    return false;
-  }
+  return mediaMatches('(prefers-color-scheme: dark)');
 }

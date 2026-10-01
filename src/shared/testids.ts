@@ -81,50 +81,69 @@ export const TID = {
   homeButton: 'home-button',
   homePage: 'home-page',
   continueButton: 'continue-button',
-  dailyButton: 'daily-button',
   professorLink: 'professor-link',
   badgeList: 'badge-list',
   /** Has data-earned="true|false". */
   badge: (id: string) => `badge-${id}`,
+  /** "Export my progress" on the home page (Settings uses settingsExport). */
+  homeExport: 'home-export',
+  profileDialog: 'profile-dialog',
   levelError: 'level-error',
   liveRegion: 'live-region',
+  sandboxPage: 'sandbox-page',
   sandboxPreset: (preset: string) => `sandbox-preset-${preset}`,
-  dailyPage: 'daily-page',
-  dailyProgress: 'daily-progress',
-  dailyDone: 'daily-done',
-  challengeTimer: 'challenge-timer',
+  notFound: 'not-found',
+  levelTitle: 'level-title',
   // mission panel extras
   /** Has data-correct="true|false". */
   questionFeedback: (id: string) => `question-${id}-feedback`,
+  goalList: 'goal-list',
+  hintNote: 'hint-note',
   cheatCard: 'cheat-card',
   dialogueLine: 'dialogue-line',
   demoSkip: 'demo-skip',
   demoCaption: 'demo-caption',
   parInfo: 'par-info',
+  sandboxRestart: 'sandbox-restart',
   // predict / win extras
   /** Has data-correct="true|false". */
   predictFeedback: 'predict-feedback',
   winReplay: 'win-replay',
-  winChallenge: 'win-challenge',
   winHome: 'win-home',
   winClose: 'win-close',
   winGlossary: 'win-glossary',
+  winBadges: 'win-badges',
   levelCompleteBanner: 'level-complete-banner',
+  showResults: 'show-results',
   // world view extras
-  /** Has data-badges="new modified ..." and data-exists. */
+  /** Chapter 0 folder view (inside box-working). */
+  folderView: 'folder-view',
+  /** Has data-path (absolute) and data-cwd="true" for the current folder. */
+  folderItem: (path: string) => `folder-item-${path}`,
+  /** Has data-badges="untracked modified ..." and data-exists. */
   workingFile: (path: string) => `working-file-${path}`,
   /** Has data-kind. */
   stagingFile: (path: string) => `staging-file-${path}`,
   commitNode: (shortId: string) => `commit-node-${shortId}`,
   remoteCommitNode: (shortId: string) => `remote-commit-node-${shortId}`,
+  /** Branch sticky note on a graph; has data-commit. */
+  branchLabel: (name: string) => `branch-label-${name}`,
+  /** The "You are here" HEAD pin; has data-commit. */
+  headPin: 'head-pin',
   commitSheet: 'commit-sheet',
   commitSheetClose: 'commit-sheet-close',
   remoteGraphDescription: 'remote-graph-description',
   remoteSelect: (name: string) => `remote-select-${name}`,
+  showLostCommits: 'show-lost-commits',
+  animationLayer: 'animation-layer',
+  animationCaption: 'animation-caption',
   // files + editor extras
   editorClose: 'file-editor-close',
   editorReload: 'file-editor-reload',
+  editorStatus: 'file-editor-status',
   newFileCancel: 'new-file-cancel',
+  // git editor extras
+  gitEditorWaiting: 'git-editor-waiting',
   // overlays
   glossaryDrawer: 'glossary-drawer',
   settingsDrawer: 'settings-drawer',
@@ -133,20 +152,24 @@ export const TID = {
   glossaryPage: 'glossary-page',
   glossarySearch: 'glossary-search',
   glossaryTerm: (id: string) => `glossary-term-${id}`,
+  glossaryRecap: (levelId: string) => `glossary-recap-${levelId}`,
   settingsPage: 'settings-page',
   settingTheme: 'setting-theme',
-  settingTerminalTheme: 'setting-terminal-theme',
   settingFontScale: 'setting-font-scale',
   settingAnimationSpeed: 'setting-animation-speed',
   settingReducedMotion: 'setting-reduced-motion',
   settingScreenReader: 'setting-screen-reader',
-  settingLanguage: 'setting-language',
   settingsExport: 'settings-export',
+  settingsExportStatus: 'settings-export-status',
   settingsImport: 'settings-import',
   settingsImportStatus: 'settings-import-status',
   settingsReset: 'settings-reset',
   settingsResetConfirm: 'settings-reset-confirm',
+  settingsResetStatus: 'settings-reset-status',
   settingsProfileName: 'settings-profile-name',
   settingsProfileClassCode: 'settings-profile-class-code',
   settingsProfileSave: 'settings-profile-save',
+  settingsShortcuts: 'settings-shortcuts',
+  // dev page
+  devPage: 'dev-page',
 } as const;

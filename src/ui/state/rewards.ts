@@ -1,5 +1,6 @@
 /**
- * Stars, badges and cosmetic unlocks (pure). Stars never unlock content.
+ * Stars, badges and the cheat card (pure). Stars and badges are cosmetic:
+ * they never lock or unlock levels.
  */
 import type { ChaptersFile, LevelDefinition } from '../../shared/level';
 import type { ProgressFile } from '../../shared/progress';
@@ -52,51 +53,28 @@ export function chapterProgress(progress: ProgressFile, chapters: ChaptersFile):
 }
 
 // ---------------------------------------------------------------------------
-// Terminal themes (cosmetic rewards)
-// ---------------------------------------------------------------------------
-
-/** Stars needed for each terminal theme. Accessibility themes are always free. */
-export const TERMINAL_THEME_UNLOCKS: { id: string; stars: number }[] = [
-  { id: 'lantern', stars: 0 },
-  { id: 'paper', stars: 0 },
-  { id: 'contrast', stars: 0 },
-  { id: 'river', stars: 15 },
-  { id: 'festival', stars: 45 },
-  { id: 'aurora', stars: 90 },
-  { id: 'golden', stars: 180 },
-];
-
-export function starsNeededForTheme(id: string): number {
-  return TERMINAL_THEME_UNLOCKS.find((t) => t.id === id)?.stars ?? 0;
-}
-
-export function isThemeUnlocked(id: string, stars: number): boolean {
-  return stars >= starsNeededForTheme(id);
-}
-
-// ---------------------------------------------------------------------------
 // Badges
 // ---------------------------------------------------------------------------
 
-export type BadgeKind = 'first-level' | 'chapter' | 'stars' | 'challenge' | 'daily' | 'sandbox';
+export type BadgeKind = 'first-level' | 'chapter' | 'stars' | 'all-stars' | 'sandbox';
 
 export interface BadgeDef {
   id: string;
   kind: BadgeKind;
-  /** Chapter number for chapter badges; star count / streak / minutes for the others. */
+  /** Chapter number for chapter badges; star count or minutes for the others. */
   value: number;
 }
 
-const STAR_MILESTONES = [25, 100, 200, 273];
+export const STAR_MILESTONES = [30, 90] as const;
+export const SANDBOX_BADGE_MINUTES = 15;
 
 export function badgeDefinitions(chapters: ChaptersFile): BadgeDef[] {
   return [
     { id: 'first-level', kind: 'first-level', value: 1 },
     ...chapters.chapters.map((c) => ({ id: `chapter-${c.number}`, kind: 'chapter' as const, value: c.number })),
     ...STAR_MILESTONES.map((n) => ({ id: `stars-${n}`, kind: 'stars' as const, value: n })),
-    { id: 'challenge-1', kind: 'challenge', value: 1 },
-    { id: 'daily-3', kind: 'daily', value: 3 },
-    { id: 'sandbox-15', kind: 'sandbox', value: 15 },
+    { id: 'all-stars', kind: 'all-stars', value: 0 },
+    { id: `sandbox-${SANDBOX_BADGE_MINUTES}`, kind: 'sandbox', value: SANDBOX_BADGE_MINUTES },
   ];
 }
 
@@ -111,10 +89,10 @@ export function isBadgeEarned(badge: BadgeDef, progress: ProgressFile, chapters:
     }
     case 'stars':
       return totalStars(progress) >= badge.value;
-    case 'challenge':
-      return Object.values(progress.levels).filter((l) => l.challenge?.completed).length >= badge.value;
-    case 'daily':
-      return progress.daily.streak >= badge.value;
+    case 'all-stars': {
+      const ids = chapters.chapters.flatMap((c) => c.levels.map((l) => l.id));
+      return ids.length > 0 && ids.every((id) => (progress.levels[id]?.stars ?? 0) >= 3);
+    }
     case 'sandbox':
       return progress.sandboxMinutes >= badge.value;
   }

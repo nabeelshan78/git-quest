@@ -188,7 +188,7 @@ export function createMockSession(options: MockSessionOptions = {}): MockGameSes
     return {
       world,
       phase: options.phase ?? (mode === 'sandbox' ? 'play' : 'intro'),
-      storyRead: mode === 'sandbox',
+      storyRead: mode === 'sandbox' || (options.phase ?? 'intro') !== 'intro',
       dialogue: level ? [...level.story] : [],
       questions: (level?.questions ?? []).map((q) => ({ question: q, chosen: null, correct: false })),
       transcript: [],
@@ -260,7 +260,6 @@ export function createMockSession(options: MockSessionOptions = {}): MockGameSes
       eventSeq: state.eventSeq,
       demoLines: level?.demo?.lines ?? [],
       result: state.result,
-      timeLeftSec: mode === 'challenge' && level?.challenge ? Math.max(0, level.challenge.timeLimitSeconds - Math.floor((now() - startedAt) / 1000)) : null,
       elapsedMs: now() - startedAt,
     };
   };
@@ -272,7 +271,7 @@ export function createMockSession(options: MockSessionOptions = {}): MockGameSes
 
   const resultFor = (completed: boolean): LevelResult => ({
     levelId: level?.id ?? 'sandbox',
-    mode: mode === 'sandbox' ? 'story' : mode,
+    mode: 'story',
     completed,
     stars: completed ? projectedStars(state) : 0,
     commandsUsed: state.commandsUsed,

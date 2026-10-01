@@ -1,15 +1,17 @@
 /**
  * The commit graph: custom SVG with a pure lane layout, sticky-note branch
- * labels, a "You are here" HEAD pin, tags, dashed remote-tracking labels and
+ * labels, a "You are here" HEAD pin, dashed remote-tracking labels and
  * merge commits. Colours come from the colour-blind-safe Okabe–Ito palette
  * and are always paired with text. New commits pop in; labels slide.
  */
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
-import { useTranslation } from 'react-i18next';
 import { BRANCH_COLORS } from '../../shared/constants';
+import { TID } from '../../shared/testids';
+import { STRINGS, fmt } from '../../strings';
 import { textOn } from '../components/Avatar';
+import { springFor, useMotionPrefs } from '../state/motion';
 import { edgePath, laneX, layoutGraph, rowY } from './layout';
 import type { GraphGeometry } from './layout';
 import { branchColorIndex, commitOwners, headCommitId, labelsByCommit } from './model';
@@ -24,11 +26,15 @@ export interface CommitGraphProps {
   selectedId?: string | null;
   /** data-testid prefix for commit nodes: "<prefix>-<short id>". */
   testIdPrefix?: string;
+  /** Put data-testids on branch labels and the HEAD pin (only for the main repository graph). */
+  labelTestIds?: boolean;
   /** Show the HEAD pin (off for remote graphs). */
   showHead?: boolean;
 }
 
-const GEOMETRY: Record<'full' | 'mini', GraphGeometry & { r: number; font: number; charW: number; labelH: number; gap: number }> = {
+type Geometry = GraphGeometry & { r: number; font: number; charW: number; labelH: number; gap: number };
+
+const GEOMETRY: Record<'full' | 'mini', Geometry> = {
   full: { laneWidth: 22, rowHeight: 36, padX: 18, padY: 20, r: 7, font: 12, charW: 7.3, labelH: 20, gap: 5 },
   mini: { laneWidth: 18, rowHeight: 28, padX: 14, padY: 16, r: 6, font: 11, charW: 6.7, labelH: 18, gap: 4 },
 };
@@ -40,6 +46,7 @@ export function colorFor(index: number | undefined): string {
 interface PlacedLabel {
   key: string;
   label: GraphLabel | { kind: 'head-pin' };
+  commit: string;
   x: number;
   y: number;
   width: number;
@@ -50,9 +57,10 @@ function truncate(s: string, n: number): string {
   return s.length > n ? `${s.slice(0, n - 1)}…` : s;
 }
 
-export function CommitGraph({ graph, variant = 'full', label, onSelect, selectedId, testIdPrefix = 'commit-node', showHead = true }: CommitGraphProps) {
-  const { t } = useTranslation('world');
+export function CommitGraph({ graph, variant = 'full', label, onSelect, selectedId, testIdPrefix = 'commit-node', labelTestIds = false, showHead = true }: CommitGraphProps) {
   const g = GEOMETRY[variant];
+  const prefs = useMotionPrefs();
+  const spring = springFor(prefs);
   const layout = useMemo(() => layoutGraph(graph.commits, { primaryTip: graph.primary ? graph.branches[graph.primary] : null }), [graph]);
   const owners = useMemo(() => commitOwners(graph), [graph]);
   const colors = useMemo(() => branchColorIndex(graph), [graph]);
@@ -62,7 +70,8 @@ export function CommitGraph({ graph, variant = 'full', label, onSelect, selected
 
   // Commits seen in earlier renders; new ones pop in.
   const known = useRef<Set<string> | null>(null);
-  const isNew = (id: string) => known.current !== null && !known.current.has(id);
+  const knownNow = known.current;
+  const isNew = (id: string) => knownNow !== null && !knownNow.has(id);
   useEffect(() => {
     known.current = new Set(graph.commits.map((c) => c.id));
   }, [graph]);
@@ -76,22 +85,22 @@ export function CommitGraph({ graph, variant = 'full', label, onSelect, selected
     const list = labels[c.id] ?? [];
     for (const l of list) {
       if (l.kind === 'branch' && l.current && showHead) {
-        const text = variant === 'mini' ? t('graph.headShort') : t('graph.youAreHere');
+        const text = variant === 'mini' ? STRINGS.graph.headShort : STRINGS.graph.youAreHere;
         const width = text.length * g.charW + 26;
-        placed.push({ key: 'head-pin', label: { kind: 'head-pin' }, x, y, width, text });
+        placed.push({ key: 'head-pin', label: { kind: 'head-pin' }, commit: c.id, x, y, width, text });
         x += width + g.gap;
       }
       if (l.kind === 'head-detached') {
         if (!showHead) continue;
-        const text = variant === 'mini' ? t('graph.headShort') : t('graph.youAreHereDetached');
+        const text = variant === 'mini' ? STRINGS.graph.headShort : STRINGS.graph.youAreHereDetached;
         const width = text.length * g.charW + 26;
-        placed.push({ key: 'head-pin', label: l, x, y, width, text });
+        placed.push({ key: 'head-pin', label: l, commit: c.id, x, y, width, text });
         x += width + g.gap;
         continue;
       }
       const text = l.name;
       const width = text.length * g.charW + (l.kind === 'tag' ? 26 : 14);
-      placed.push({ key: `${l.kind}:${l.name}`, label: l, x, y, width, text });
+      placed.push({ key: `${l.kind}:${l.name}`, label: l, commit: c.id, x, y, width, text });
       x += width + g.gap;
     }
     rowEnd[c.id] = x;
@@ -99,13 +108,12 @@ export function CommitGraph({ graph, variant = 'full', label, onSelect, selected
 
   const subjectMax = variant === 'mini' ? 0 : 34;
   const maxRowEnd = Math.max(labelsX, ...Object.values(rowEnd));
-  const subjectWidth = subjectMax ? Math.max(...graph.commits.map((c) => `${c.short} ${truncate(c.subject, subjectMax)}`.length), 0) * (g.charW - 0.4) + 10 : 0;
+  const subjectWidth = subjectMax ? Math.max(0, ...graph.commits.map((c) => `${c.short} ${truncate(c.subject, subjectMax)}`.length)) * (g.charW - 0.4) + 10 : 0;
   const width = Math.ceil(maxRowEnd + subjectWidth + g.padX);
   const height = Math.ceil(g.padY * 2 + Math.max(0, layout.rowCount - 1) * g.rowHeight);
 
-  const nodeColor = (id: string) => colorFor(colors[owners[id] ?? ''] ?? (layout.index[id]?.lane ?? 0));
+  const nodeColor = (id: string) => colorFor(colors[owners[id] ?? ''] ?? layout.index[id]?.lane ?? 0);
   const interactive = variant === 'full' && !!onSelect;
-  const spring = { type: 'spring' as const, stiffness: 260, damping: 28 };
 
   return (
     <svg className={`gq-graph gq-graph-${variant}`} width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="group" aria-label={label}>
@@ -119,6 +127,7 @@ export function CommitGraph({ graph, variant = 'full', label, onSelect, selected
             strokeWidth={variant === 'mini' ? 2 : 2.5}
             strokeDasharray={e.merge ? '5 3' : undefined}
             strokeLinecap="round"
+            opacity={byId.get(e.from)?.lost ? 0.45 : 1}
           />
         ))}
       </g>
@@ -130,27 +139,30 @@ export function CommitGraph({ graph, variant = 'full', label, onSelect, selected
           const merge = commit.parents.length > 1;
           const isHead = c.id === headId;
           const fill = nodeColor(c.id);
-          const aria = t(merge ? 'graph.mergeCommitLabel' : 'graph.commitLabel', { id: commit.short, subject: commit.subject || commit.short });
+          const subject = commit.subject || commit.short;
+          const aria = fmt(commit.lost ? STRINGS.graph.lostLabel : merge ? STRINGS.graph.mergeCommitLabel : STRINGS.graph.commitLabel, { id: commit.short, subject });
+          const select = onSelect;
           return (
             <motion.g
               key={c.id}
-              className={`gq-commit${isHead ? ' gq-commit-head' : ''}${selectedId === c.id ? ' gq-commit-selected' : ''}`}
-              initial={isNew(c.id) ? { x: cx, y: cy, scale: 0.2, opacity: 0 } : false}
-              animate={{ x: cx, y: cy, scale: 1, opacity: 1 }}
+              className={`gq-commit${isHead ? ' gq-commit-head' : ''}${selectedId === c.id ? ' gq-commit-selected' : ''}${commit.lost ? ' gq-commit-lost' : ''}`}
+              initial={isNew(c.id) && prefs.animate ? { x: cx, y: cy, scale: 0.2, opacity: 0 } : false}
+              animate={{ x: cx, y: cy, scale: 1, opacity: commit.lost ? 0.55 : 1 }}
               transition={spring}
               data-testid={`${testIdPrefix}-${commit.short}`}
               data-commit={c.id}
               data-head={isHead ? 'true' : undefined}
-              {...(interactive
+              data-merge={merge ? 'true' : undefined}
+              {...(interactive && select
                 ? {
                     role: 'button',
                     tabIndex: 0,
                     'aria-label': aria,
-                    onClick: () => onSelect!(c.id),
+                    onClick: () => select(c.id),
                     onKeyDown: (ev: KeyboardEvent) => {
                       if (ev.key === 'Enter' || ev.key === ' ') {
                         ev.preventDefault();
-                        onSelect!(c.id);
+                        select(c.id);
                       }
                     },
                   }
@@ -158,7 +170,7 @@ export function CommitGraph({ graph, variant = 'full', label, onSelect, selected
             >
               <circle className="gq-commit-focus" r={g.r + 6} fill="none" />
               {isHead && <circle className="gq-commit-head-ring" r={g.r + 4} fill="none" strokeWidth="2" />}
-              <circle r={g.r} fill={fill} className="gq-commit-dot" strokeWidth="2" />
+              <circle r={g.r} fill={fill} className="gq-commit-dot" strokeWidth="2" strokeDasharray={commit.lost ? '3 2' : undefined} />
               {merge && <circle r={g.r - 3.5} fill="none" stroke={textOn(fill)} strokeWidth="1.5" />}
               {variant === 'mini' && (
                 <text className="gq-commit-mini-id" x={0} y={g.r + 11} textAnchor="middle" fontSize={9}>
@@ -171,7 +183,15 @@ export function CommitGraph({ graph, variant = 'full', label, onSelect, selected
       </g>
       <g className="gq-graph-labels" aria-hidden="true">
         {placed.map((p) => (
-          <motion.g key={p.key} initial={false} animate={{ x: p.x, y: p.y }} transition={spring} className={`gq-label gq-label-${p.label.kind}`}>
+          <motion.g
+            key={p.key}
+            initial={false}
+            animate={{ x: p.x, y: p.y }}
+            transition={spring}
+            className={`gq-label gq-label-${p.label.kind}`}
+            data-testid={labelTestIds ? labelTestId(p) : undefined}
+            data-commit={p.commit}
+          >
             <LabelShape p={p} geometry={g} color={labelColor(p, colors)} />
           </motion.g>
         ))}
@@ -181,7 +201,14 @@ export function CommitGraph({ graph, variant = 'full', label, onSelect, selected
           {layout.commits.map((c) => {
             const commit = byId.get(c.id)!;
             return (
-              <motion.text key={c.id} initial={false} animate={{ x: rowEnd[c.id] + 2, y: rowY(c.row, g) + 4 }} transition={spring} fontSize={g.font} className="gq-commit-subject">
+              <motion.text
+                key={c.id}
+                initial={false}
+                animate={{ x: rowEnd[c.id] + 2, y: rowY(c.row, g) + 4 }}
+                transition={spring}
+                fontSize={g.font}
+                className={`gq-commit-subject${commit.lost ? ' gq-commit-subject-lost' : ''}`}
+              >
                 <tspan className="gq-commit-short">{commit.short}</tspan> {truncate(commit.subject, subjectMax)}
               </motion.text>
             );
@@ -192,12 +219,25 @@ export function CommitGraph({ graph, variant = 'full', label, onSelect, selected
   );
 }
 
+function labelTestId(p: PlacedLabel): string | undefined {
+  switch (p.label.kind) {
+    case 'head-pin':
+    case 'head-detached':
+      return TID.headPin;
+    case 'branch':
+    case 'remote':
+      return TID.branchLabel(p.label.name);
+    default:
+      return undefined;
+  }
+}
+
 function labelColor(p: PlacedLabel, colors: Record<string, number>): string {
   if (p.label.kind === 'branch' || p.label.kind === 'remote') return colorFor(colors[p.label.name]);
   return 'var(--accent)';
 }
 
-function LabelShape({ p, geometry: g, color }: { p: PlacedLabel; geometry: (typeof GEOMETRY)['full']; color: string }) {
+function LabelShape({ p, geometry: g, color }: { p: PlacedLabel; geometry: Geometry; color: string }) {
   const h = g.labelH;
   const y = -h / 2;
   switch (p.label.kind) {
@@ -224,7 +264,7 @@ function LabelShape({ p, geometry: g, color }: { p: PlacedLabel; geometry: (type
     case 'remote':
       return (
         <>
-          <rect x={0} y={y} width={p.width} height={h} rx={3} fill="var(--panel)" stroke={color} strokeWidth="2" strokeDasharray="4 3" />
+          <rect x={0} y={y} width={p.width} height={h} rx={3} className="gq-remote-label-bg" stroke={color} strokeWidth="2" strokeDasharray="4 3" />
           <text x={7} y={4} fontSize={g.font} className="gq-label-text gq-label-remote-text">
             {p.text}
           </text>

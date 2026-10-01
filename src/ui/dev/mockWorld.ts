@@ -12,7 +12,8 @@ import { createHostedRepoRecord, createMachine, createWorld } from '../../engine
 import { CHARACTER_IDENTITIES, httpsUrl } from '../../shared/constants';
 import type { Hash, Machine, RepoState, Signature, World } from '../../shared/types';
 
-export type MockVariant = 'full' | 'chapter0' | 'conflict' | 'sandbox';
+export type MockVariant = 'full' | 'chapter0' | 'conflict' | 'editor' | 'sandbox';
+export const MOCK_VARIANTS: MockVariant[] = ['full', 'chapter0', 'conflict', 'editor', 'sandbox'];
 
 export const MOCK_REPO_ROOT = '/home/intern/festival';
 export const MOCK_HOSTED_ID = 'lantern-labs/festival-site';
@@ -149,7 +150,28 @@ export function createMockWorld(variant: MockVariant, player: { name: string; em
     hosted.nextNumber = 2;
     w.hosted[MOCK_HOSTED_ID] = hosted;
 
-    if (variant === 'full' || variant === 'conflict') {
+    if (variant === 'editor') {
+      m.editor = {
+        purpose: 'commit-message',
+        file: '.git/COMMIT_EDITMSG',
+        initialContent: [
+          '',
+          '# Please enter the commit message for your changes. Lines starting',
+          "# with '#' will be ignored, and an empty message aborts the commit.",
+          '#',
+          '# On branch main',
+          '# Changes to be committed:',
+          '#\tnew file:   poster.txt',
+          '#',
+        ].join('\n'),
+        command: 'git commit',
+        machine: m.id,
+        workTree: MOCK_REPO_ROOT,
+        resume: { handler: 'mock-commit', data: {} },
+      };
+    }
+
+    if (variant === 'full' || variant === 'conflict' || variant === 'editor') {
       const samLaptop = createMachine({ id: 'sam', label: "Sam's laptop", user: 'sam', host: 'sams-laptop', globalConfig: { 'user.name': CHARACTER_IDENTITIES.Sam.name, 'user.email': CHARACTER_IDENTITIES.Sam.email } });
       const clone = createEmptyRepo();
       copyObjectClosure(hosted.repo, clone, e);
