@@ -58,6 +58,8 @@ committed code works; not extended).
 - Reduced contracts committed. Stopped agents' unfinished work was saved
   as WIP commits on their branches; fresh agents continue on those
   branches (Engine A, UI, Classroom) and Parser restarted.
-- Chapter 6.7 (HTTPS token vs SSH) will be simulated through the hub
-  (create a token / add a prepared public key) and `git remote set-url`;
-  no key-generation tool is needed.
+- Scope correction (docs/SCOPE.md, second section): 6.7 is a concept
+  level (sign-in is automatic; no SSH/tokens/auth), one "Merge pull
+  request" button, 8.3 = `git reset --soft HEAD~1` only, 8.4 = one simple
+  reflog rescue, minimal simulated GitHub. Contracts updated: no SSH keys,
+  tokens, requireAuth or merge-settings; `MergeMethod` is 'merge' only.
