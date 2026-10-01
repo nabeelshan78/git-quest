@@ -1,33 +1,44 @@
 # Progress
 
-Resuming? Read this file, then `docs/ARCHITECTURE.md`. Do not restart
-finished work. Each workstream works on its own branch (`ws/<name>`) and
-is merged into `main` when its tests pass.
+Resuming? Read this file, then `docs/SCOPE.md` (scope source of truth),
+then `docs/ARCHITECTURE.md`. Do not restart finished work. Each
+workstream works on its own branch (`ws/<name>`) in a worktree under
+`.claude/worktrees/` and is merged into `main` when its tests pass.
+
+## Scope
+
+**Reduced scope (docs/SCOPE.md):** 9 chapters, 58 levels. Removed:
+rebase (incl. interactive), cherry-pick, bisect, blame, tag,
+force-with-lease and force push, forks/upstream, the open-source chapter,
+GitHub Actions and Pages, protected branches, daily practice, challenge
+levels, i18n (one plain English strings file instead), extra themes
+(light + dark only), the full Professor Dashboard page (kept only if the
+committed code works; not extended).
 
 ## Status
 
 | # | Workstream | Branch | Status | Notes |
 | --- | --- | --- | --- | --- |
 | 0 | Foundation (orchestrator) | main | done | scaffold, contracts, core data layer, harness, CI |
-| 1 | Engine A | ws/engine-a | in progress | batch 1 |
-| 2 | Engine B | ws/engine-b | not started | after Engine A |
-| 3 | Remote | ws/remote | not started | after Engine A |
-| 4 | Parser | ws/parser | in progress | batch 1 (relaunched twice: content-filter error, then usage limit) |
-| 5 | UI | ws/ui | in progress | batch 1 |
-| 6 | Mock GitHub | ws/hub | not started | after Engine A |
+| 0b | Scope cut (orchestrator) | main | in progress | contracts, chapters.json (58 levels), docs |
+| 1 | Engine A | ws/engine-a | paused (stopped by user) | resume with reduced scope |
+| 2 | Engine B (stash, amend, reset, reflog) | ws/engine-b | not started | after Engine A |
+| 3 | Remote (remote, clone, fetch, pull, push, teammates) | ws/remote | not started | after Engine A |
+| 4 | Parser | ws/parser | not started | 3 launches failed (2× content filter, 1× usage limit); relaunch without SSH key generation (orchestrator writes that) |
+| 5 | UI | ws/ui | paused (stopped by user) | resume: no i18n, light/dark only, no daily/challenge |
+| 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub | not started | after Engine A |
 | 7 | Level runner | ws/levels | not started | after Engine A + Parser |
-| 8a | Content ch 0–3 | ws/content-0-3 | not started | after runner |
-| 8b | Content ch 4–7 | ws/content-4-7 | not started | after runner |
-| 8c | Content ch 8–11 | ws/content-8-11 | not started | after runner |
-| 9 | Classroom | ws/classroom | in progress | batch 1; store, aggregation, CSV, dashboard committed |
-| 10 | QA (e2e) | ws/qa | not started | after UI + content |
+| 8a | Content ch 0–4 (32 levels) | ws/content-0-4 | not started | after runner |
+| 8b | Content ch 5–8 (26 levels) | ws/content-5-8 | not started | after runner |
+| 9 | Classroom (progress save, export JSON/CSV, short guide) | ws/classroom | paused (stopped by user) | store, aggregation, CSV, dashboard committed; finish small scope |
+| 10 | QA (e2e per level) | ws/qa | not started | after UI + content |
 | 11 | Beginner review | — | not started | after everything |
 
 ## Batches (2–4 subagents in parallel)
 
-1. Engine A, Parser, UI, Classroom
+1. Engine A, Parser, UI, Classroom (resume)
 2. Engine B, Remote, Mock GitHub, Level runner
-3. Content 0–3, Content 4–7, Content 8–11
+3. Content 0–4, Content 5–8
 4. QA, integration fixes
 5. Beginner playthrough review → fixes → second review
 
@@ -37,9 +48,10 @@ is merged into `main` when its tests pass.
   GitHub Pages workflow; contracts in `src/shared`; engine core (SHA-1,
   objects, trees, refs, reflog, fs, repo discovery) with hash tests
   against real git; dispatcher; differential harness; level schema +
-  `content/chapters.json` (91 levels).
+  `content/chapters.json`.
 - Batch 1 started (Engine A, Parser, UI, Classroom). All four were stopped
   by an API usage limit and resumed after it reset. Agents now commit
   often so work survives interruptions.
-- Added `docs/CONTENT_GUIDE.md` and the `startRebase` hook
-  (`src/engine/b/rebase.ts`) for Remote's `pull --rebase`.
+- Added `docs/CONTENT_GUIDE.md`.
+- Scope cut to 9 chapters / 58 levels (`docs/SCOPE.md`); all agents
+  paused by the user; contracts being reduced before resuming.
