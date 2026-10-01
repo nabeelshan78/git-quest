@@ -9,17 +9,17 @@ is merged into `main` when its tests pass.
 | # | Workstream | Branch | Status | Notes |
 | --- | --- | --- | --- | --- |
 | 0 | Foundation (orchestrator) | main | done | scaffold, contracts, core data layer, harness, CI |
-| 1 | Engine A | ws/engine-a | not started | |
+| 1 | Engine A | ws/engine-a | in progress | batch 1 |
 | 2 | Engine B | ws/engine-b | not started | after Engine A |
 | 3 | Remote | ws/remote | not started | after Engine A |
-| 4 | Parser | ws/parser | not started | |
-| 5 | UI | ws/ui | not started | |
+| 4 | Parser | ws/parser | in progress | batch 1 (relaunched twice: content-filter error, then usage limit) |
+| 5 | UI | ws/ui | in progress | batch 1 |
 | 6 | Mock GitHub | ws/hub | not started | after Engine A |
 | 7 | Level runner | ws/levels | not started | after Engine A + Parser |
 | 8a | Content ch 0–3 | ws/content-0-3 | not started | after runner |
 | 8b | Content ch 4–7 | ws/content-4-7 | not started | after runner |
 | 8c | Content ch 8–11 | ws/content-8-11 | not started | after runner |
-| 9 | Classroom | ws/classroom | not started | |
+| 9 | Classroom | ws/classroom | in progress | batch 1; store, aggregation, CSV, dashboard committed |
 | 10 | QA (e2e) | ws/qa | not started | after UI + content |
 | 11 | Beginner review | — | not started | after everything |
 
@@ -38,3 +38,8 @@ is merged into `main` when its tests pass.
   objects, trees, refs, reflog, fs, repo discovery) with hash tests
   against real git; dispatcher; differential harness; level schema +
   `content/chapters.json` (91 levels).
+- Batch 1 started (Engine A, Parser, UI, Classroom). All four were stopped
+  by an API usage limit and resumed after it reset. Agents now commit
+  often so work survives interruptions.
+- Added `docs/CONTENT_GUIDE.md` and the `startRebase` hook
+  (`src/engine/b/rebase.ts`) for Remote's `pull --rebase`.
