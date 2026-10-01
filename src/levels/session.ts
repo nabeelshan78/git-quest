@@ -1,0 +1,682 @@
+/**
+ * GameSession implementation — the core level runner.
+ */
+import type {
+  CompletionResult,
+  GameSession,
+  GoalItemStatus,
+  LevelPhase,
+  PendingPredict,
+  QuestionStatus,
+  SessionMode,
+  SessionOptions,
+  SessionSnapshot,
+  TerminalEntry,
+} from '../shared/session';
+import type { LevelDefinition, DialogueLine, HubAction, PredictCard } from '../shared/level';
+import type { LevelResult, PlayerProfile } from '../shared/progress';
+import type { EditorRequest, MachineId, World } from '../shared/types';
+import type { GameEvent } from '../shared/events';
+import type { CommandResult, OutputLine } from '../shared/result';
+import { runLine, completeLine as parserComplete } from '../parser';
+import { applyHubAction, reactToEvents } from '../hub/index';
+import { resumeEditor } from '../engine';
+import { runSetup, substituteLevel } from './setup';
+import { evaluateGoals, allGoalsMet } from './goals';
+import type { GoalContext } from './goals';
+import { translateError } from './errors';
+import { computeStars, projectStars } from './scoring';
+import { worldChanged } from '../shared/compare';
+import { findRepo, currentBranch, headCommit } from '../engine/core/repo';
+import { MAIN_MACHINE_ID } from '../shared/constants';
+import { normalize, resolvePath, dirname } from '../engine/core/paths';
+import { writeFile as fsWriteFile, mkdirp } from '../engine/core/fs';
+import { createWorld, createMachine } from '../engine/core/world';
+import { produce } from 'immer';
+
+// ---------------------------------------------------------------------------
+// Prompt generation
+// ---------------------------------------------------------------------------
+
+function buildPrompt(world: World, machineId: string): string {
+  const machine = world.machines[machineId];
+  if (!machine) return '$ ';
+  const handle = findRepo(world, machineId);
+  let cwd = machine.cwd;
+  // Replace home with ~
+  if (cwd.startsWith(machine.home)) {
+    cwd = '~' + cwd.slice(machine.home.length);
+  }
+  let branch = '';
+  if (handle) {
+    const b = currentBranch(handle.repo);
+    if (b) {
+      branch = ` (${b})`;
+    } else {
+      const h = headCommit(handle.repo);
+      branch = h ? ` (${h.slice(0, 7)}...)` : '';
+    }
+  }
+  return `${machine.user}@${machine.host}:${cwd}${branch}$ `;
+}
+
+// ---------------------------------------------------------------------------
+// Session class
+// ---------------------------------------------------------------------------
+
+let entryIdCounter = 0;
+
+export class GameSessionImpl implements GameSession {
+  private mode: SessionMode;
+  private level: LevelDefinition | null;
+  private player: PlayerProfile;
+  private phase: LevelPhase;
+  private world: World;
+  private initialWorld: World;
+  private rewindStack: World[] = [];
+  private transcript: TerminalEntry[] = [];
+  private dialogue: DialogueLine[] = [];
+  private storyRead = false;
+  private commandsUsed = 0;
+  private commandsTyped = 0;
+  private hintsRevealed: 0 | 1 | 2 | 3 = 0;
+  private revealedHints: string[] = [];
+  private pendingPredict: PendingPredict | null = null;
+  private editor: EditorRequest | null = null;
+  private lastEvents: GameEvent[] = [];
+  private eventSeq = 0;
+  private answeredQuestions = new Set<string>();
+  private questionStatuses: QuestionStatus[] = [];
+  private commandsRun = new Map<string, number>();
+  private errors = 0;
+  private errorCodes: Record<string, number> = {};
+  private rewinds = 0;
+  private startTime: number;
+  private nowFn: () => number;
+  private onResult?: (result: LevelResult) => void;
+  private listeners = new Set<(snapshot: SessionSnapshot) => void>();
+  private disposed = false;
+  private result: LevelResult | null = null;
+
+  constructor(options: SessionOptions) {
+    this.mode = options.mode;
+    this.player = options.player;
+    this.nowFn = options.now ?? Date.now;
+    this.startTime = this.nowFn();
+    this.onResult = options.onResult;
+
+    if (options.mode === 'story' && options.level) {
+      this.level = substituteLevel(options.level, options.player);
+      // Run setup
+      const { world, errors } = runSetup(this.level, options.player);
+      if (errors.length > 0) {
+        // Log setup errors as system messages
+        for (const err of errors) {
+          this.addTranscript('system', err);
+        }
+      }
+      this.world = world;
+      this.initialWorld = world;
+
+      // Populate dialogue from story
+      this.dialogue = [...this.level.story];
+
+      // Set up questions
+      if (this.level.questions) {
+        this.questionStatuses = this.level.questions.map((q) => ({
+          question: q,
+          chosen: null,
+          correct: false,
+        }));
+      }
+
+      // Determine initial phase
+      if (this.level.story.length > 0) {
+        this.phase = 'intro';
+      } else if (this.level.demo) {
+        this.phase = 'demo';
+      } else {
+        this.phase = 'play';
+      }
+    } else {
+      // Sandbox mode
+      this.level = null;
+      this.phase = 'play';
+      this.world = createWorld({
+        hubViewer: options.player.handle,
+        hubViewerName: options.player.name,
+      });
+      // Set player identity
+      this.world = produce(this.world, (draft) => {
+        const m = draft.machines[MAIN_MACHINE_ID];
+        m.globalConfig['user.name'] = options.player.name;
+        m.globalConfig['user.email'] = options.player.email;
+      });
+      this.initialWorld = this.world;
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Snapshot
+  // -----------------------------------------------------------------------
+
+  getSnapshot(): SessionSnapshot {
+    const goalCtx = this.makeGoalContext();
+    const goals = this.level ? evaluateGoals(this.level.goal.items, goalCtx) : [];
+
+    return {
+      mode: this.mode,
+      level: this.level,
+      phase: this.phase,
+      world: this.world,
+      goals,
+      questions: this.questionStatuses,
+      dialogue: this.dialogue,
+      storyRead: this.storyRead,
+      commandsUsed: this.commandsUsed,
+      commandsTyped: this.commandsTyped,
+      par: this.level?.par ?? null,
+      hintsRevealed: this.hintsRevealed,
+      hints: this.revealedHints,
+      projectedStars: projectStars(this.commandsUsed, this.level?.par ?? null, this.hintsRevealed),
+      pendingPredict: this.pendingPredict,
+      editor: this.editor,
+      transcript: this.transcript,
+      prompt: buildPrompt(this.world, this.world.activeMachine),
+      canRewind: this.rewindStack.length > 0,
+      lastEvents: this.lastEvents,
+      eventSeq: this.eventSeq,
+      demoLines: this.level?.demo?.lines ?? [],
+      result: this.result,
+      elapsedMs: this.nowFn() - this.startTime,
+    };
+  }
+
+  subscribe(listener: (snapshot: SessionSnapshot) => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  private notify(): void {
+    if (this.disposed) return;
+    const snapshot = this.getSnapshot();
+    for (const listener of this.listeners) {
+      listener(snapshot);
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Command execution
+  // -----------------------------------------------------------------------
+
+  run(line: string, options?: { source?: 'typed' | 'button' | 'demo' }): void {
+    if (this.disposed) return;
+    const source = options?.source ?? 'typed';
+
+    // Check if editor is pending
+    if (this.editor) {
+      this.addTranscript('stderr', 'An editor is open. Save or close it first.');
+      this.notify();
+      return;
+    }
+
+    // Check if predict card is pending
+    if (this.pendingPredict) {
+      this.addTranscript('stderr', 'Answer the predict card first.');
+      this.notify();
+      return;
+    }
+
+    const trimmed = line.trim();
+    if (!trimmed) {
+      this.addTranscript('input', '', { prompt: buildPrompt(this.world, this.world.activeMachine) });
+      this.notify();
+      return;
+    }
+
+    // Check if predict card should trigger
+    if (this.level?.predict && this.phase === 'play' && !this.pendingPredict) {
+      const trigger = this.level.predict.trigger.trim().replace(/\s+/g, ' ');
+      const normalizedLine = trimmed.replace(/\s+/g, ' ');
+      if (normalizedLine.startsWith(trigger)) {
+        // Show predict card
+        this.pendingPredict = {
+          card: this.level.predict,
+          command: line,
+          chosen: null,
+        };
+        // Record the input
+        this.addTranscript('input', trimmed, { prompt: buildPrompt(this.world, this.world.activeMachine) });
+        this.notify();
+        return;
+      }
+    }
+
+    this.executeCommand(trimmed, source);
+  }
+
+  private executeCommand(line: string, source: string): void {
+    const machineId = this.world.activeMachine;
+    const prevWorld = this.world;
+
+    // Track command in prompt
+    this.addTranscript('input', line, { prompt: buildPrompt(this.world, machineId) });
+
+    // Run through parser
+    const result = runLine(this.world, machineId, line, {
+      allowed: this.level?.allowedCommands ?? null,
+    });
+
+    // Check if world changed (for par counting)
+    const changed = worldChanged(prevWorld, result.state);
+
+    if (changed) {
+      // Save rewind state
+      this.rewindStack.push(prevWorld);
+      this.commandsUsed++;
+    }
+    this.commandsTyped++;
+
+    // Track ranCommand
+    const words = line.trim().split(/\s+/);
+    if (words[0] === 'git' && words.length > 1) {
+      const cmd = `git ${words[1]}`;
+      this.commandsRun.set(cmd, (this.commandsRun.get(cmd) ?? 0) + 1);
+    } else if (words.length > 0) {
+      this.commandsRun.set(words[0], (this.commandsRun.get(words[0]) ?? 0) + 1);
+    }
+
+    // Apply result
+    this.world = result.state;
+    this.lastEvents = result.events;
+    this.eventSeq++;
+
+    // Check for editor
+    const machine = this.world.machines[machineId];
+    if (machine?.editor) {
+      this.editor = machine.editor;
+    }
+
+    // Add output to transcript
+    for (const line of result.output) {
+      this.addTranscript(line.stream === 'stderr' ? 'stderr' : 'stdout', line.text);
+    }
+
+    // Error translation
+    if (result.exitCode !== 0) {
+      this.errors++;
+      const outputText = result.output.map((l) => l.text).join('\n');
+      const translation = translateError(outputText);
+      if (translation) {
+        this.errorCodes[translation.id] = (this.errorCodes[translation.id] ?? 0) + 1;
+        this.addTranscript('ada', translation.message);
+      }
+    }
+
+    // React to events (hub)
+    if (result.events.length > 0) {
+      const hubResult = reactToEvents(this.world, result.events);
+      this.world = hubResult.state;
+      if (hubResult.events.length > 0) {
+        this.lastEvents = [...this.lastEvents, ...hubResult.events];
+      }
+    }
+
+    // Check goals
+    this.checkCompletion();
+    this.notify();
+  }
+
+  complete(line: string): CompletionResult {
+    try {
+      return parserComplete(this.world, this.world.activeMachine, line);
+    } catch {
+      return { candidates: [], line };
+    }
+  }
+
+  history(): string[] {
+    const machine = this.world.machines[this.world.activeMachine];
+    return machine?.history ?? [];
+  }
+
+  // -----------------------------------------------------------------------
+  // File editor
+  // -----------------------------------------------------------------------
+
+  saveFile(path: string, content: string): void {
+    if (this.disposed) return;
+    const machineId = this.world.activeMachine;
+    const machine = this.world.machines[machineId];
+    if (!machine) return;
+
+    let absPath: string;
+    absPath = resolvePath(machine.cwd, machine.home, path);
+
+    const prevWorld = this.world;
+    this.world = produce(this.world, (draft) => {
+      const m = draft.machines[machineId];
+      mkdirp(m.fs, dirname(absPath));
+      fsWriteFile(m.fs, absPath, content);
+    });
+
+    if (worldChanged(prevWorld, this.world)) {
+      this.rewindStack.push(prevWorld);
+      this.lastEvents = [{ type: 'fs.write', machine: machineId, path: absPath, created: true }];
+      this.eventSeq++;
+    }
+
+    this.checkCompletion();
+    this.notify();
+  }
+
+  submitEditor(text: string | null): void {
+    if (this.disposed || !this.editor) return;
+
+    const machineId = this.editor.machine;
+    const prevWorld = this.world;
+
+    if (text === null) {
+      // Abort
+      this.world = produce(this.world, (draft) => {
+        draft.machines[machineId].editor = null;
+      });
+      this.addTranscript('system', 'Editor closed (aborted).');
+      this.editor = null;
+    } else {
+      // Resume the command with the edited content
+      try {
+        const result = resumeEditor(this.world, machineId, text);
+        this.world = result.state;
+        this.lastEvents = result.events;
+        this.eventSeq++;
+        for (const line of result.output) {
+          this.addTranscript(line.stream === 'stderr' ? 'stderr' : 'stdout', line.text);
+        }
+      } catch {
+        this.world = produce(this.world, (draft) => {
+          draft.machines[machineId].editor = null;
+        });
+        this.addTranscript('system', 'Editor closed.');
+      }
+      this.editor = null;
+    }
+
+    if (worldChanged(prevWorld, this.world)) {
+      this.rewindStack.push(prevWorld);
+      this.commandsUsed++;
+    }
+
+    this.checkCompletion();
+    this.notify();
+  }
+
+  // -----------------------------------------------------------------------
+  // Predict cards
+  // -----------------------------------------------------------------------
+
+  answerPredict(choice: number): void {
+    if (!this.pendingPredict) return;
+    this.pendingPredict.chosen = choice;
+    this.notify();
+  }
+
+  continuePredict(): void {
+    if (!this.pendingPredict || this.pendingPredict.chosen === null) return;
+    const command = this.pendingPredict.command;
+    // Clear the predict card's trigger so it does not fire again
+    if (this.level?.predict) {
+      // Nullify predict after use
+      (this.level as any).predict = null;
+    }
+    this.pendingPredict = null;
+    // Execute the held command
+    this.executeCommand(command.trim(), 'typed');
+  }
+
+  answerQuestion(questionId: string, choice: number): void {
+    const qs = this.questionStatuses.find((q) => q.question.id === questionId);
+    if (!qs) return;
+    qs.chosen = choice;
+    qs.correct = choice === qs.question.answer;
+    if (qs.correct) {
+      this.answeredQuestions.add(questionId);
+    }
+    this.checkCompletion();
+    this.notify();
+  }
+
+  markStoryRead(): void {
+    this.storyRead = true;
+    if (this.phase === 'intro') {
+      if (this.level?.demo) {
+        this.phase = 'demo';
+      } else {
+        this.phase = 'play';
+      }
+    }
+    this.checkCompletion();
+    this.notify();
+  }
+
+  finishDemo(): void {
+    if (this.phase === 'demo') {
+      this.phase = 'play';
+    }
+    this.notify();
+  }
+
+  // -----------------------------------------------------------------------
+  // Hints
+  // -----------------------------------------------------------------------
+
+  revealHint(): string | null {
+    if (!this.level || this.hintsRevealed >= 3) return null;
+    const hint = this.level.hints[this.hintsRevealed];
+    this.hintsRevealed = (this.hintsRevealed + 1) as 0 | 1 | 2 | 3;
+    this.revealedHints.push(hint);
+    this.notify();
+    return hint;
+  }
+
+  // -----------------------------------------------------------------------
+  // Rewind / restart
+  // -----------------------------------------------------------------------
+
+  rewind(): void {
+    if (this.rewindStack.length === 0) return;
+    this.world = this.rewindStack.pop()!;
+    this.commandsUsed = Math.max(0, this.commandsUsed - 1);
+    this.rewinds++;
+    // Remove the last input + its output from transcript
+    // Find the last input entry and remove everything after it
+    for (let i = this.transcript.length - 1; i >= 0; i--) {
+      if (this.transcript[i].kind === 'input') {
+        this.transcript = this.transcript.slice(0, i);
+        break;
+      }
+    }
+    this.lastEvents = [];
+    this.eventSeq++;
+    this.editor = null;
+    this.pendingPredict = null;
+    if (this.phase === 'complete') {
+      this.phase = 'play';
+      this.result = null;
+    }
+    this.notify();
+  }
+
+  restart(): void {
+    this.world = this.initialWorld;
+    this.rewindStack = [];
+    this.transcript = [];
+    this.commandsUsed = 0;
+    this.commandsTyped = 0;
+    this.hintsRevealed = 0;
+    this.revealedHints = [];
+    this.pendingPredict = null;
+    this.editor = null;
+    this.lastEvents = [];
+    this.eventSeq++;
+    this.errors = 0;
+    this.errorCodes = {};
+    this.rewinds = 0;
+    this.answeredQuestions.clear();
+    this.commandsRun.clear();
+    this.result = null;
+    this.storyRead = false;
+    if (this.level?.questions) {
+      this.questionStatuses = this.level.questions.map((q) => ({
+        question: q,
+        chosen: null,
+        correct: false,
+      }));
+    }
+    if (this.level?.story && this.level.story.length > 0) {
+      this.dialogue = [...this.level.story];
+      this.phase = 'intro';
+    } else if (this.level?.demo) {
+      this.phase = 'demo';
+    } else {
+      this.phase = 'play';
+    }
+    this.startTime = this.nowFn();
+    this.notify();
+  }
+
+  // -----------------------------------------------------------------------
+  // Hub / machines
+  // -----------------------------------------------------------------------
+
+  hubAction(action: HubAction): void {
+    if (this.disposed) return;
+    const prevWorld = this.world;
+    const result = applyHubAction(this.world, action);
+    this.world = result.state;
+    this.lastEvents = result.events;
+    this.eventSeq++;
+
+    if (result.exitCode !== 0) {
+      for (const line of result.output) {
+        this.addTranscript(line.stream === 'stderr' ? 'stderr' : 'stdout', line.text);
+      }
+    }
+
+    if (worldChanged(prevWorld, this.world)) {
+      this.rewindStack.push(prevWorld);
+      this.commandsUsed++;
+    }
+
+    // React to events
+    if (result.events.length > 0) {
+      const hubResult = reactToEvents(this.world, result.events);
+      this.world = hubResult.state;
+    }
+
+    this.checkCompletion();
+    this.notify();
+  }
+
+  switchMachine(id: MachineId): void {
+    if (!this.world.machines[id]) return;
+    this.world = produce(this.world, (draft) => {
+      draft.activeMachine = id;
+    });
+    this.lastEvents = [{ type: 'machine.switch', from: this.world.activeMachine, to: id }];
+    this.eventSeq++;
+    this.notify();
+  }
+
+  // -----------------------------------------------------------------------
+  // Completion check
+  // -----------------------------------------------------------------------
+
+  private checkCompletion(): void {
+    if (this.phase === 'complete' || !this.level) return;
+    if (this.phase !== 'play') return;
+
+    const goalCtx = this.makeGoalContext();
+    if (allGoalsMet(this.level.goal.items, goalCtx)) {
+      this.phase = 'complete';
+      const stars = computeStars(this.commandsUsed, this.level.par, this.hintsRevealed);
+      this.result = {
+        levelId: this.level.id,
+        mode: 'story',
+        completed: true,
+        stars,
+        commandsUsed: this.commandsUsed,
+        commandsTyped: this.commandsTyped,
+        par: this.level.par,
+        hintsRevealed: this.hintsRevealed,
+        errors: this.errors,
+        errorCodes: this.errorCodes,
+        rewinds: this.rewinds,
+        timeMs: this.nowFn() - this.startTime,
+        recap: this.level.recap,
+      };
+      // Add success dialogue
+      if (this.level.success) {
+        this.dialogue = [...this.dialogue, ...this.level.success];
+      }
+      this.onResult?.(this.result);
+    }
+  }
+
+  private makeGoalContext(): GoalContext {
+    const machine = this.world.machines[this.world.activeMachine];
+    const handle = findRepo(this.world, this.world.activeMachine);
+    return {
+      world: this.world,
+      defaultMachine: this.world.activeMachine,
+      defaultRepoPath: handle?.root ?? machine?.cwd ?? '/home/intern',
+      answeredQuestions: this.answeredQuestions,
+      storyRead: this.storyRead,
+      commandsRun: this.commandsRun,
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // Helpers
+  // -----------------------------------------------------------------------
+
+  private addTranscript(
+    kind: TerminalEntry['kind'],
+    text: string,
+    extra?: { prompt?: string; speaker?: string },
+  ): void {
+    this.transcript.push({
+      id: ++entryIdCounter,
+      kind,
+      text,
+      prompt: extra?.prompt,
+      speaker: extra?.speaker,
+      machine: this.world.activeMachine,
+    });
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    if (!this.result && this.level) {
+      // Report abandoned attempt
+      const result: LevelResult = {
+        levelId: this.level.id,
+        mode: 'story',
+        completed: false,
+        stars: 0,
+        commandsUsed: this.commandsUsed,
+        commandsTyped: this.commandsTyped,
+        par: this.level.par,
+        hintsRevealed: this.hintsRevealed,
+        errors: this.errors,
+        errorCodes: this.errorCodes,
+        rewinds: this.rewinds,
+        timeMs: this.nowFn() - this.startTime,
+        recap: this.level.recap,
+      };
+      this.onResult?.(result);
+    }
+    this.listeners.clear();
+  }
+}
