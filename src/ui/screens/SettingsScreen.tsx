@@ -16,7 +16,7 @@ import {
 import type { AnimationSpeed, ThemeSetting } from '../state/settings';
 import { useProgress, useProgressApi } from '../state/progress';
 import { deriveHandle, profileFromForm } from '../state/profile';
-import { Modal } from '../components/Modal';
+// Modal not needed here currently
 
 export function SettingsScreen() {
   const settings = useSettings();

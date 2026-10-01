@@ -4,7 +4,7 @@
  */
 import { useMemo, useState } from 'react';
 import type { GameSession, SessionSnapshot } from '../../shared/session';
-import type { AbsPath, MachineId } from '../../shared/types';
+import type { Machine } from '../../shared/types';
 import { TID } from '../../shared/testids';
 import { STRINGS, fmt } from '../../strings';
 import { Icon } from '../components/Icon';
@@ -22,14 +22,14 @@ import {
   panelVisibility,
   remoteCandidates,
 } from './derive';
-import type { RepoView, StagingEntry, WorkingFile } from './derive';
+import type { RemoteInfo, StagingEntry, WorkingFile } from './derive';
 
 export interface WorldViewProps {
   session: GameSession;
   snapshot: SessionSnapshot;
 }
 
-export function WorldView({ session, snapshot }: WorldViewProps) {
+export function WorldView({ session: _session, snapshot }: WorldViewProps) {
   const machine = snapshot.world.activeMachine;
   const m = snapshot.world.machines[machine];
   const repoRoot = useMemo(
@@ -46,7 +46,7 @@ export function WorldView({ session, snapshot }: WorldViewProps) {
   );
 
   const [selectedCommit, setSelectedCommit] = useState<string | null>(null);
-  const [showLost, setShowLost] = useState(false);
+  const [showLost, _setShowLost] = useState(false);
 
   const graph = useMemo<GraphInput | null>(() => {
     if (!repoView) return null;
@@ -65,7 +65,7 @@ export function WorldView({ session, snapshot }: WorldViewProps) {
   if (!vis.boxes) {
     return (
       <section className="gq-world" data-testid={TID.worldView} aria-label={STRINGS.world.title}>
-        <FolderView machine={m} machineId={machine} />
+        <FolderView machine={m} />
       </section>
     );
   }
@@ -145,7 +145,7 @@ export function WorldView({ session, snapshot }: WorldViewProps) {
             <Icon name="cloud" size={14} /> {STRINGS.world.remote}
           </div>
           {remotes.map((r, i) => (
-            <RemoteBox key={i} remote={r} world={snapshot.world} />
+            <RemoteBox key={i} remote={r} />
           ))}
         </div>
       )}
@@ -214,7 +214,7 @@ function StagingList({ entries }: { entries: StagingEntry[] }) {
   );
 }
 
-function FolderView({ machine, machineId }: { machine: any; machineId: MachineId }) {
+function FolderView({ machine }: { machine: Machine }) {
   const root = folderViewRoot(machine);
   const nodes = useMemo(() => folderTree(machine, root, { showGitDir: false }), [machine, root]);
   return (
@@ -245,7 +245,7 @@ function FolderView({ machine, machineId }: { machine: any; machineId: MachineId
   );
 }
 
-function RemoteBox({ remote, world }: { remote: any; world: any }) {
+function RemoteBox({ remote }: { remote: RemoteInfo }) {
   const [selectedCommit, setSelectedCommit] = useState<string | null>(null);
 
   if (!remote.hosted) {

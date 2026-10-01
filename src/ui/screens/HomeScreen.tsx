@@ -28,7 +28,7 @@ export function HomeScreen() {
   const done = useMemo(() => completedIds(progress), [progress]);
   const suggested = useMemo(() => suggestedNextLevel(progress, levelOrder), [progress]);
   const chapterProg = useMemo(() => chapterProgress(progress, chapters), [progress]);
-  const stars = totalStars(progress);
+  const _stars = totalStars(progress);
   const badges = useMemo(() => badgeDefinitions(chapters), []);
 
   return (
@@ -144,7 +144,7 @@ function ChapterCard({
           {chapter.levels.map((lv) => {
             const isDone = done.has(lv.id);
             const isSuggested = lv.id === suggested;
-            const lvStars = 0; // stars per level from progress
+            const _lvStars = 0; // stars per level from progress
             return (
               <li key={lv.id} className={`gq-level-item ${isDone ? 'gq-level-done' : ''}`} data-testid={TID.levelCard(lv.id)}>
                 <a href={routeHref({ name: 'play', levelId: lv.id })} className="gq-level-link">

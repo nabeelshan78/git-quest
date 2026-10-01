@@ -1,7 +1,7 @@
 /**
  * Sandbox screen: preset picker, then a free-play terminal with world view.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { GameSession, SessionSnapshot } from '../../shared/session';
 import { TID } from '../../shared/testids';
 import { STRINGS, fmt } from '../../strings';

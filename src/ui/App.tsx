@@ -105,7 +105,7 @@ function AppInner() {
 
       {needsProfile && <ProfileDialog />}
 
-      {route.name !== 'play' && route.name !== 'sandbox' && <TopBar route={route} stars={stars} />}
+      {route.name !== 'play' && route.name !== 'sandbox' && <TopBar stars={stars} />}
 
       <main id="main-content" ref={mainRef} tabIndex={-1} style={{ flex: 1, display: 'flex', flexDirection: 'column', outline: 'none' }}>
         <RoutePage route={route} />
@@ -125,7 +125,7 @@ function AppInner() {
   );
 }
 
-function TopBar({ route, stars }: { route: Route; stars: number }) {
+function TopBar({ stars }: { stars: number }) {
   return (
     <nav className="gq-topbar" aria-label={STRINGS.topBar.mainNav} data-testid={TID.topBar}>
       <a href={routeHref({ name: 'home' })} className="gq-topbar-brand" data-testid={TID.homeButton}>

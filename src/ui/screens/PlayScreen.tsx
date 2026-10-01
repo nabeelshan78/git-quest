@@ -2,9 +2,9 @@
  * Level play screen: mission panel, world view, file editor, terminal,
  * story dialog, predict cards, win screen.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameSession, SessionSnapshot, GoalItemStatus, PendingPredict, QuestionStatus } from '../../shared/session';
-import type { DialogueLine, LevelDefinition } from '../../shared/level';
+import type { DialogueLine } from '../../shared/level';
 import { TID } from '../../shared/testids';
 import { STRINGS, fmt } from '../../strings';
 import { Icon } from '../components/Icon';
@@ -12,15 +12,13 @@ import { Logo } from '../components/Logo';
 import { Stars } from '../components/Stars';
 import { Avatar } from '../components/Avatar';
 import { Modal } from '../components/Modal';
-import { Picture, pictureDescription } from '../graph/Picture';
+import { Picture } from '../graph/Picture';
 import { TerminalPanel } from '../terminal/Terminal';
 import { WorldView } from '../world/WorldView';
 import { FileEditor, GitEditor } from '../editor/FileEditor';
 import { HubPanel } from '../hub/index';
 import { routeHref, navigate } from '../router';
 import { useAppStatus } from '../state/appStatus';
-import { useAppEnv } from '../env';
-import { announce } from '../state/announcer';
 import { useProgressApi, useProgress } from '../state/progress';
 import { createMockSession } from '../dev/mockSession';
 
@@ -29,7 +27,6 @@ export interface PlayScreenProps {
 }
 
 export function PlayScreen({ levelId }: PlayScreenProps) {
-  const env = useAppEnv();
   const progressApi = useProgressApi();
   const progress = useProgress();
   const appStatus = useAppStatus();

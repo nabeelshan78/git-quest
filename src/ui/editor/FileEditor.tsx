@@ -2,9 +2,9 @@
  * File editor: tree of files on the left, editor on the right.
  * Also the git-opened editor (commit message etc.).
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { GameSession, SessionSnapshot } from '../../shared/session';
-import type { EditorRequest, MachineId } from '../../shared/types';
+import type { EditorRequest } from '../../shared/types';
 import { TID } from '../../shared/testids';
 import { STRINGS, fmt } from '../../strings';
 import { Icon } from '../components/Icon';

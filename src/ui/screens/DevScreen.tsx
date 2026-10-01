@@ -8,7 +8,7 @@ import { STRINGS } from '../../strings';
 import { TerminalPanel } from '../terminal/Terminal';
 import { WorldView } from '../world/WorldView';
 import { FileEditor, GitEditor } from '../editor/FileEditor';
-import { navigate, routeHref } from '../router';
+import { routeHref } from '../router';
 import { createMockSession, MOCK_PLAYER } from '../dev/mockSession';
 import { MOCK_VARIANTS } from '../dev/mockWorld';
 import type { MockVariant } from '../dev/mockWorld';

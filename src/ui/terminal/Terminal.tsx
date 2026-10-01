@@ -2,20 +2,18 @@
  * Terminal component: renders xterm.js and integrates with the controller
  * and line editor. Handles input, history, tab completion and screen reader output.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Terminal as XTerminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
-import type { GameSession, SessionSnapshot, TerminalEntry } from '../../shared/session';
+import type { GameSession, SessionSnapshot } from '../../shared/session';
 import { TID } from '../../shared/testids';
 import { STRINGS } from '../../strings';
-import { useAppEnv } from '../env';
 import { useSettings, resolveTheme, prefersDarkScheme } from '../state/settings';
 import { announce } from '../state/announcer';
 import { TerminalController } from './controller';
-import type { LiveMode } from './controller';
 import { EMPTY_LINE, lineReducer, parseTerminalInput } from './lineEditor';
-import type { LineState, TerminalKey } from './lineEditor';
+import type { LineState } from './lineEditor';
 import { terminalThemeFor } from './themes';
 import { entriesForMachine } from './transcript';
 
@@ -31,7 +29,6 @@ export function TerminalPanel({ session, snapshot }: TerminalProps) {
   const ctrlRef = useRef<TerminalController | null>(null);
   const lineRef = useRef<LineState>(EMPTY_LINE);
   const settings = useSettings();
-  const env = useAppEnv();
   const machine = snapshot.world.activeMachine;
   const theme = terminalThemeFor(resolveTheme(settings.theme, prefersDarkScheme()));
 
@@ -65,7 +62,7 @@ export function TerminalPanel({ session, snapshot }: TerminalProps) {
     ctrlRef.current = ctrl;
 
     // Handle resize
-    const ro = new ResizeObserver(() => { try { fit.fit(); } catch {} });
+    const ro = new ResizeObserver(() => { try { fit.fit(); } catch { /* fit may throw if detached */ } });
     ro.observe(containerRef.current);
 
     return () => {

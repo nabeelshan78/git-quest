@@ -47,7 +47,7 @@ const BUILTIN_TERMS: GlossaryTerm[] = [
 export function GlossaryScreen() {
   const progress = useProgress();
   const [query, setQuery] = useState('');
-  const unlocked = new Set(progress.glossary);
+  const _unlocked = new Set(progress.glossary);
 
   const terms = useMemo(() => {
     const all = BUILTIN_TERMS;
