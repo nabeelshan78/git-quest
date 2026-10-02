@@ -31,6 +31,8 @@ export function SettingsScreen() {
   const [exportStatus, setExportStatus] = useState('');
   const [importStatus, setImportStatus] = useState('');
   const [importError, setImportError] = useState(false);
+  const [importConfirm, setImportConfirm] = useState(false);
+  const [pendingImportText, setPendingImportText] = useState<string | null>(null);
   const [resetConfirm, setResetConfirm] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -63,18 +65,36 @@ export function SettingsScreen() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      const result = progressApi.importFile(reader.result as string);
-      if (result.ok) {
-        setImportStatus(STRINGS.settings.importOk);
-        setImportError(false);
-      } else {
-        setImportStatus(fmt(STRINGS.settings.importFailed, { error: result.error }));
-        setImportError(true);
-      }
+      const text = reader.result as string;
+      setPendingImportText(text);
+      setImportConfirm(true);
+      setImportStatus('');
+      setImportError(false);
     };
     reader.readAsText(file);
     e.target.value = '';
-  }, [progressApi]);
+  }, []);
+
+  const onImportConfirmed = useCallback(() => {
+    if (!pendingImportText) return;
+    const result = progressApi.importFile(pendingImportText);
+    if (result.ok) {
+      setImportStatus(STRINGS.settings.importOk);
+      setImportError(false);
+      setProfileName(progressApi.get().player.name);
+      setProfileClassCode(progressApi.get().player.classCode);
+    } else {
+      setImportStatus(fmt(STRINGS.settings.importFailed, { error: result.error }));
+      setImportError(true);
+    }
+    setImportConfirm(false);
+    setPendingImportText(null);
+  }, [pendingImportText, progressApi]);
+
+  const onImportCancel = useCallback(() => {
+    setImportConfirm(false);
+    setPendingImportText(null);
+  }, []);
 
   const onReset = useCallback(() => {
     progressApi.reset();
@@ -115,7 +135,7 @@ export function SettingsScreen() {
             data-testid={TID.settingFontScale}
           >
             {FONT_SCALES.map((s, i) => (
-              <option key={s} value={s}>{(STRINGS.settings.fontScales as string[])[i]}</option>
+              <option key={s} value={s}>{(STRINGS.settings.fontScales as readonly string[])[i]}</option>
             ))}
           </select>
         </div>
@@ -213,6 +233,22 @@ export function SettingsScreen() {
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".json,.gitquest.json" onChange={onFileSelected} />
         </div>
         {exportStatus && <p className="gq-settings-status" data-testid={TID.settingsExportStatus}>{exportStatus}</p>}
+
+        {importConfirm && (
+          <div className="gq-card" style={{ marginTop: 8 }}>
+            <h4>{STRINGS.settings.importConfirmTitle}</h4>
+            <p className="gq-small">{STRINGS.settings.importConfirmBody}</p>
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              <button type="button" className="gq-btn gq-btn-sm gq-btn-danger" onClick={onImportConfirmed} data-testid={TID.settingsImportConfirm}>
+                {STRINGS.settings.importConfirm}
+              </button>
+              <button type="button" className="gq-btn gq-btn-sm" onClick={onImportCancel}>
+                {STRINGS.common.cancel}
+              </button>
+            </div>
+          </div>
+        )}
+
         {importStatus && <p className={`gq-settings-status ${importError ? 'gq-settings-status-error' : ''}`} data-testid={TID.settingsImportStatus}>{importStatus}</p>}
 
         <div style={{ marginTop: 12 }}>

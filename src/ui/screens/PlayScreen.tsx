@@ -20,7 +20,7 @@ import { HubPanel } from '../hub/index';
 import { routeHref, navigate } from '../router';
 import { useAppStatus } from '../state/appStatus';
 import { useProgressApi, useProgress } from '../state/progress';
-import { createMockSession } from '../dev/mockSession';
+import { createSession, getLevel } from '../../levels';
 
 export interface PlayScreenProps {
   levelId: string;
@@ -40,10 +40,13 @@ export function PlayScreen({ levelId }: PlayScreenProps) {
     let disposed = false;
 
     // Try to load level and create real session
-    // For now, use mock session for development
     try {
-      const session = createMockSession({
-        variant: 'full',
+      const level = getLevel(levelId);
+      if (!level) throw new Error(`Level ${levelId} not found`);
+
+      const session = createSession({
+        mode: 'story',
+        level,
         player: {
           ...progress.player,
           id: progress.player.id || 'player',
@@ -54,6 +57,7 @@ export function PlayScreen({ levelId }: PlayScreenProps) {
         },
       });
       sessionRef.current = session;
+      (window as unknown as Record<string, unknown>).__session = session;
       setSnapshot(session.getSnapshot());
 
       const unsub = session.subscribe((snap) => {
@@ -72,11 +76,13 @@ export function PlayScreen({ levelId }: PlayScreenProps) {
       setError(String(e));
       return () => { disposed = true; };
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [levelId]);
 
   // Update app status
   useEffect(() => {
     if (snapshot) appStatus.set({ phase: snapshot.phase, ready: true, level: levelId });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snapshot?.phase]);
 
   if (error) {
@@ -249,7 +255,7 @@ function MissionPanel({ session, snapshot }: { session: GameSession; snapshot: S
           <h3>{STRINGS.mission.hintsTitle}</h3>
           {snapshot.hints.map((h, i) => (
             <div key={i} className="gq-hint-box" data-testid={TID.hintText(i + 1)}>
-              <span className="gq-small gq-muted">{fmt(STRINGS.mission.hintTier, { tier: i + 1 })}: {(STRINGS.mission.hintTierNames as string[])[i]}</span>
+              <span className="gq-small gq-muted">{fmt(STRINGS.mission.hintTier, { tier: i + 1 })}: {(STRINGS.mission.hintTierNames as readonly string[])[i]}</span>
               <p>{h}</p>
             </div>
           ))}

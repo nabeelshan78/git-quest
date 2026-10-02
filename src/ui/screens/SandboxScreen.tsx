@@ -75,6 +75,7 @@ function SandboxPlay({ preset }: { preset: SandboxPreset }) {
     const unsub = session.subscribe((snap) => { if (!disposed) setSnapshot(snap); });
     appStatus.set({ phase: 'play', ready: true, level: null });
     return () => { disposed = true; unsub(); session.dispose(); appStatus.clear(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preset]);
 
   if (!snapshot || !sessionRef.current) {

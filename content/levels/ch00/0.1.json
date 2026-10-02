@@ -70,13 +70,16 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ],
   "hints": [
-    "Nudge",
-    "Concept",
-    "Exact command"
+    "Read the story, then answer the question at the bottom.",
+    "Version control tracks file changes so you never need 'final_v2' names again.",
+    "Pick the first choice: 'To keep track of file history without weird names.'"
   ],
   "allowedCommands": null
 }

@@ -32,29 +32,16 @@
       },
       {
         "commit": {
-          "message": "Draft poster text",
-          "files": {
-            "poster.txt": null
-          }
-        }
-      },
-      {
-        "files": {
-          "index.html": "<h1>Festival</h1>\n"
+          "message": "Draft poster text"
         }
       },
       {
         "commit": {
           "message": "Add homepage",
           "files": {
-            "index.html": null
+            "index.html": "<h1>Festival</h1>\n"
           }
         }
-      },
-      {
-        "delete": [
-          "poster.txt"
-        ]
       },
       {
         "commit": {

@@ -34,9 +34,9 @@
   "par": null,
   "allowedCommands": null,
   "hints": [
-    "Click the merge button.",
-    "Additional hint",
-    "Additional hint"
+    "Your PR is approved. Time to merge it.",
+    "The merge button combines your branch into main on GitHub.",
+    "Answer the question about merging a pull request."
   ],
   "questions": [
     {
@@ -58,7 +58,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

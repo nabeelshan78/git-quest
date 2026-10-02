@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { runSetup, substituteTemplates, substituteLevel } from '../../../src/levels/setup';
+import { runSetup, substituteTemplates } from '../../../src/levels/setup';
 import type { LevelDefinition } from '../../../src/shared/level';
 import type { PlayerProfile } from '../../../src/shared/progress';
 
@@ -12,7 +12,7 @@ const player: PlayerProfile = {
   createdAt: '2026-01-01',
 };
 
-function minimalLevel(steps: any[]): LevelDefinition {
+function minimalLevel(steps: unknown[]): LevelDefinition {
   return {
     id: '0.1',
     chapter: 0,

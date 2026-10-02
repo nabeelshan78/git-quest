@@ -50,7 +50,7 @@
         "text": "Commit only the map",
         "checks": [
           {
-            "type": "commit",
+            "type": "commitExists",
             "messageContains": "map",
             "changesExactly": [
               "map.html"
@@ -62,7 +62,7 @@
         "text": "Commit only the menu update",
         "checks": [
           {
-            "type": "commit",
+            "type": "commitExists",
             "messageContains": "menu",
             "changesExactly": [
               "menu.html"
@@ -74,7 +74,7 @@
         "text": "Ignore the poster",
         "checks": [
           {
-            "type": "commit",
+            "type": "commitExists",
             "messageContains": "ignore",
             "changesExactly": [
               ".gitignore"
@@ -88,9 +88,9 @@
     ]
   },
   "hints": [
-    "Additional hint",
-    "Additional hint",
-    "Additional hint"
+    "You have three changes. Each one deserves its own commit.",
+    "Use `git add <file>` to stage one file at a time before each commit.",
+    "Run `git add map.html`, `git commit -m \"map\"`, then repeat for menu.html. Use .gitignore for poster.txt."
   ],
   "par": 6,
   "allowedCommands": null,
@@ -99,7 +99,28 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "git add map.html"
+    },
+    {
+      "run": "git commit -m \"map\""
+    },
+    {
+      "run": "git add menu.html"
+    },
+    {
+      "run": "git commit -m \"menu\""
+    },
+    {
+      "edit": {
+        "path": ".gitignore",
+        "content": "poster.txt"
+      }
+    },
+    {
+      "run": "git add .gitignore"
+    },
+    {
+      "run": "git commit -m \"ignore\""
     }
   ]
 }

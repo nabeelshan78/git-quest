@@ -216,7 +216,7 @@ export function createMockSession(options: MockSessionOptions = {}): MockGameSes
   const goals = (s: State): GoalItemStatus[] => {
     if (!level) return [];
     return level.goal.items.map((item, i) => {
-      let done = false;
+      let done: boolean;
       if (variant === 'chapter0') done = s.world.machines.laptop.cwd === '/home/intern/festival';
       else if (i === 0) {
         const st = computeStatus(s.world, 'laptop', MOCK_REPO_ROOT);

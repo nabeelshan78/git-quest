@@ -19,19 +19,11 @@
       "text": "Then use `git merge schedule` to bring those commits in."
     }
   ],
-  "workdir": "festival",
+  "workdir": "~/festival",
   "setup": {
-    "machine": {
-      "cwd": "festival"
-    },
     "steps": [
       {
-        "mkdir": [
-          "festival"
-        ]
-      },
-      {
-        "run": "cd festival && git init"
+        "run": "git init"
       },
       {
         "commit": {
@@ -42,7 +34,7 @@
         }
       },
       {
-        "run": "cd festival && git switch -c schedule"
+        "run": "git switch -c schedule"
       },
       {
         "commit": {
@@ -79,9 +71,9 @@
     "git merge"
   ],
   "hints": [
-    "Switch to main, then merge schedule.",
-    "Type `git switch main` followed by `git merge schedule`.",
-    "Additional hint"
+    "Which branch should you be on to receive the merge?",
+    "Switch to main first. Then merge brings another branch into yours.",
+    "Type `git switch main` then `git merge schedule`."
   ],
   "predict": {
     "trigger": "git merge",

@@ -7,8 +7,7 @@ import type { World, MachineId, RepoState, Hash } from '../shared/types';
 import { findRepo, headCommit, readRef, dwimRef, branchNames, currentBranch, getConfig } from '../engine/core/repo';
 import { fileExists, dirExists, readFile } from '../engine/core/fs';
 import { normalize, resolvePath, join } from '../engine/core/paths';
-import { getCommit, getObject, readCommitFiles, readTreeFlat, peel } from '../engine/core/objects';
-import { MAIN_MACHINE_ID } from '../shared/constants';
+import { getCommit, getObject, readCommitFiles, peel } from '../engine/core/objects';
 import { computeStatus } from '../engine/a/status';
 
 // ---------------------------------------------------------------------------
@@ -21,6 +20,8 @@ export interface GoalContext {
   defaultMachine: MachineId;
   /** Default repo path (the level's workdir). */
   defaultRepoPath: string;
+  /** The level's initial working directory for resolving goal-check paths. */
+  levelWorkdir: string;
   /** Questions that have been answered correctly (by question id). */
   answeredQuestions: Set<string>;
   /** Whether the player has read the story. */
@@ -80,7 +81,7 @@ function getRepo(ctx: GoalContext, machineId?: string, repoPath?: string): { rep
 function resolveCheckPath(ctx: GoalContext, path: string, machineId?: string): string {
   const machine = getMachine(ctx, machineId);
   if (!machine) return path;
-  return resolvePath(machine.cwd, machine.home, path);
+  return resolvePath(ctx.levelWorkdir, machine.home, path);
 }
 
 // ---------------------------------------------------------------------------
@@ -635,7 +636,7 @@ function evaluateBaseCheck(check: BaseGoalCheck, ctx: GoalContext): boolean {
       const branchHash = hosted.repo.refs[branchRef];
       if (check.exists === false) return !branchHash;
       if (check.exists === true || check.exists === undefined) {
-        if (!branchHash) return check.exists === false;
+        if (!branchHash) return false;
       }
       if (!branchHash) return false;
       if (check.equalsLocal) {

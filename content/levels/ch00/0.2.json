@@ -56,7 +56,7 @@
         "checks": [
           {
             "type": "cwd",
-            "path": "festival"
+            "path": "~/festival"
           }
         ]
       }
@@ -90,7 +90,13 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "pwd"
+    },
+    {
+      "run": "ls"
+    },
+    {
+      "run": "cd festival"
     }
   ]
 }

@@ -4,7 +4,7 @@
 import type { HostedRepo, HubState, HubUser, Machine, World } from '../../shared/types';
 import { CHARACTER_IDENTITIES, CHARACTER_LOGINS, DEFAULT_CLOCK, DEFAULT_HOME, DEFAULT_HOST, DEFAULT_USER, MAIN_MACHINE_ID } from '../../shared/constants';
 import { emptyFs, mkdirp } from './fs';
-import { normalize } from './paths';
+import { normalize, resolvePath } from './paths';
 import { createEmptyRepo } from './repo';
 
 export interface MachineOptions {
@@ -20,7 +20,7 @@ export interface MachineOptions {
 export function createMachine(options: MachineOptions = {}): Machine {
   const user = options.user ?? DEFAULT_USER;
   const home = normalize(options.home ?? (user === DEFAULT_USER ? DEFAULT_HOME : `/home/${user}`));
-  const cwd = normalize(options.cwd ?? home);
+  const cwd = options.cwd ? resolvePath('/', home, options.cwd) : home;
   const fs = emptyFs();
   mkdirp(fs, home);
   mkdirp(fs, cwd);

@@ -34,9 +34,9 @@
   "par": null,
   "allowedCommands": null,
   "hints": [
-    "Just answer the question.",
-    "Additional hint",
-    "Additional hint"
+    "GitHub needs to know who you are.",
+    "Signing in proves you have permission to push to the repo.",
+    "Read the explanation and answer the question."
   ],
   "questions": [
     {
@@ -58,7 +58,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
     }
   ]
 }

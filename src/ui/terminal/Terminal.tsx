@@ -72,6 +72,7 @@ export function TerminalPanel({ session, snapshot }: TerminalProps) {
       ctrlRef.current = null;
       fitRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update theme
@@ -127,6 +128,8 @@ export function TerminalPanel({ session, snapshot }: TerminalProps) {
         if (key.type === 'enter') {
           const line = lineRef.current.buffer;
           lineRef.current = EMPTY_LINE;
+          const ctrl = ctrlRef.current;
+          if (ctrl) ctrl.setLive({ kind: 'input', prompt: snapshot.prompt, line: EMPTY_LINE });
           session.run(line);
           return;
         }

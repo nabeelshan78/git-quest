@@ -45,9 +45,9 @@
     "git checkout"
   ],
   "hints": [
-    "git switch -c fix-typo",
-    "Additional hint",
-    "Additional hint"
+    "Each task should have its own branch.",
+    "Create a branch named after the task you are fixing.",
+    "Answer the question about branch naming."
   ],
   "questions": [
     {
@@ -69,7 +69,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

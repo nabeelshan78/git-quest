@@ -49,9 +49,9 @@
     "git status"
   ],
   "hints": [
-    "Run git status.",
-    "Additional hint",
-    "Additional hint"
+    "Think about what git does by itself, without the internet.",
+    "Git tracks files on your computer. GitHub is a website for sharing.",
+    "Answer the question based on the story you just read."
   ],
   "questions": [
     {
@@ -73,7 +73,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
     }
   ]
 }

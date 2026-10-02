@@ -7,6 +7,7 @@
 import type { AbsPath, StatusSummary, World } from '../../shared/types';
 import { getCommit, hashBlob, readTreeFlat } from '../core/objects';
 import { currentBranch, findRepo, headCommit, listWorkTree } from '../core/repo';
+import { IgnoreMatcher } from './ignore';
 
 export function computeStatus(world: World, machineId: string, root?: AbsPath): StatusSummary | null {
   const machine = world.machines[machineId];
@@ -34,9 +35,19 @@ export function computeStatus(world: World, machineId: string, root?: AbsPath): 
     if (work[p] === undefined) unstaged.push({ path: p, kind: 'deleted' });
     else if (hashBlob(work[p]) !== index[p].hash) unstaged.push({ path: p, kind: 'modified' });
   }
-  const untracked = Object.keys(work)
+  const ignoreMatcher = new IgnoreMatcher(machine, handle.root, repo);
+  const untrackedAll = Object.keys(work)
     .filter((p) => !index[p] && !repo.index.conflicts[p])
     .sort();
+  const untracked: string[] = [];
+  const ignored: string[] = [];
+  for (const p of untrackedAll) {
+    if (ignoreMatcher.isIgnored(p)) {
+      ignored.push(p);
+    } else {
+      untracked.push(p);
+    }
+  }
   const conflicted = Object.keys(repo.index.conflicts)
     .sort()
     .map((path) => ({ path, kind: 'both modified' as const }));
@@ -51,7 +62,7 @@ export function computeStatus(world: World, machineId: string, root?: AbsPath): 
     staged,
     unstaged,
     untracked,
-    ignored: [],
+    ignored,
     conflicted,
     inProgress,
     clean: staged.length === 0 && unstaged.length === 0 && conflicted.length === 0,

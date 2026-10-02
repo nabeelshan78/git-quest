@@ -19,19 +19,11 @@
       "text": "Git will refuse to delete it if the work hasn't been merged."
     }
   ],
-  "workdir": "festival",
+  "workdir": "~/festival",
   "setup": {
-    "machine": {
-      "cwd": "festival"
-    },
     "steps": [
       {
-        "mkdir": [
-          "festival"
-        ]
-      },
-      {
-        "run": "cd festival && git init"
+        "run": "git init"
       },
       {
         "commit": {
@@ -42,7 +34,7 @@
         }
       },
       {
-        "run": "cd festival && git switch -c map"
+        "run": "git switch -c map"
       },
       {
         "commit": {
@@ -53,10 +45,10 @@
         }
       },
       {
-        "run": "cd festival && git switch main"
+        "run": "git switch main"
       },
       {
-        "run": "cd festival && git switch -c schedule"
+        "run": "git switch -c schedule"
       },
       {
         "commit": {
@@ -67,13 +59,13 @@
         }
       },
       {
-        "run": "cd festival && git switch main"
+        "run": "git switch main"
       },
       {
-        "run": "cd festival && git merge map"
+        "run": "git merge map"
       },
       {
-        "run": "cd festival && git merge schedule"
+        "run": "git merge schedule"
       }
     ]
   },
@@ -104,9 +96,9 @@
     "git branch"
   ],
   "hints": [
-    "Delete map with `git branch -d map`.",
-    "Do the same for schedule.",
-    "Additional hint"
+    "Merged branches can be safely removed.",
+    "`git branch -d <name>` deletes a branch that has been merged.",
+    "Type `git branch -d map` then `git branch -d schedule`."
   ],
   "recap": "`git branch -d <name>` deletes a branch label, keeping your workspace tidy.",
   "glossary": [],

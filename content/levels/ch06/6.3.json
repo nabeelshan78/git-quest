@@ -52,9 +52,9 @@
     "git push"
   ],
   "hints": [
-    "Run git push -u origin main",
-    "Additional hint",
-    "Additional hint"
+    "Push sends your commits from your computer to GitHub.",
+    "`git push -u origin main` uploads your main branch to GitHub.",
+    "Answer the question about pushing to origin."
   ],
   "questions": [
     {
@@ -76,7 +76,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
     }
   ]
 }

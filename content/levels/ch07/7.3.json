@@ -34,9 +34,9 @@
   "par": null,
   "allowedCommands": null,
   "hints": [
-    "Look at Priya's comment in the GitHub view.",
-    "Additional hint",
-    "Additional hint"
+    "Someone left feedback on your code.",
+    "Code review means a teammate reads your changes and suggests fixes.",
+    "Read the review comment and answer the question."
   ],
   "questions": [
     {
@@ -58,7 +58,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

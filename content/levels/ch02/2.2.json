@@ -81,7 +81,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "git add map.html menu.html schedule.html"
+    },
+    {
+      "run": "git commit -m \"Add\""
     }
   ]
 }

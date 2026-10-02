@@ -44,16 +44,16 @@
     "git commit"
   ],
   "hints": [
-    "Run git commit --amend -m 'Add menu page'",
-    "Additional hint",
-    "Additional hint"
+    "The last commit message has a typo.",
+    "`git commit --amend` lets you change the most recent commit.",
+    "Type `git commit --amend -m \"Add menu page\"`."
   ],
   "questions": [],
   "recap": "git commit --amend changes the last commit.",
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "git commit --amend -m \"Add menu page\""
     }
   ]
 }

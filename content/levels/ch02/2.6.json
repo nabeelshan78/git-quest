@@ -82,7 +82,16 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "edit": {
+        "path": ".gitignore",
+        "content": "thumbs.db"
+      }
+    },
+    {
+      "run": "git add .gitignore"
+    },
+    {
+      "run": "git commit -m \"ignore\""
     }
   ]
 }

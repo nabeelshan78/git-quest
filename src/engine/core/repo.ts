@@ -50,6 +50,7 @@ export function findRepo(world: World, machineId: string, cwd?: AbsPath): RepoHa
     insideGitDir = true;
     dir = dir.split('/').slice(0, gitIdx).join('/') || '/';
   }
+  if (!dir.startsWith('/')) return null;
   for (;;) {
     const repo = machine.repos[dir];
     if (repo) {

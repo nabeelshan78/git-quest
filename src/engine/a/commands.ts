@@ -6,42 +6,40 @@
  * State mutations use immer `produce`. Output matches real git's wording.
  */
 import { produce } from 'immer';
-import type { ParsedArgs } from '../../shared/args';
 import { allArgs, getString, getList, hasFlag, isNegated } from '../../shared/args';
 import { ZERO_HASH } from '../../shared/constants';
-import type { CommitKind, GameEvent, RefUpdateReason } from '../../shared/events';
-import type { CommandResult, OutputLine } from '../../shared/result';
+import type { CommitKind, GameEvent } from '../../shared/events';
+import type { CommandResult } from '../../shared/result';
 import { fatal, ok, fail, stdout, stderr } from '../../shared/result';
 import type {
   AbsPath, CommitObject, ConflictEntry, FileMode, Hash,
-  HeadState, IndexEntry, IndexState, Machine, RepoPath,
+  Machine, RepoLocation, RepoPath,
   RepoState, Signature, World,
 } from '../../shared/types';
 import {
-  EMPTY_TREE_HASH, comparePaths, getBlob, getCommit, getObject, getTag, getTree,
-  hashBlob, hashObject, objectSize, peel, readCommitFiles, readTreeFlat, shortHash,
-  sortTreeEntries, subjectOf, writeBlob, writeObject, writeTreeFromFlat,
+  EMPTY_TREE_HASH, getBlob, getCommit, getObject,
+  hashBlob, peel, readTreeFlat, shortHash,
+  subjectOf, writeBlob, writeObject, writeTreeFromFlat,
 } from '../core/objects';
 import type { FlatTreeEntry } from '../core/objects';
 import {
   absOf, branchNames, configuredIdentity, createEmptyRepo, currentBranch,
   deleteRef, dwimRef, findRepo, getConfig, headCommit, listWorkTree,
-  NOT_A_REPO, normalizeConfigKey, readRef, remoteBranchNames, repoPathOf,
-  setHead, signatureFor, tagNames, updateRef,
+  NOT_A_REPO, normalizeConfigKey, readRef, remoteBranchNames,
+  setHead, signatureFor, updateRef,
 } from '../core/repo';
 import {
-  deleteFile, dirExists, fileExists, filesUnder, listDir, mkdirp,
+  deleteFile, dirExists, mkdirp,
   pruneEmptyDirs, readFile, writeFile,
 } from '../core/fs';
-import { basename, dirname, isWithin, join, normalize, relative, resolvePath } from '../core/paths';
-import type { GitContext, GitHandler, EditorResumeHandler } from '../types';
-import { Out, openRepo, openWorkTree, isResult, localLoc, fatalResult, displayPath, quotePath, relativeToPrefix } from './context';
+import { basename, dirname, join, resolvePath } from '../core/paths';
+import type { GitHandler, EditorResumeHandler } from '../types';
+import { Out, openRepo, openWorkTree, isResult, localLoc, fatalResult, displayPath } from './context';
 import { IgnoreMatcher } from './ignore';
 import { matchPathspec, parsePathspec, PathspecError, type Pathspec } from './pathspec';
 import { merge3 } from './merge3';
 import { emitHunks } from './unified';
-import { diffTexts, countChanges, splitRecords, diffRecords } from './xdiff';
-import type { DiffResult } from './xdiff';
+import { diffTexts, countChanges } from './xdiff';
 import { computeStatus } from './status';
 
 // =========================================================================
@@ -112,14 +110,6 @@ function indexFlat(repo: RepoState): Record<string, FlatTreeEntry> {
     out[e.path] = { hash: e.hash, mode: e.mode };
   }
   return out;
-}
-
-/** HEAD's tree as a flat map, empty if unborn. */
-function headFlat(repo: RepoState): Record<string, FlatTreeEntry> {
-  const h = headCommit(repo);
-  if (!h) return {};
-  const c = getCommit(repo, h);
-  return c ? readTreeFlat(repo, c.tree) : {};
 }
 
 /** Requires identity configured. Returns the signature or a fatal result. */
@@ -523,7 +513,6 @@ export const commitHandler: GitHandler = (world, ctx) => {
   const identity = requireIdentity(world, machine, repo);
   if (isResult(identity)) return identity;
 
-  const dryRun = hasFlag(args, 'dry-run');
   const allowEmpty = hasFlag(args, 'allow-empty');
   const commitAll = hasFlag(args, 'all');
   const authorStr = getString(args, 'author');
@@ -635,7 +624,7 @@ function doCommit(
   world: World, machineId: string, root: AbsPath,
   author: Signature, committer: Signature,
   treeHash: Hash, head: Hash | null, mergeHeads: Hash[],
-  rawMessage: string, allowEmpty: boolean, kind: CommitKind,
+  rawMessage: string, _allowEmpty: boolean, kind: CommitKind,
 ): CommandResult {
   const o = new Out();
   // Strip comment lines and trim
@@ -666,7 +655,6 @@ function doCommit(
     };
     commitHash = writeObject(repo, commitObj);
 
-    const branch = currentBranch(repo);
     const reason = `commit${!head ? ' (initial)' : mergeHeads.length ? ' (merge)' : ''}: ${subjectOf(message)}`;
     if (repo.head.type === 'symbolic') {
       updateRef(repo, repo.head.ref, commitHash, committer, reason);
@@ -728,8 +716,8 @@ export const commitEditorResume: EditorResumeHandler = (world, request, text) =>
   if (text === null) {
     return fail(world, 1, stderr('Aborting commit due to empty commit message.'));
   }
-  const { author, committer, treeHash, head, mergeHeads, allowEmpty } = request.resume.data as any;
-  return doCommit(world, request.machine, request.workTree, author, committer, treeHash, head, mergeHeads, text, allowEmpty, head ? 'normal' : 'initial');
+  const { author, committer, treeHash, head, mergeHeads, allowEmpty } = request.resume.data as Record<string, unknown>;
+  return doCommit(world, request.machine, request.workTree, author as Signature, committer as Signature, treeHash as Hash, head as Hash | null, mergeHeads as Hash[], text, allowEmpty as boolean, head ? 'normal' : 'initial');
 };
 
 // =========================================================================
@@ -744,7 +732,7 @@ export const logHandler: GitHandler = (world, ctx) => {
   const o = new Out();
 
   const oneline = hasFlag(args, 'oneline');
-  const showGraph = hasFlag(args, 'graph');
+  hasFlag(args, 'graph');
   const showAll = hasFlag(args, 'all');
   const maxCountStr = getString(args, 'max-count');
   const maxCount = maxCountStr ? parseInt(maxCountStr, 10) : undefined;
@@ -918,7 +906,7 @@ export const diffHandler: GitHandler = (world, ctx) => {
 
   let oldFlat: Record<string, FlatTreeEntry>;
   let newFlat: Record<string, FlatTreeEntry>;
-  let newSource: 'index' | 'worktree' | 'tree' = 'worktree';
+  let newSource: 'index' | 'worktree' | 'tree';
 
   if (commitArgs.length >= 2) {
     // diff <commit1> <commit2>
@@ -1048,7 +1036,7 @@ function emitDiffPatches(
     const nh = newFlat[p]?.hash;
     if (oh === nh) continue;
 
-    let oldContent = oh ? (getBlob(repo, oh)?.content ?? '') : '';
+    const oldContent = oh ? (getBlob(repo, oh)?.content ?? '') : '';
     let newContent: string;
     if (newSource === 'worktree' && machine && root) {
       const abs = absOf(root, p);
@@ -1092,7 +1080,7 @@ export const restoreHandler: GitHandler = (world, ctx) => {
   const { machineId, args } = ctx;
   const r = openWorkTree(world, machineId);
   if (isResult(r)) return r;
-  const { root, repo, machine, prefix } = r;
+  const { root, repo, machine: _machine, prefix } = r;
 
   const restoreStaged = hasFlag(args, 'staged');
   const restoreWorktree = hasFlag(args, 'worktree') || !restoreStaged;
@@ -1221,10 +1209,10 @@ export const rmHandler: GitHandler = (world, ctx) => {
   const { machineId, args } = ctx;
   const r = openWorkTree(world, machineId);
   if (isResult(r)) return r;
-  const { root, repo, machine, prefix } = r;
+  const { root, repo, machine: _machine, prefix } = r;
 
   const cached = hasFlag(args, 'cached');
-  const force = hasFlag(args, 'force');
+  hasFlag(args, 'force');
   const dryRun = hasFlag(args, 'dry-run');
   const recursive = hasFlag(args, 'recursive');
 
@@ -1294,10 +1282,10 @@ export const mvHandler: GitHandler = (world, ctx) => {
   const { machineId, args } = ctx;
   const r = openWorkTree(world, machineId);
   if (isResult(r)) return r;
-  const { root, repo, machine, prefix } = r;
+  const { root, repo: _repo, machine: _machine, prefix } = r;
 
-  const dryRun = hasFlag(args, 'dry-run');
-  const force = hasFlag(args, 'force');
+  const dryRunMv = hasFlag(args, 'dry-run');
+  hasFlag(args, 'force');
   const verbose = hasFlag(args, 'verbose');
 
   const positionals = allArgs(args);
@@ -1332,7 +1320,7 @@ export const mvHandler: GitHandler = (world, ctx) => {
         continue;
       }
 
-      if (!dryRun) {
+      if (!dryRunMv) {
         // Move in index
         const entry = rep.index.entries[srcRp];
         delete rep.index.entries[srcRp];
@@ -1346,7 +1334,7 @@ export const mvHandler: GitHandler = (world, ctx) => {
         }
       }
 
-      if (verbose || !dryRun) {
+      if (verbose || !dryRunMv) {
         o.out(`Renaming ${srcRp} to ${targetRp}`);
       }
       o.ev({ type: 'index.rename', repo: r.loc, from: srcRp, to: targetRp });
@@ -1372,7 +1360,7 @@ export const showHandler: GitHandler = (world, ctx) => {
   const nameOnly = hasFlag(args, 'name-only');
   const nameStatus = hasFlag(args, 'name-status');
   const oneline = hasFlag(args, 'oneline');
-  const prettyStr = getString(args, 'pretty');
+  getString(args, 'pretty');
   const abbrevCommit = hasFlag(args, 'abbrev-commit');
 
   const refs = args.positionals.length > 0 ? args.positionals : ['HEAD'];
@@ -1443,7 +1431,7 @@ export const branchHandler: GitHandler = (world, ctx) => {
   const { machineId, args } = ctx;
   const r = openRepo(world, machineId);
   if (isResult(r)) return r;
-  const { root, repo, machine } = r;
+  const { root, repo, machine: _machine } = r;
   const o = new Out();
 
   const doDelete = hasFlag(args, 'delete') || hasFlag(args, 'force-delete');
@@ -1652,7 +1640,7 @@ export const switchHandler: GitHandler = (world, ctx) => {
   const { machineId, args } = ctx;
   const r = openWorkTree(world, machineId);
   if (isResult(r)) return r;
-  const { root, repo, machine } = r;
+  const { root, repo, machine: _machine } = r;
   const o = new Out();
 
   const createBranch = getString(args, 'create');
@@ -1676,7 +1664,7 @@ export const switchHandler: GitHandler = (world, ctx) => {
   }
 
   const creatingNew = !!(createBranch || forceCreate);
-  let targetBranch = creatingNew ? (createBranch ?? forceCreate!) : branchArg;
+  const targetBranch = creatingNew ? (createBranch ?? forceCreate!) : branchArg;
   let targetHash: Hash;
 
   if (creatingNew) {
@@ -1737,7 +1725,7 @@ export const switchHandler: GitHandler = (world, ctx) => {
   return doCheckoutBranch(world, machineId, root, targetBranch, targetHash, discard, quiet, o, r.loc);
 };
 
-function doOrphanSwitch(world: World, machineId: string, root: AbsPath, branchName: string, quiet: boolean, o: Out, loc: any): CommandResult {
+function doOrphanSwitch(world: World, machineId: string, root: AbsPath, branchName: string, quiet: boolean, o: Out, _loc: RepoLocation): CommandResult {
   const state = produce(world, d => {
     const m = d.machines[machineId];
     const repo = m.repos[root];
@@ -1762,7 +1750,7 @@ function doOrphanSwitch(world: World, machineId: string, root: AbsPath, branchNa
   return o.result(state);
 }
 
-function doDetach(world: World, machineId: string, root: AbsPath, hash: Hash, discard: boolean, quiet: boolean, o: Out, loc: any, targetName?: string): CommandResult {
+function doDetach(world: World, machineId: string, root: AbsPath, hash: Hash, discard: boolean, quiet: boolean, o: Out, loc: RepoLocation, targetName?: string): CommandResult {
   const repo = world.machines[machineId].repos[root];
   const oldHead = headCommit(repo);
   const from = currentBranch(repo) ?? (oldHead ? shortHash(oldHead) : '');
@@ -1784,7 +1772,7 @@ function doDetach(world: World, machineId: string, root: AbsPath, hash: Hash, di
   return { ...final, output: [...o.lines, ...final.output.filter(l => !o.lines.includes(l))], events: [...o.events, ...final.events.filter(e => !o.events.includes(e))] };
 }
 
-function doCheckoutBranch(world: World, machineId: string, root: AbsPath, branchName: string, targetHash: Hash, discard: boolean, quiet: boolean, o: Out, loc: any): CommandResult {
+function doCheckoutBranch(world: World, machineId: string, root: AbsPath, branchName: string, targetHash: Hash, discard: boolean, quiet: boolean, o: Out, loc: RepoLocation): CommandResult {
   const repo = world.machines[machineId].repos[root];
   const cur = currentBranch(repo);
   const oldHead = headCommit(repo);
@@ -1811,7 +1799,7 @@ function doCheckoutBranch(world: World, machineId: string, root: AbsPath, branch
   return o.result(final.state);
 }
 
-function updateWorktreeForCheckout(world: World, machineId: string, root: AbsPath, targetHash: Hash, discard: boolean, o: Out, loc: any): CommandResult {
+function updateWorktreeForCheckout(world: World, machineId: string, root: AbsPath, targetHash: Hash, discard: boolean, o: Out, loc: RepoLocation): CommandResult {
   const machine = world.machines[machineId];
   const repo = machine.repos[root];
 
@@ -1873,7 +1861,7 @@ export const checkoutHandler: GitHandler = (world, ctx) => {
   const { machineId, args } = ctx;
   const r = openWorkTree(world, machineId);
   if (isResult(r)) return r;
-  const { root, repo, machine, prefix } = r;
+  const { root, repo, machine: _machine2, prefix } = r;
   const o = new Out();
 
   const createBranch = getString(args, 'branch');
@@ -2039,7 +2027,7 @@ export const mergeHandler: GitHandler = (world, ctx) => {
   const { machineId, args } = ctx;
   const r = openWorkTree(world, machineId);
   if (isResult(r)) return r;
-  const { root, repo, machine } = r;
+  const { root, repo, machine: _machine3 } = r;
   const o = new Out();
 
   const doAbort = hasFlag(args, 'abort');
@@ -2070,7 +2058,7 @@ export const mergeHandler: GitHandler = (world, ctx) => {
   const head = headCommit(repo);
   if (!head) return fatal(world, 'You are on a branch yet to be born');
 
-  const branch = currentBranch(repo);
+  currentBranch(repo);
 
   // Check if already up to date
   if (isAncestor(repo, targetHash, head)) {
@@ -2166,7 +2154,7 @@ function doThreeWayMerge(
   head: Hash, theirs: Hash, theirName: string,
   messages: string[], squash: boolean, quiet: boolean,
   allowUnrelated: boolean,
-  o: Out, loc: any,
+  o: Out, loc: RepoLocation,
 ): CommandResult {
   const repo = world.machines[machineId].repos[root];
   const base = findMergeBase(repo, head, theirs);
@@ -2275,7 +2263,7 @@ function doThreeWayMerge(
     const rep = m.repos[root];
 
     // Store merged blobs
-    for (const [p, content] of Object.entries(mergedFiles)) {
+    for (const [_p, content] of Object.entries(mergedFiles)) {
       writeBlob(rep, content);
     }
 
@@ -2288,7 +2276,7 @@ function doThreeWayMerge(
       }
     }
     // Add non-conflicted paths from oursFlat that weren't touched
-    for (const [p, entry] of Object.entries(oursFlat)) {
+    for (const [p, _entry] of Object.entries(oursFlat)) {
       if (!mergedIndex[p] && !conflicts[p] && !theirsFlat[p] && !baseFlat[p]) {
         // ours-only addition that wasn't in the merge
       }
@@ -2367,7 +2355,7 @@ function doThreeWayMerge(
   return { ...commitResult, output: [...o.lines, ...commitResult.output], events: [...o.events, ...commitResult.events] };
 };
 
-function doMergeAbort(world: World, machineId: string, root: AbsPath, o: Out, loc: any): CommandResult {
+function doMergeAbort(world: World, machineId: string, root: AbsPath, o: Out, loc: RepoLocation): CommandResult {
   const repo = world.machines[machineId].repos[root];
   if (!repo.special.MERGE_HEAD) {
     return fatal(world, 'There is no merge to abort (MERGE_HEAD missing).');
@@ -2398,7 +2386,7 @@ function doMergeAbort(world: World, machineId: string, root: AbsPath, o: Out, lo
   return o.result(final.state);
 }
 
-function doMergeContinue(world: World, machineId: string, root: AbsPath, o: Out, loc: any): CommandResult {
+function doMergeContinue(world: World, machineId: string, root: AbsPath, o: Out, loc: RepoLocation): CommandResult {
   const repo = world.machines[machineId].repos[root];
   if (!repo.special.MERGE_HEAD) {
     return fatal(world, 'There is no merge in progress (MERGE_HEAD missing).');
@@ -2439,7 +2427,7 @@ export const revertHandler: GitHandler = (world, ctx) => {
   const { machineId, args } = ctx;
   const r = openWorkTree(world, machineId);
   if (isResult(r)) return r;
-  const { root, repo, machine } = r;
+  const { root, repo, machine: _machine4 } = r;
   const o = new Out();
 
   const doAbort = hasFlag(args, 'abort');
@@ -2484,7 +2472,7 @@ export const revertHandler: GitHandler = (world, ctx) => {
 function doRevertOne(
   world: World, machineId: string, root: AbsPath,
   commitHash: Hash, noCommit: boolean, noEdit: boolean,
-  remaining: Hash[], o: Out, loc: any,
+  remaining: Hash[], o: Out, loc: RepoLocation,
 ): CommandResult {
   const repo = world.machines[machineId].repos[root];
   const commit = getCommit(repo, commitHash);
@@ -2568,7 +2556,7 @@ function doRevertOne(
     const m = d.machines[machineId];
     const rep = m.repos[root];
 
-    for (const [p, content] of Object.entries(mergedFiles)) {
+    for (const [_p, content] of Object.entries(mergedFiles)) {
       writeBlob(rep, content);
     }
 
@@ -2614,7 +2602,7 @@ function doRevertOne(
     }
   });
 
-  o.ev({ type: 'revert.start', repo: loc, hash: commitHash } as any);
+  o.ev({ type: 'revert.start', repo: loc, hash: commitHash } as unknown as GameEvent);
 
   if (conflictPaths.length > 0) {
     for (const p of conflictPaths) {
@@ -2672,7 +2660,7 @@ export const revertEditorResume: EditorResumeHandler = (world, request, text) =>
   if (text === null) {
     return fail(world, 1, stderr('Aborting revert due to empty commit message.'));
   }
-  const { commitHash, remaining } = request.resume.data as any;
+  const { commitHash: _commitHash, remaining: _remaining } = request.resume.data as Record<string, unknown>;
   const repo = world.machines[request.machine].repos[request.workTree];
   const head = headCommit(repo)!;
   const identity = requireIdentity(world, world.machines[request.machine], repo);
@@ -2687,7 +2675,7 @@ export const revertEditorResume: EditorResumeHandler = (world, request, text) =>
   return doCommit(state, request.machine, request.workTree, identity, identity, treeHash, head, [], text, false, 'revert');
 };
 
-function doRevertAbort(world: World, machineId: string, root: AbsPath, o: Out, loc: any): CommandResult {
+function doRevertAbort(world: World, machineId: string, root: AbsPath, o: Out, loc: RepoLocation): CommandResult {
   const repo = world.machines[machineId].repos[root];
   if (!repo.special.REVERT_HEAD && !repo.sequencer) {
     return fatal(world, 'error: no revert in progress');
@@ -2717,7 +2705,7 @@ function doRevertAbort(world: World, machineId: string, root: AbsPath, o: Out, l
   return o.result(final.state);
 }
 
-function doRevertContinue(world: World, machineId: string, root: AbsPath, noEdit: boolean, o: Out, loc: any): CommandResult {
+function doRevertContinue(world: World, machineId: string, root: AbsPath, noEdit: boolean, o: Out, loc: RepoLocation): CommandResult {
   const repo = world.machines[machineId].repos[root];
   if (!repo.special.REVERT_HEAD) {
     return fatal(world, 'error: no revert in progress');
@@ -2770,6 +2758,6 @@ function doRevertContinue(world: World, machineId: string, root: AbsPath, noEdit
     delete rep.sequencer;
   });
 
-  o.ev({ type: 'revert.complete', repo: loc, hash: '' } as any);
+  o.ev({ type: 'revert.complete', repo: loc, hash: '' } as unknown as GameEvent);
   return { ...commitResult, state: finalState, output: [...o.lines, ...commitResult.output], events: [...o.events, ...commitResult.events] };
 }

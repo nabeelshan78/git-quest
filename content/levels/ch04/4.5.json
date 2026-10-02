@@ -19,19 +19,11 @@
       "text": "It will create a **merge commit** to tie the two paths together. Try `git merge map`."
     }
   ],
-  "workdir": "festival",
+  "workdir": "~/festival",
   "setup": {
-    "machine": {
-      "cwd": "festival"
-    },
     "steps": [
       {
-        "mkdir": [
-          "festival"
-        ]
-      },
-      {
-        "run": "cd festival && git init"
+        "run": "git init"
       },
       {
         "commit": {
@@ -42,7 +34,7 @@
         }
       },
       {
-        "run": "cd festival && git switch -c map"
+        "run": "git switch -c map"
       },
       {
         "commit": {
@@ -53,7 +45,7 @@
         }
       },
       {
-        "run": "cd festival && git switch main"
+        "run": "git switch main"
       },
       {
         "commit": {
@@ -88,9 +80,9 @@
     "git merge"
   ],
   "hints": [
-    "You are already on main, just run the merge command.",
-    "Type `git merge map`. Then save and close the editor for the commit message.",
-    "Additional hint"
+    "You are on main. Merge the other branch in.",
+    "`git merge <branch>` combines that branch into yours. Save the editor message.",
+    "Type `git merge map`. When the editor opens, save the message."
   ],
   "predict": {
     "trigger": "git merge",

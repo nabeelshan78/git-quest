@@ -76,7 +76,7 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "git restore style.css"
     }
   ]
 }

@@ -47,7 +47,7 @@ const BUILTIN_TERMS: GlossaryTerm[] = [
 export function GlossaryScreen() {
   const progress = useProgress();
   const [query, setQuery] = useState('');
-  const _unlocked = new Set(progress.glossary);
+  const unlocked = new Set(progress.glossary);
 
   const terms = useMemo(() => {
     const all = BUILTIN_TERMS;
@@ -87,7 +87,7 @@ export function GlossaryScreen() {
       ) : (
         <ul className="gq-glossary-list">
           {terms.map((t) => (
-            <li key={t.id} className="gq-glossary-item" data-testid={TID.glossaryTerm(t.id)}>
+            <li key={t.id} className={`gq-glossary-item ${unlocked.has(t.id) ? 'gq-glossary-unlocked' : ''}`} aria-label={unlocked.has(t.id) ? 'Encountered' : undefined} data-testid={TID.glossaryTerm(t.id)}>
               <div className="gq-glossary-term">{t.term}</div>
               <div className="gq-glossary-def">{t.definition}</div>
               {t.command && <div className="gq-glossary-cmd">{fmt(STRINGS.glossary.command, { command: t.command })}</div>}

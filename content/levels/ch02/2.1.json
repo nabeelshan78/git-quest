@@ -88,13 +88,16 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
     }
   ],
   "hints": [
-    "Nudge",
-    "Concept",
-    "Exact command"
+    "Think about where your files go after each step in the git workflow.",
+    "Git has three areas: your working folder (files you edit), the staging area (files ready to save), and the repository (saved history).",
+    "Answer the question based on the story: the staging area is like a packing box for your next save."
   ],
   "allowedCommands": null
 }

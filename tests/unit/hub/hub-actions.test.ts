@@ -3,7 +3,7 @@ import { applyHubAction, reactToEvents } from '../../../src/hub/index';
 import { createWorld, createHostedRepoRecord } from '../../../src/engine/core/world';
 import { writeBlob, writeTreeFromFlat, writeObject } from '../../../src/engine/core/objects';
 import type { FlatTreeEntry } from '../../../src/engine/core/objects';
-import type { World, HostedRepo } from '../../../src/shared/types';
+import type { World } from '../../../src/shared/types';
 
 function makeWorldWithRepo(): { world: World; repoId: string } {
   const world = createWorld({ hubViewer: 'intern', hubViewerName: 'Intern' });
@@ -207,7 +207,7 @@ describe('Hub Actions', () => {
       const mainHash = hosted.repo.refs['refs/heads/main'];
       const mainCommit = hosted.repo.objects[mainHash!];
       expect(mainCommit).toBeDefined();
-      expect((mainCommit as any).parents).toHaveLength(2);
+      expect((mainCommit as unknown as { parents: unknown[] }).parents).toHaveLength(2);
     });
 
     it('closes issues referenced with Fixes #N', () => {

@@ -28,8 +28,8 @@ committed code works; not extended).
 | 5 | UI | ws/ui | **done** | merged to main (50 files, 8033 lines) |
 | 6 | Mock GitHub (repo, issues, PRs, reviews, merge buttons) | ws/hub-levels | **done** | merged (hub actions, PR merge, reactToEvents) |
 | 7 | Level runner | ws/hub-levels | **done** | merged (session, setup, goals, errors, scoring, playSolution) |
-| 8a | Content ch 0–4 (32 levels) | ws/content-0-4 | not started | after runner |
-| 8b | Content ch 5–8 (26 levels) | ws/content-5-8 | not started | after runner |
+| 8a | Content ch 0–4 (32 levels) | ws/content-0-4 | **done** | merged |
+| 8b | Content ch 5–8 (26 levels) | ws/content-5-8 | **done** | merged |
 | 9 | Classroom (progress save, export JSON/CSV, short guide) | ws/classroom | **done** | merged to main (120 tests) |
 | 10 | QA (e2e per level) | ws/qa | not started | after UI + content |
 | 11 | Beginner review | — | not started | after everything |
@@ -75,3 +75,27 @@ committed code works; not extended).
   files). Engine B/Remote/Hub/Levels had no commits (still reading).
 - UI merged to main (282 tests, 24 files). Batch 2 relaunched: Engine B,
   Remote, Hub+Levels (combined). 3 agents running.
+- Engine B merged (stash, amend, reset, reflog). Parser updated with &&/||
+  chaining. All 58 level JSON files committed.
+- Deep audit pass (2026-10-01):
+  - Fixed session.ts: switchMachine event stale ID, predict card mutation,
+    hints bounds check, predictUsed flag on restart, transcript/dialogue
+    snapshot shallow copies.
+  - Fixed goals.ts: resolveCheckPath using levelWorkdir instead of
+    machine.cwd (goals were unchecking when player navigated).
+  - Fixed engine lint breakages: hashBlob import restored in b/commands.ts,
+    dryRunMv variable fixed in a/commands.ts, removed dead _headFlat.
+  - Fixed all placeholder hints (27 levels had generic text, all replaced
+    with proper 3-tier hints).
+  - Added progress export/import with confirmation dialog to HomeScreen and
+    SettingsScreen. Import replaces all progress after user confirms.
+  - Fixed HomeScreen: per-level star display, ChapterCard progress prop bug.
+  - Updated README with full instructions.
+  - Fixed all 19 strict typecheck errors (unused vars, missing imports,
+    readonly tuple casts, window cast, PlayerProfile unused import).
+  - Fixed infinite loop in findRepo when machine.cwd was not absolute
+    (caused all ch1 tests to hang). Root cause: createMachine did not
+    resolve ~ in cwd option; dirname of relative path never reaches /.
+  - Fixed ch4 levels (4.1–4.7): removed broken machine.cwd + cd nesting
+    pattern, using ~/festival workdir instead.
+  - All 58 level solutions now pass. All typecheck, lint, and unit tests pass.

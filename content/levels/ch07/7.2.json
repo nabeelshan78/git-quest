@@ -64,9 +64,9 @@
     "git push"
   ],
   "hints": [
-    "Run git push -u origin fix-typo",
-    "Additional hint",
-    "Additional hint"
+    "A pull request asks others to review your branch before merging.",
+    "Push your branch, then open a PR on GitHub to propose the change.",
+    "Answer the question about pull requests."
   ],
   "questions": [
     {
@@ -88,7 +88,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

@@ -43,9 +43,9 @@
     "git clone"
   ],
   "hints": [
-    "git clone https://github.com/lantern-labs/festival-site.git",
-    "Additional hint",
-    "Additional hint"
+    "How do you get a copy of someone else's project?",
+    "`git clone <url>` downloads a full copy of a repo to your computer.",
+    "Answer the question about cloning."
   ],
   "questions": [
     {
@@ -67,7 +67,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

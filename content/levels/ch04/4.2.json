@@ -19,19 +19,11 @@
       "text": "And `git switch -c <name>` makes a new branch and moves to it in one go."
     }
   ],
-  "workdir": "festival",
+  "workdir": "~/festival",
   "setup": {
-    "machine": {
-      "cwd": "festival"
-    },
     "steps": [
       {
-        "mkdir": [
-          "festival"
-        ]
-      },
-      {
-        "run": "cd festival && git init"
+        "run": "git init"
       },
       {
         "commit": {
@@ -42,18 +34,22 @@
         }
       },
       {
-        "run": "cd festival && git branch map"
+        "run": "git branch map"
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Move to the map branch",
+        "text": "Visit the map branch",
         "checks": [
           {
-            "type": "currentBranch",
+            "type": "branchExists",
             "name": "map"
+          },
+          {
+            "type": "ranCommand",
+            "command": "git switch map"
           }
         ]
       },
@@ -74,9 +70,9 @@
     "git checkout"
   ],
   "hints": [
-    "Move to map with `git switch map`.",
-    "Then make and move to schedule with `git switch -c schedule`.",
-    "Additional hint"
+    "You need to visit an existing branch, then create a new one.",
+    "`git switch <name>` moves to a branch. `git switch -c <name>` creates and moves.",
+    "Type `git switch map`, then `git switch -c schedule`."
   ],
   "recap": "`git switch <branch>` moves you to a branch. `git switch -c <branch>` creates and moves in one go.",
   "glossary": [],

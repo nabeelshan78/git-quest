@@ -1,7 +1,7 @@
 /**
  * Home screen: chapter map with level cards, badges, sandbox/glossary/settings links.
  */
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import chaptersData from '../../../content/chapters.json';
 import type { ChaptersFile } from '../../shared/level';
 import { TID } from '../../shared/testids';
@@ -10,7 +10,7 @@ import { Icon } from '../components/Icon';
 import { Logo } from '../components/Logo';
 import { Stars } from '../components/Stars';
 import { routeHref } from '../router';
-import { useProgress } from '../state/progress';
+import { useProgress, useProgressApi } from '../state/progress';
 import {
   badgeDefinitions,
   chapterProgress,
@@ -25,11 +25,66 @@ const levelOrder = chapters.chapters.flatMap((c) => c.levels.map((l) => l.id));
 
 export function HomeScreen() {
   const progress = useProgress();
+  const progressApi = useProgressApi();
   const done = useMemo(() => completedIds(progress), [progress]);
   const suggested = useMemo(() => suggestedNextLevel(progress, levelOrder), [progress]);
   const chapterProg = useMemo(() => chapterProgress(progress, chapters), [progress]);
-  const _stars = totalStars(progress);
+  const stars = totalStars(progress);
   const badges = useMemo(() => badgeDefinitions(chapters), []);
+  const [exportMsg, setExportMsg] = useState('');
+  const [importMsg, setImportMsg] = useState('');
+  const [importError, setImportError] = useState(false);
+  const [importConfirm, setImportConfirm] = useState(false);
+  const [pendingImportText, setPendingImportText] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const onExport = useCallback(() => {
+    try {
+      const json = progressApi.exportFile();
+      downloadFile(`${progress.player.handle}.gitquest.json`, json, 'application/json');
+      setExportMsg(STRINGS.home.exportDone);
+      setTimeout(() => setExportMsg(''), 3000);
+    } catch {
+      setExportMsg('Export failed.');
+    }
+  }, [progressApi, progress.player.handle]);
+
+  const onImportClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const onFileSelected = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPendingImportText(reader.result as string);
+      setImportConfirm(true);
+      setImportMsg('');
+      setImportError(false);
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }, []);
+
+  const onImportConfirmed = useCallback(() => {
+    if (!pendingImportText) return;
+    const result = progressApi.importFile(pendingImportText);
+    if (result.ok) {
+      setImportMsg(STRINGS.settings.importOk);
+      setImportError(false);
+    } else {
+      setImportMsg(fmt(STRINGS.settings.importFailed, { error: result.error }));
+      setImportError(true);
+    }
+    setImportConfirm(false);
+    setPendingImportText(null);
+  }, [pendingImportText, progressApi]);
+
+  const onImportCancel = useCallback(() => {
+    setImportConfirm(false);
+    setPendingImportText(null);
+  }, []);
 
   return (
     <div className="gq-home" data-testid={TID.homePage}>
@@ -61,7 +116,8 @@ export function HomeScreen() {
           <ChapterCard
             key={ch.number}
             chapter={ch}
-            progress={chapterProg[ci]}
+            chapterProgress={chapterProg[ci]}
+            levelProgress={progress.levels}
             done={done}
             suggested={suggested}
           />
@@ -88,6 +144,38 @@ export function HomeScreen() {
         </div>
       </section>
 
+      {/* Progress export / import */}
+      <section>
+        <h2>{STRINGS.home.progressTitle}</h2>
+        <p className="gq-muted gq-small">{STRINGS.home.progressHelp}</p>
+        <p className="gq-small">{fmt(STRINGS.home.starsEarned, { count: stars })}</p>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+          <button type="button" className="gq-btn gq-btn-sm" onClick={onExport} data-testid={TID.homeExport}>
+            <Icon name="download" size={14} /> {STRINGS.home.exportBtn}
+          </button>
+          <button type="button" className="gq-btn gq-btn-sm" onClick={onImportClick}>
+            <Icon name="upload" size={14} /> {STRINGS.home.importBtn}
+          </button>
+          <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".json,.gitquest.json" onChange={onFileSelected} />
+        </div>
+        {exportMsg && <p className="gq-settings-status">{exportMsg}</p>}
+        {importConfirm && (
+          <div className="gq-card" style={{ marginTop: 8 }}>
+            <h4>{STRINGS.settings.importConfirmTitle}</h4>
+            <p className="gq-small">{STRINGS.settings.importConfirmBody}</p>
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              <button type="button" className="gq-btn gq-btn-sm gq-btn-danger" onClick={onImportConfirmed}>
+                {STRINGS.settings.importConfirm}
+              </button>
+              <button type="button" className="gq-btn gq-btn-sm" onClick={onImportCancel}>
+                {STRINGS.common.cancel}
+              </button>
+            </div>
+          </div>
+        )}
+        {importMsg && <p className={`gq-settings-status ${importError ? 'gq-settings-status-error' : ''}`}>{importMsg}</p>}
+      </section>
+
       {/* Quick links */}
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <a href={routeHref({ name: 'sandbox', preset: null })} className="gq-btn">
@@ -112,12 +200,14 @@ export function HomeScreen() {
 
 function ChapterCard({
   chapter,
-  progress,
+  chapterProgress: cp,
+  levelProgress,
   done,
   suggested,
 }: {
   chapter: ChaptersFile['chapters'][number];
-  progress: { completed: number; total: number; stars: number; maxStars: number };
+  chapterProgress: { completed: number; total: number; stars: number; maxStars: number };
+  levelProgress: Record<string, { stars: number }>;
   done: Set<string>;
   suggested: string | null;
 }) {
@@ -135,7 +225,7 @@ function ChapterCard({
           <span className="gq-chapter-title">{chapter.title}</span>
           <br />
           <span className="gq-chapter-progress-text">
-            {progress.completed}/{progress.total} levels &middot; <Stars value={progress.stars} max={progress.maxStars} size={12} />
+            {cp.completed}/{cp.total} levels &middot; <Stars value={cp.stars} max={cp.maxStars} size={12} />
           </span>
         </span>
       </button>
@@ -144,7 +234,8 @@ function ChapterCard({
           {chapter.levels.map((lv) => {
             const isDone = done.has(lv.id);
             const isSuggested = lv.id === suggested;
-            const _lvStars = 0; // stars per level from progress
+            const lvProgress = levelProgress[lv.id];
+            const lvStars = lvProgress?.stars ?? 0;
             return (
               <li key={lv.id} className={`gq-level-item ${isDone ? 'gq-level-done' : ''}`} data-testid={TID.levelCard(lv.id)}>
                 <a href={routeHref({ name: 'play', levelId: lv.id })} className="gq-level-link">
@@ -153,7 +244,8 @@ function ChapterCard({
                     {lv.title}
                     {isSuggested && <span className="gq-small gq-muted"> ({STRINGS.home.suggested})</span>}
                   </span>
-                  {isDone && <Icon name="check" size={16} />}
+                  {isDone && lvStars > 0 && <Stars value={lvStars} max={3} size={12} />}
+                  {isDone && lvStars === 0 && <Icon name="check" size={16} />}
                 </a>
               </li>
             );
@@ -162,6 +254,16 @@ function ChapterCard({
       )}
     </div>
   );
+}
+
+function downloadFile(name: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function levelTitle(id: string): string {

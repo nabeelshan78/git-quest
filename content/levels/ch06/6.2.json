@@ -49,9 +49,9 @@
     "git remote"
   ],
   "hints": [
-    "Use git remote add origin <url>.",
-    "Additional hint",
-    "Additional hint"
+    "Your local repo needs to know where the online copy lives.",
+    "A remote is a link to another copy of your repo, usually on GitHub.",
+    "Answer the question about `git remote add origin <url>`."
   ],
   "questions": [
     {
@@ -73,7 +73,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

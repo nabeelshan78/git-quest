@@ -34,9 +34,9 @@
   "par": null,
   "allowedCommands": null,
   "hints": [
-    "Answer the question.",
-    "Additional hint",
-    "Additional hint"
+    "You have learned everything this simulator teaches.",
+    "Install git on your real computer. The commands are exactly the same.",
+    "Answer the question to graduate from Git Quest."
   ],
   "questions": [
     {
@@ -58,7 +58,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

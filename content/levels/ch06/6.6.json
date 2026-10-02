@@ -74,9 +74,9 @@
     "git push"
   ],
   "hints": [
-    "Run git pull, then git push.",
-    "Additional hint",
-    "Additional hint"
+    "Your push was rejected. Why?",
+    "Someone else pushed first. You need to pull their changes before pushing.",
+    "Answer the question. The fix is: pull first, then push again."
   ],
   "questions": [
     {
@@ -98,7 +98,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
     }
   ]
 }

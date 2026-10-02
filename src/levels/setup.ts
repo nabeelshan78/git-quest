@@ -2,19 +2,16 @@
  * Execute level setup steps to create the initial World.
  */
 import { produce } from 'immer';
-import type { HubAction, LevelDefinition, LevelSetup, SetupStep, TeammateAction } from '../shared/level';
+import type { HubAction, LevelDefinition, SetupStep, TeammateAction, HostedRepoSetup } from '../shared/level';
 import type { PlayerProfile } from '../shared/progress';
-import type { World, MachineId } from '../shared/types';
-import { createWorld, createMachine, createHub } from '../engine/core/world';
+import type { World } from '../shared/types';
+import { createWorld, createMachine } from '../engine/core/world';
 import { writeFile, mkdirp, deleteFile } from '../engine/core/fs';
-import { normalize, resolvePath } from '../engine/core/paths';
+import { resolvePath } from '../engine/core/paths';
 import { runLine } from '../parser/index';
 import { applyHubAction } from '../hub/index';
 import { setupHostedRepo, applyTeammatePush } from '../remote/index';
 import { MAIN_MACHINE_ID, DEFAULT_HOME, DEFAULT_HOST, DEFAULT_USER, DEFAULT_CLOCK } from '../shared/constants';
-import { findRepo, signatureFor, headCommit, updateRef } from '../engine/core/repo';
-import { writeBlob, writeTreeFromFlat, writeObject } from '../engine/core/objects';
-import type { FlatTreeEntry } from '../engine/core/objects';
 
 // ---------------------------------------------------------------------------
 // Template substitution
@@ -219,7 +216,7 @@ function executeSetupStep(world: World, step: SetupStep, workdir: string, errors
     const machine = world.machines[defaultMachine];
     const defaultRepoPath = machine?.cwd ?? workdir;
 
-    const result = setupHostedRepo(world, hostedSetup as any, {
+    const result = setupHostedRepo(world, hostedSetup as HostedRepoSetup, {
       machine: defaultMachine,
       repoPath: defaultRepoPath,
     });

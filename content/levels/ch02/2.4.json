@@ -90,7 +90,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "git restore --staged poster.txt"
+    },
+    {
+      "run": "git commit -m \"menu\""
     }
   ]
 }

@@ -64,9 +64,9 @@
     "git push"
   ],
   "hints": [
-    "Just git push",
-    "Additional hint",
-    "Additional hint"
+    "The reviewer asked for a change. Fix it and push again.",
+    "New commits on the same branch automatically update the pull request.",
+    "Answer the question about updating a PR."
   ],
   "questions": [
     {
@@ -88,7 +88,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

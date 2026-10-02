@@ -20,19 +20,11 @@
       "text": "Commit your files, merge both into `main`, and delete the branches."
     }
   ],
-  "workdir": "festival",
+  "workdir": "~/festival",
   "setup": {
-    "machine": {
-      "cwd": "festival"
-    },
     "steps": [
       {
-        "mkdir": [
-          "festival"
-        ]
-      },
-      {
-        "run": "cd festival && git init"
+        "run": "git init"
       },
       {
         "commit": {

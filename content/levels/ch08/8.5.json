@@ -35,9 +35,9 @@
   "par": null,
   "allowedCommands": null,
   "hints": [
-    "Just answer.",
-    "Additional hint",
-    "Additional hint"
+    "The site is broken. Use your git skills to find and fix the problem.",
+    "Stash, amend, reset, and reflog are all tools in your belt now.",
+    "Answer the question using what you learned in this chapter."
   ],
   "questions": [
     {
@@ -59,7 +59,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

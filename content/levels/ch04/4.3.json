@@ -19,19 +19,11 @@
       "text": "Now our branch and `main` have split into two paths. Make your commit and watch the graph."
     }
   ],
-  "workdir": "festival",
+  "workdir": "~/festival",
   "setup": {
-    "machine": {
-      "cwd": "festival"
-    },
     "steps": [
       {
-        "mkdir": [
-          "festival"
-        ]
-      },
-      {
-        "run": "cd festival && git init"
+        "run": "git init"
       },
       {
         "commit": {
@@ -42,10 +34,10 @@
         }
       },
       {
-        "run": "cd festival && git switch -c map"
+        "run": "git switch -c map"
       },
       {
-        "run": "cd festival && git switch main"
+        "run": "git switch main"
       },
       {
         "commit": {
@@ -56,7 +48,7 @@
         }
       },
       {
-        "run": "cd festival && git switch map"
+        "run": "git switch map"
       }
     ]
   },
@@ -84,9 +76,9 @@
     "echo"
   ],
   "hints": [
-    "Create or stage map.html, then commit it.",
-    "Use `echo 'map' > map.html`, then `git add map.html` and `git commit -m 'Add map'`.",
-    "Additional hint"
+    "You are on the map branch. Create a file, stage it, and commit.",
+    "Use `echo` or the editor to create map.html, then `git add` and `git commit`.",
+    "Type `echo \"map\" > map.html`, then `git add map.html` and `git commit -m \"Add map\"`."
   ],
   "predict": {
     "trigger": "git commit",

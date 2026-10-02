@@ -36,9 +36,9 @@
     "git reflog"
   ],
   "hints": [
-    "Run git reflog",
-    "Additional hint",
-    "Additional hint"
+    "A commit seems to have vanished. Where can you find it?",
+    "`git reflog` shows every place HEAD has been, even after a reset.",
+    "Answer the question about using reflog to recover work."
   ],
   "questions": [
     {
@@ -60,7 +60,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

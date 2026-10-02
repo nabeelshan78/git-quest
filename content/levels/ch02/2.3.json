@@ -96,13 +96,16 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
     }
   ],
   "hints": [
-    "Nudge",
-    "Concept",
-    "Exact command"
+    "Try running git diff to see what changed in your working folder.",
+    "git diff shows unstaged changes. git diff --staged shows what you have already staged for the next commit.",
+    "Run git diff to see the unstaged changes, then run git diff --staged to see the staged ones."
   ],
   "allowedCommands": null
 }

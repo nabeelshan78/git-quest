@@ -32,62 +32,39 @@
       },
       {
         "commit": {
-          "message": "Add homepage with logo",
-          "files": {
-            "index.html": null
-          }
-        }
-      },
-      {
-        "files": {
-          "menu.html": "<p>Food</p>\n"
+          "message": "Add homepage with logo"
         }
       },
       {
         "commit": {
           "message": "Add menu",
           "files": {
-            "menu.html": null
+            "menu.html": "<p>Food</p>\n"
           }
-        }
-      },
-      {
-        "files": {
-          "index.html": "<img src=\"logo.jpg\">\n"
         }
       },
       {
         "commit": {
           "message": "Optimize images",
           "files": {
-            "index.html": null
+            "index.html": "<img src=\"logo.jpg\">\n"
           },
           "author": "Sam Lee <sam@lanternlabs.example>"
-        }
-      },
-      {
-        "files": {
-          "schedule.html": "<p>Times</p>\n"
         }
       },
       {
         "commit": {
           "message": "Add schedule",
           "files": {
-            "schedule.html": null
+            "schedule.html": "<p>Times</p>\n"
           }
-        }
-      },
-      {
-        "files": {
-          "style.css": "body { color: black; }\n"
         }
       },
       {
         "commit": {
           "message": "Add styles",
           "files": {
-            "style.css": null
+            "style.css": "body { color: black; }\n"
           }
         }
       }

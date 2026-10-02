@@ -84,7 +84,13 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "git rm old.txt"
+    },
+    {
+      "run": "git mv main.html index.html"
+    },
+    {
+      "run": "git commit -m \"Clean\""
     }
   ]
 }

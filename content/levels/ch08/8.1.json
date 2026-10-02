@@ -48,16 +48,16 @@
     "git stash"
   ],
   "hints": [
-    "Run git stash",
-    "Additional hint",
-    "Additional hint"
+    "You are in the middle of something but need to switch tasks.",
+    "`git stash` saves your uncommitted changes and cleans the folder.",
+    "Type `git stash` to park your work. Use `git stash pop` to get it back."
   ],
   "questions": [],
   "recap": "git stash parks your uncommitted changes so you can switch tasks.",
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "git stash"
     }
   ]
 }

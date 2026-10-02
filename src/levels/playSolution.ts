@@ -4,7 +4,7 @@
  * the win screen.
  */
 import type { GameSession, SessionSnapshot } from '../shared/session';
-import type { SolutionStep, LevelDefinition } from '../shared/level';
+import type { SolutionStep } from '../shared/level';
 
 export interface PlayResult {
   success: boolean;
@@ -32,7 +32,6 @@ export function playSolution(session: GameSession, steps: SolutionStep[]): PlayR
   // Finish demo if needed
   if (snapshot.phase === 'demo') {
     session.finishDemo();
-    snapshot = session.getSnapshot();
   }
 
   for (let i = 0; i < steps.length; i++) {
@@ -70,7 +69,6 @@ export function playSolution(session: GameSession, steps: SolutionStep[]): PlayR
     if (snapshot.editor) {
       // Save with default content
       session.submitEditor(snapshot.editor.initialContent);
-      snapshot = session.getSnapshot();
     }
   }
 

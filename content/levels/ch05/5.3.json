@@ -85,7 +85,16 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "edit": {
+        "path": "index.html",
+        "content": "<h1>Riverside Lantern Festival 2026</h1>\n<p>Coming soon!</p>\n"
+      }
+    },
+    {
+      "run": "git add index.html"
+    },
+    {
+      "run": "git commit -m \"Merge\""
     }
   ]
 }

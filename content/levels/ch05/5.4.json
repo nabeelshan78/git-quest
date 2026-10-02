@@ -83,7 +83,7 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "git merge --abort"
     }
   ]
 }

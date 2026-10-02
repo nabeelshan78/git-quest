@@ -1,7 +1,7 @@
 /**
  * Differential tests: git add, git commit
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it } from 'vitest';
 import { runScenario, type Scenario } from '../harness';
 
 function run(scenario: Scenario) {

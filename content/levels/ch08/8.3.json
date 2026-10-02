@@ -52,9 +52,9 @@
     "git reset"
   ],
   "hints": [
-    "Run git reset --soft HEAD~1",
-    "Additional hint",
-    "Additional hint"
+    "You want to undo the last commit but keep your files.",
+    "`git reset --soft HEAD~1` removes the commit but keeps changes staged.",
+    "Answer the question about soft reset."
   ],
   "questions": [
     {
@@ -76,7 +76,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

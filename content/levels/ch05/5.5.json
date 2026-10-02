@@ -81,7 +81,19 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "git merge my-updates"
+    },
+    {
+      "edit": {
+        "path": "index.html",
+        "content": "<h1>The Festival!</h1>\n"
+      }
+    },
+    {
+      "run": "git add index.html"
+    },
+    {
+      "run": "git commit -m \"Merge\""
     }
   ]
 }

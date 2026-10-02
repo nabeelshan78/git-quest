@@ -4,7 +4,6 @@
 import type {
   CompletionResult,
   GameSession,
-  GoalItemStatus,
   LevelPhase,
   PendingPredict,
   QuestionStatus,
@@ -13,11 +12,10 @@ import type {
   SessionSnapshot,
   TerminalEntry,
 } from '../shared/session';
-import type { LevelDefinition, DialogueLine, HubAction, PredictCard } from '../shared/level';
-import type { LevelResult, PlayerProfile } from '../shared/progress';
+import type { LevelDefinition, DialogueLine, HubAction } from '../shared/level';
+import type { LevelResult } from '../shared/progress';
 import type { EditorRequest, MachineId, World } from '../shared/types';
 import type { GameEvent } from '../shared/events';
-import type { CommandResult, OutputLine } from '../shared/result';
 import { runLine, completeLine as parserComplete } from '../parser';
 import { applyHubAction, reactToEvents } from '../hub/index';
 import { resumeEditor } from '../engine';
@@ -29,9 +27,9 @@ import { computeStars, projectStars } from './scoring';
 import { worldChanged } from '../shared/compare';
 import { findRepo, currentBranch, headCommit } from '../engine/core/repo';
 import { MAIN_MACHINE_ID } from '../shared/constants';
-import { normalize, resolvePath, dirname } from '../engine/core/paths';
+import { resolvePath, dirname } from '../engine/core/paths';
 import { writeFile as fsWriteFile, mkdirp } from '../engine/core/fs';
-import { createWorld, createMachine } from '../engine/core/world';
+import { createWorld } from '../engine/core/world';
 import { produce } from 'immer';
 
 // ---------------------------------------------------------------------------
@@ -69,10 +67,10 @@ let entryIdCounter = 0;
 export class GameSessionImpl implements GameSession {
   private mode: SessionMode;
   private level: LevelDefinition | null;
-  private player: PlayerProfile;
   private phase: LevelPhase;
   private world: World;
   private initialWorld: World;
+  private levelWorkdir: string = '/home/intern';
   private rewindStack: World[] = [];
   private transcript: TerminalEntry[] = [];
   private dialogue: DialogueLine[] = [];
@@ -97,10 +95,10 @@ export class GameSessionImpl implements GameSession {
   private listeners = new Set<(snapshot: SessionSnapshot) => void>();
   private disposed = false;
   private result: LevelResult | null = null;
+  private predictUsed = false;
 
   constructor(options: SessionOptions) {
     this.mode = options.mode;
-    this.player = options.player;
     this.nowFn = options.now ?? Date.now;
     this.startTime = this.nowFn();
     this.onResult = options.onResult;
@@ -109,14 +107,14 @@ export class GameSessionImpl implements GameSession {
       this.level = substituteLevel(options.level, options.player);
       // Run setup
       const { world, errors } = runSetup(this.level, options.player);
+      this.world = world;
+      this.initialWorld = world;
+      this.levelWorkdir = world.machines[world.activeMachine]?.cwd ?? '/home/intern';
       if (errors.length > 0) {
-        // Log setup errors as system messages
         for (const err of errors) {
           this.addTranscript('system', err);
         }
       }
-      this.world = world;
-      this.initialWorld = world;
 
       // Populate dialogue from story
       this.dialogue = [...this.level.story];
@@ -171,17 +169,17 @@ export class GameSessionImpl implements GameSession {
       world: this.world,
       goals,
       questions: this.questionStatuses,
-      dialogue: this.dialogue,
+      dialogue: [...this.dialogue],
       storyRead: this.storyRead,
       commandsUsed: this.commandsUsed,
       commandsTyped: this.commandsTyped,
       par: this.level?.par ?? null,
       hintsRevealed: this.hintsRevealed,
-      hints: this.revealedHints,
+      hints: [...this.revealedHints],
       projectedStars: projectStars(this.commandsUsed, this.level?.par ?? null, this.hintsRevealed),
       pendingPredict: this.pendingPredict,
       editor: this.editor,
-      transcript: this.transcript,
+      transcript: [...this.transcript],
       prompt: buildPrompt(this.world, this.world.activeMachine),
       canRewind: this.rewindStack.length > 0,
       lastEvents: this.lastEvents,
@@ -235,7 +233,7 @@ export class GameSessionImpl implements GameSession {
     }
 
     // Check if predict card should trigger
-    if (this.level?.predict && this.phase === 'play' && !this.pendingPredict) {
+    if (this.level?.predict && this.phase === 'play' && !this.pendingPredict && !this.predictUsed) {
       const trigger = this.level.predict.trigger.trim().replace(/\s+/g, ' ');
       const normalizedLine = trimmed.replace(/\s+/g, ' ');
       if (normalizedLine.startsWith(trigger)) {
@@ -255,7 +253,7 @@ export class GameSessionImpl implements GameSession {
     this.executeCommand(trimmed, source);
   }
 
-  private executeCommand(line: string, source: string): void {
+  private executeCommand(line: string, _source: string): void {
     const machineId = this.world.activeMachine;
     const prevWorld = this.world;
 
@@ -277,13 +275,18 @@ export class GameSessionImpl implements GameSession {
     }
     this.commandsTyped++;
 
-    // Track ranCommand
-    const words = line.trim().split(/\s+/);
+    // Track ranCommand — store both the full command and prefix forms
+    // so goals can match "cat notes.txt", "cat", "git status", or "git"
+    const normalized = line.trim().replace(/\s+/g, ' ');
+    this.commandsRun.set(normalized, (this.commandsRun.get(normalized) ?? 0) + 1);
+    const words = normalized.split(' ');
     if (words[0] === 'git' && words.length > 1) {
-      const cmd = `git ${words[1]}`;
-      this.commandsRun.set(cmd, (this.commandsRun.get(cmd) ?? 0) + 1);
-    } else if (words.length > 0) {
-      this.commandsRun.set(words[0], (this.commandsRun.get(words[0]) ?? 0) + 1);
+      const sub = `git ${words[1]}`;
+      if (sub !== normalized) this.commandsRun.set(sub, (this.commandsRun.get(sub) ?? 0) + 1);
+    }
+    if (words.length > 0) {
+      const prog = words[0];
+      if (prog !== normalized) this.commandsRun.set(prog, (this.commandsRun.get(prog) ?? 0) + 1);
     }
 
     // Apply result
@@ -350,8 +353,7 @@ export class GameSessionImpl implements GameSession {
     const machine = this.world.machines[machineId];
     if (!machine) return;
 
-    let absPath: string;
-    absPath = resolvePath(machine.cwd, machine.home, path);
+    const absPath = resolvePath(machine.cwd, machine.home, path);
 
     const prevWorld = this.world;
     this.world = produce(this.world, (draft) => {
@@ -425,10 +427,7 @@ export class GameSessionImpl implements GameSession {
     if (!this.pendingPredict || this.pendingPredict.chosen === null) return;
     const command = this.pendingPredict.command;
     // Clear the predict card's trigger so it does not fire again
-    if (this.level?.predict) {
-      // Nullify predict after use
-      (this.level as any).predict = null;
-    }
+    this.predictUsed = true;
     this.pendingPredict = null;
     // Execute the held command
     this.executeCommand(command.trim(), 'typed');
@@ -472,7 +471,8 @@ export class GameSessionImpl implements GameSession {
 
   revealHint(): string | null {
     if (!this.level || this.hintsRevealed >= 3) return null;
-    const hint = this.level.hints[this.hintsRevealed];
+    const hint = (this.level.hints as readonly string[])[this.hintsRevealed];
+    if (hint === undefined) return null;
     this.hintsRevealed = (this.hintsRevealed + 1) as 0 | 1 | 2 | 3;
     this.revealedHints.push(hint);
     this.notify();
@@ -516,6 +516,7 @@ export class GameSessionImpl implements GameSession {
     this.hintsRevealed = 0;
     this.revealedHints = [];
     this.pendingPredict = null;
+    this.predictUsed = false;
     this.editor = null;
     this.lastEvents = [];
     this.eventSeq++;
@@ -580,10 +581,11 @@ export class GameSessionImpl implements GameSession {
 
   switchMachine(id: MachineId): void {
     if (!this.world.machines[id]) return;
+    const previousMachine = this.world.activeMachine;
     this.world = produce(this.world, (draft) => {
       draft.activeMachine = id;
     });
-    this.lastEvents = [{ type: 'machine.switch', from: this.world.activeMachine, to: id }];
+    this.lastEvents = [{ type: 'machine.switch', from: previousMachine, to: id }];
     this.eventSeq++;
     this.notify();
   }
@@ -630,6 +632,7 @@ export class GameSessionImpl implements GameSession {
       world: this.world,
       defaultMachine: this.world.activeMachine,
       defaultRepoPath: handle?.root ?? machine?.cwd ?? '/home/intern',
+      levelWorkdir: this.levelWorkdir,
       answeredQuestions: this.answeredQuestions,
       storyRead: this.storyRead,
       commandsRun: this.commandsRun,

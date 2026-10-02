@@ -162,6 +162,7 @@ export const TID = {
   settingsExport: 'settings-export',
   settingsExportStatus: 'settings-export-status',
   settingsImport: 'settings-import',
+  settingsImportConfirm: 'settings-import-confirm',
   settingsImportStatus: 'settings-import-status',
   settingsReset: 'settings-reset',
   settingsResetConfirm: 'settings-reset-confirm',

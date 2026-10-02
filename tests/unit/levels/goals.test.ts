@@ -2,15 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { evaluateGoals, allGoalsMet } from '../../../src/levels/goals';
 import type { GoalContext } from '../../../src/levels/goals';
 import type { GoalItem } from '../../../src/shared/level';
-import { createWorld, createMachine } from '../../../src/engine/core/world';
+import { createWorld } from '../../../src/engine/core/world';
 import { runLine } from '../../../src/parser/index';
 import { MAIN_MACHINE_ID } from '../../../src/shared/constants';
+import { produce } from 'immer';
+import type { World } from '../../../src/shared/types';
 
 function makeContext(overrides?: Partial<GoalContext>): GoalContext {
-  const { produce } = require('immer');
   let world = createWorld();
   // Set user identity so commits work
-  world = produce(world, (draft: any) => {
+  world = produce(world, (draft: World) => {
     draft.machines[MAIN_MACHINE_ID].globalConfig['user.name'] = 'Test User';
     draft.machines[MAIN_MACHINE_ID].globalConfig['user.email'] = 'test@example.com';
   });
@@ -18,6 +19,7 @@ function makeContext(overrides?: Partial<GoalContext>): GoalContext {
     world,
     defaultMachine: MAIN_MACHINE_ID,
     defaultRepoPath: '/home/intern',
+    levelWorkdir: '/home/intern',
     answeredQuestions: new Set(),
     storyRead: false,
     commandsRun: new Map(),
@@ -26,7 +28,7 @@ function makeContext(overrides?: Partial<GoalContext>): GoalContext {
 }
 
 function initRepo(ctx: GoalContext): GoalContext {
-  let result = runLine(ctx.world, MAIN_MACHINE_ID, 'git init');
+  const result = runLine(ctx.world, MAIN_MACHINE_ID, 'git init');
   return { ...ctx, world: result.state };
 }
 
@@ -68,8 +70,7 @@ describe('Goal Checks', () => {
     it('checks if a file exists', () => {
       const ctx = makeContext();
       // Write a file to the machine's fs
-      const { produce } = require('immer');
-      const world = produce(ctx.world, (draft: any) => {
+      const world = produce(ctx.world, (draft: World) => {
         draft.machines[MAIN_MACHINE_ID].fs.files['/home/intern/test.txt'] = 'hello';
       });
       const ctx2 = { ...ctx, world };
@@ -83,9 +84,8 @@ describe('Goal Checks', () => {
 
   describe('fileContent', () => {
     it('checks file content with contains', () => {
-      const { produce } = require('immer');
       const ctx = makeContext();
-      const world = produce(ctx.world, (draft: any) => {
+      const world = produce(ctx.world, (draft: World) => {
         draft.machines[MAIN_MACHINE_ID].fs.files['/home/intern/test.txt'] = 'hello world';
       });
       const ctx2 = { ...ctx, world };
@@ -113,7 +113,7 @@ describe('Goal Checks', () => {
     it('checks branch existence and current branch', () => {
       let ctx = initRepo(makeContext());
       // Make an initial commit so refs exist
-      let r = runLine(ctx.world, MAIN_MACHINE_ID, 'git commit --allow-empty -m "init"');
+      const r = runLine(ctx.world, MAIN_MACHINE_ID, 'git commit --allow-empty -m "init"');
       ctx = { ...ctx, world: r.state };
 
       const items: GoalItem[] = [{ text: 'On main', checks: [{ type: 'currentBranch', name: 'main' }] }];

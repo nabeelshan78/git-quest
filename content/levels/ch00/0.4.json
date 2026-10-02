@@ -87,7 +87,13 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "cat notes.txt"
+    },
+    {
+      "edit": {
+        "path": "index.html",
+        "content": "<h1>Festival</h1>"
+      }
     }
   ]
 }

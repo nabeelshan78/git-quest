@@ -28,9 +28,9 @@
     }
   ],
   "hints": [
-    "Additional hint",
-    "Additional hint",
-    "Additional hint"
+    "Read the clue file first. It tells you what to do.",
+    "`mkdir` creates a folder. `touch` creates an empty file.",
+    "Type `mkdir festival` then `touch festival/plan.txt`."
   ],
   "goal": {
     "items": [
@@ -62,7 +62,13 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "run": "mkdir festival"
+    },
+    {
+      "edit": {
+        "path": "festival/plan.txt",
+        "content": "plan"
+      }
     }
   ]
 }

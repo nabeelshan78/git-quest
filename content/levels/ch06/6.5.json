@@ -66,9 +66,9 @@
     "git fetch"
   ],
   "hints": [
-    "Run git pull",
-    "Additional hint",
-    "Additional hint"
+    "Someone changed the project online. How do you get those changes?",
+    "`git fetch` checks for changes. `git pull` fetches and merges them in.",
+    "Answer the question about fetch vs pull."
   ],
   "questions": [
     {
@@ -90,7 +90,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

@@ -69,9 +69,9 @@
     "git merge"
   ],
   "hints": [
-    "git merge main",
-    "Additional hint",
-    "Additional hint"
+    "Two people changed the same line. Git cannot pick one automatically.",
+    "Pull main into your branch, then fix the conflict markers by hand.",
+    "Answer the question about resolving merge conflicts in a PR."
   ],
   "questions": [
     {
@@ -93,7 +93,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

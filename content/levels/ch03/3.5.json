@@ -32,35 +32,22 @@
       },
       {
         "commit": {
-          "message": "Add style",
-          "files": {
-            "style.css": null
-          }
-        }
-      },
-      {
-        "files": {
-          "style.css": "body { background: neon-green; }\n"
+          "message": "Add style"
         }
       },
       {
         "commit": {
           "message": "Make it neon green",
           "files": {
-            "style.css": null
+            "style.css": "body { background: neon-green; }\n"
           }
-        }
-      },
-      {
-        "files": {
-          "index.html": "<h1>Festival</h1>\n"
         }
       },
       {
         "commit": {
           "message": "Add homepage",
           "files": {
-            "index.html": null
+            "index.html": "<h1>Festival</h1>\n"
           }
         }
       }

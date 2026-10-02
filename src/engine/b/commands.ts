@@ -5,31 +5,28 @@
  * State mutations use immer `produce`. Output matches real git's wording.
  */
 import { produce } from 'immer';
-import { hasFlag, getString, getList, allArgs } from '../../shared/args';
+import { hasFlag, getString, getList } from '../../shared/args';
 import { ZERO_HASH } from '../../shared/constants';
 import type { CommitKind, RefUpdateReason } from '../../shared/events';
-import type { CommandResult, OutputLine } from '../../shared/result';
+import type { CommandResult } from '../../shared/result';
 import { fatal, ok, fail, stdout, stderr } from '../../shared/result';
 import type {
-  AbsPath, CommitObject, FileMode, Hash,
-  IndexEntry, Machine, RepoPath,
-  RepoState, Signature, World,
+  AbsPath, CommitObject, Hash,
+  Machine, RepoState, Signature, World,
 } from '../../shared/types';
 import {
-  EMPTY_TREE_HASH, getBlob, getCommit, getObject, getTree,
-  hashBlob, hashObject, peel, readTreeFlat, shortHash,
-  sortTreeEntries, subjectOf, writeBlob, writeObject, writeTreeFromFlat,
+  getBlob, getCommit, hashBlob, peel, readTreeFlat, shortHash,
+  subjectOf, writeBlob, writeObject, writeTreeFromFlat,
 } from '../core/objects';
 import type { FlatTreeEntry } from '../core/objects';
 import {
-  absOf, branchNames, configuredIdentity, currentBranch,
+  absOf, configuredIdentity, currentBranch,
   dwimRef, headCommit, listWorkTree, readRef,
-  setHead, signatureFor, updateRef, appendReflog,
+  signatureFor, updateRef, appendReflog,
 } from '../core/repo';
 import {
-  deleteFile, fileExists, writeFile,
+  deleteFile, writeFile,
 } from '../core/fs';
-import { join } from '../core/paths';
 import type { GitContext, GitHandler, EditorResumeHandler } from '../types';
 import { Out, openRepo, openWorkTree, isResult, localLoc, fatalResult } from '../a/context';
 import { countChanges, diffTexts } from '../a/xdiff';
@@ -441,7 +438,7 @@ function stashApply(world: World, machineId: string, args: import('../../shared/
 function stashPop(world: World, machineId: string, args: import('../../shared/args').ParsedArgs): CommandResult {
   const r = openWorkTree(world, machineId);
   if (isResult(r)) return r;
-  const { root, repo } = r;
+  const { repo } = r;
 
   const idx = args.positionals.length > 0 ? parseStashRef(args.positionals[0]) : 0;
   if (idx === null) return fatal(world, `'${args.positionals[0]}' is not a valid stash reference`);
@@ -480,7 +477,7 @@ function stashList(world: World, machineId: string): CommandResult {
   return o.result(world);
 }
 
-function dropStashEntry(repo: RepoState, idx: number, who: Signature): void {
+function dropStashEntry(repo: RepoState, idx: number, _who: Signature): void {
   const reflog = repo.reflog['refs/stash'];
   if (!reflog) return;
   // reflog is oldest-first, stash@{0} = last entry, stash@{n} = reflog[reflog.length - 1 - n]
@@ -572,7 +569,6 @@ function stashShow(world: World, machineId: string, args: import('../../shared/a
       deletions += counts.deleted;
 
       if (!showPatch) {
-        const change = !oh ? 'new file' : !nh ? 'deleted' : 'modified';
         const ins = nh ? counts.added : 0;
         const del = oh ? counts.deleted : 0;
         const bar = '+'.repeat(Math.min(ins, 40)) + '-'.repeat(Math.min(del, 40));
@@ -762,8 +758,8 @@ export const amendEditorResume: EditorResumeHandler = (world, request, text) => 
   if (text === null) {
     return fail(world, 1, stderr('Aborting commit due to empty commit message.'));
   }
-  const { author, committer, treeHash, parents, head } = request.resume.data as any;
-  return doAmend(world, request.machine, request.workTree, author, committer, treeHash, parents, head, text);
+  const { author, committer, treeHash, parents, head } = request.resume.data as Record<string, unknown>;
+  return doAmend(world, request.machine, request.workTree, author as Signature, committer as Signature, treeHash as Hash, parents as Hash[], head as Hash, text);
 };
 
 // =========================================================================

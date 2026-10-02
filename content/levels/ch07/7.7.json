@@ -35,9 +35,9 @@
   "par": null,
   "allowedCommands": null,
   "hints": [
-    "Just answer the question.",
-    "Additional hint",
-    "Additional hint"
+    "This is the boss level. Use everything you learned about PRs.",
+    "Create branches, push, open PRs, handle reviews and conflicts.",
+    "Answer the question to complete the sprint."
   ],
   "questions": [
     {
@@ -59,7 +59,10 @@
   "predict": null,
   "solution": [
     {
-      "run": "clear"
+      "answer": {
+        "question": "q1",
+        "choice": 0
+      }
     }
   ]
 }

@@ -7,30 +7,28 @@
 import { produce } from 'immer';
 import type { ParsedArgs } from '../shared/args';
 import { getString, getCount, hasFlag, isNegated, parseArgs } from '../shared/args';
-import { ZERO_HASH, httpsUrl, parseHubUrl } from '../shared/constants';
+import { ZERO_HASH, parseHubUrl } from '../shared/constants';
 import type { RefChange } from '../shared/events';
-import type { CommandResult } from '../shared/result';
 import { fatal, fail, stdout, stderr } from '../shared/result';
 import type {
   Hash, Machine, RepoState, Signature, World, HostedRepo,
 } from '../shared/types';
 import {
   copyObjectClosure, getBlob, getCommit,
-  readTreeFlat, shortHash, writeBlob,
+  readTreeFlat, shortHash,
 } from '../engine/core/objects';
 import {
   createEmptyRepo, currentBranch, headCommit,
-  readRef, signatureFor,
+  signatureFor,
 } from '../engine/core/repo';
 import {
   dirExists, filesUnder, mkdirp, writeFile,
 } from '../engine/core/fs';
 import { join, normalize } from '../engine/core/paths';
 import type { GitHandler, CommandTable } from '../engine/types';
-import { Out, openRepo, openWorkTree, isResult, localLoc } from '../engine/a/context';
+import { Out, openRepo, openWorkTree, isResult } from '../engine/a/context';
 import { mergeHandler } from '../engine/a/commands';
 import { GIT_COMMANDS } from '../shared/commandSpecs';
-import { configuredIdentity } from '../engine/core/repo';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -668,7 +666,6 @@ const pullHandler: GitHandler = (world, ctx) => {
   const r = openWorkTree(world, machineId);
   if (isResult(r)) return r;
   const { root, repo } = r;
-  const o = new Out();
 
   // Check for unmerged conflicts
   if (Object.keys(repo.index.conflicts).length > 0) {

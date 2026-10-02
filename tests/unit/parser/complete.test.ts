@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { produce } from 'immer';
 import { createWorld, createMachine } from '../../../src/engine/core/world';
-import { writeFile, mkdirp } from '../../../src/engine/core/fs';
+import { writeFile } from '../../../src/engine/core/fs';
 import { createEmptyRepo } from '../../../src/engine/core/repo';
 import { completeLine } from '../../../src/parser';
 

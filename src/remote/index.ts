@@ -4,20 +4,19 @@
 import { produce } from 'immer';
 import type { HostedRepoSetup, TeammateAction } from '../shared/level';
 import type { CommandResult } from '../shared/result';
-import { ok, fail, stderr, stdout } from '../shared/result';
-import { ZERO_HASH, httpsUrl, parseHubUrl, CHARACTER_IDENTITIES } from '../shared/constants';
+import { fail, stderr } from '../shared/result';
+import { httpsUrl, parseHubUrl, CHARACTER_IDENTITIES } from '../shared/constants';
 import type {
-  AbsPath, Hash, HostedRepo, HostedRepoId, MachineId,
-  RepoState, Signature, World,
+  AbsPath, Hash, HostedRepo, MachineId,
+  Signature, World,
 } from '../shared/types';
 import {
-  copyObjectClosure, getBlob, getCommit, hashBlob,
+  getCommit,
   readTreeFlat, writeBlob, writeObject, writeTreeFromFlat,
 } from '../engine/core/objects';
 import type { FlatTreeEntry } from '../engine/core/objects';
 import {
-  createEmptyRepo, currentBranch, headCommit,
-  signatureFor, configuredIdentity,
+  createEmptyRepo, currentBranch,
 } from '../engine/core/repo';
 import type { GameEvent } from '../shared/events';
 
