@@ -141,7 +141,7 @@ function runSingle(
 // runLine: main entry point
 // ---------------------------------------------------------------------------
 
-/** Run one typed line on a machine, handling chaining with `;`. */
+/** Run one typed line on a machine, handling chaining with `;`, `&&`, `||`. */
 export function runLine(
   world: World,
   machineId: string,
@@ -183,9 +183,9 @@ export function runLine(
     };
   }
 
-  // Split by semicolons into separate commands
-  const commands = splitBySemicolons(tokens);
-  if (commands.length === 0) {
+  // Split into segments separated by `;`, `&&`, `||`
+  const segments = splitByOperators(tokens);
+  if (segments.length === 0) {
     return { state: world, events: [], output: [], exitCode: 0, executed: [] };
   }
 
@@ -195,14 +195,18 @@ export function runLine(
   const allEvents: import('../shared/events').GameEvent[] = [];
   let lastExitCode = 0;
 
-  for (const cmdTokens of commands) {
-    if (cmdTokens.length === 0) continue;
+  for (const seg of segments) {
+    if (seg.tokens.length === 0) continue;
+
+    // Handle && and || chaining
+    if (seg.operator === '&&' && lastExitCode !== 0) continue;
+    if (seg.operator === '||' && lastExitCode === 0) continue;
 
     const wordsBefore = currentWorld;
-    const r = runSingle(currentWorld, machineId, cmdTokens);
+    const r = runSingle(currentWorld, machineId, seg.tokens);
 
     // Build program + argv for ExecutedCommand
-    const words = cmdTokens.filter((t) => t.kind === 'word').map((t) => t.value);
+    const words = seg.tokens.filter((t) => t.kind === 'word').map((t) => t.value);
     const [program, ...argv] = words.length > 0 ? words : [''];
 
     allOutput.push(...r.output);
@@ -235,21 +239,29 @@ export function completeLine(world: World, machineId: string, line: string): Com
 // Helpers
 // ---------------------------------------------------------------------------
 
-function splitBySemicolons(tokens: Token[]): Token[][] {
-  const result: Token[][] = [];
+interface Segment {
+  /** The operator that preceded this segment: null for the first, ';', '&&', or '||' for the rest. */
+  operator: null | ';' | '&&' | '||';
+  tokens: Token[];
+}
+
+function splitByOperators(tokens: Token[]): Segment[] {
+  const result: Segment[] = [];
   let current: Token[] = [];
+  let pendingOp: Segment['operator'] = null;
   for (const t of tokens) {
-    if (t.kind === 'semicolon') {
+    if (t.kind === 'semicolon' || t.kind === 'and' || t.kind === 'or') {
       if (current.length > 0) {
-        result.push(current);
+        result.push({ operator: pendingOp, tokens: current });
         current = [];
       }
+      pendingOp = t.kind === 'semicolon' ? ';' : t.kind === 'and' ? '&&' : '||';
     } else {
       current.push(t);
     }
   }
   if (current.length > 0) {
-    result.push(current);
+    result.push({ operator: pendingOp, tokens: current });
   }
   return result;
 }
