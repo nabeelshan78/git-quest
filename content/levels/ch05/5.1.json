@@ -4,13 +4,35 @@
   "chapter": 5,
   "number": 1,
   "title": "Why conflicts happen",
-  "concept": "Two edits to the same lines",
+  "concept": "Two edits to the same lines; cause a real conflict",
+  "boss": false,
   "story": [
     {
       "speaker": "Ada",
-      "text": "Sam and you both edited the main page today. Try to merge the feature branch into main to see what happens when git tries to combine them."
+      "text": "Most merges just work. Git matches up the changes by itself."
+    },
+    {
+      "speaker": "Ada",
+      "text": "But if two people change **the same line**, git cannot guess which one is right."
+    },
+    {
+      "speaker": "Ada",
+      "text": "That is a **conflict**. It is not an error and nothing is broken."
+    },
+    {
+      "speaker": "Ada",
+      "text": "You changed the title on your branch. Sam changed the same title on main."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Try the merge and see what git says. Causing one on purpose is the fastest way to learn."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Do not fix it yet. Next level we read it properly."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -52,7 +74,20 @@
   "goal": {
     "items": [
       {
-        "text": "Try to merge the feature branch and answer the question",
+        "text": "Try to merge feature into main",
+        "checks": [
+          {
+            "type": "operationInProgress",
+            "operation": "merge"
+          },
+          {
+            "type": "conflicted",
+            "path": "index.html"
+          }
+        ]
+      },
+      {
+        "text": "Answer: what did git do?",
         "checks": [
           {
             "type": "answered",
@@ -62,37 +97,59 @@
       }
     ]
   },
-  "par": null,
-  "allowedCommands": [
-    "git merge"
-  ],
-  "hints": [
-    "You need to bring the feature branch into main.",
-    "Use the git merge command.",
-    "git merge feature"
-  ],
   "questions": [
     {
       "id": "q1",
-      "prompt": "What did git say when you tried to merge?",
+      "prompt": "The merge stopped. What is true right now?",
       "choices": [
         {
-          "text": "Fast-forward"
+          "text": "Git threw away one of the two versions"
         },
         {
-          "text": "Merge conflict in index.html"
+          "text": "Git stopped and left both versions in the file for me to decide"
         },
         {
-          "text": "Already up to date"
+          "text": "The repository is broken"
         }
       ],
       "answer": 1,
-      "explanation": "Because you and Sam changed the exact same line, git doesn't know which edit to keep. This is a merge conflict."
+      "explanation": "Git never picks a winner on its own. It pauses the merge and puts both versions in the file so a human can choose."
     }
   ],
-  "recap": "A merge conflict happens when git cannot automatically merge two edits to the same lines.",
-  "predict": null,
+  "par": 1,
+  "recap": "A conflict happens when two branches change the same line. Git pauses the merge and asks you to decide. Nothing is broken and nothing is lost.",
+  "glossary": [
+    "conflict"
+  ],
+  "cheatSheet": [],
+  "predict": {
+    "trigger": "git merge",
+    "question": "You and Sam both changed the title line. What will the merge do?",
+    "choices": [
+      {
+        "text": "Keep Sam's version, because it is on main"
+      },
+      {
+        "text": "Stop and ask you to decide"
+      }
+    ],
+    "answer": 1,
+    "explanation": "Git will not choose for you when the same line changed on both sides."
+  },
+  "allowedCommands": [
+    "git merge",
+    "git status",
+    "cat"
+  ],
+  "hints": [
+    "You are on main. Merge the other branch in and see what happens.",
+    "`git merge <branch>` joins that branch into the one you are on.",
+    "Run `git merge feature`."
+  ],
   "solution": [
+    {
+      "run": "git merge feature"
+    },
     {
       "answer": {
         "question": "q1",

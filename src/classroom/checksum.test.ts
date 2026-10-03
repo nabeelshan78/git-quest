@@ -65,3 +65,38 @@ describe('progress checksum', () => {
     expect(verifyChecksum(roundTripped)).toBe(true);
   });
 });
+
+describe('fnv1a32 UTF-8 encoding', () => {
+  // The inline encoder must stay byte-identical to TextEncoder, or progress
+  // files written by older builds would stop verifying.
+  const encoder = new TextEncoder();
+  function viaTextEncoder(text: string): string {
+    let hash = 0x811c9dc5;
+    for (const byte of encoder.encode(text)) {
+      hash ^= byte;
+      hash = Math.imul(hash, 0x01000193) >>> 0;
+    }
+    return hash.toString(16).padStart(8, '0');
+  }
+
+  it('matches TextEncoder for ASCII, accents, CJK and emoji', () => {
+    for (const s of ['', 'a', 'hello world', 'café', '日本語テキスト', '🎉🎆', '𝄞', 'Ünïcödé ✓']) {
+      expect(fnv1a32(s)).toBe(viaTextEncoder(s));
+    }
+  });
+
+  it('matches TextEncoder for unpaired surrogates', () => {
+    for (const s of ['\uD83D', '\uDE29', 'a\uD800b', '\uDC00\uD800']) {
+      expect(fnv1a32(s)).toBe(viaTextEncoder(s));
+    }
+  });
+
+  it('matches TextEncoder on random strings', () => {
+    for (let i = 0; i < 2000; i++) {
+      let s = '';
+      const len = Math.floor(Math.random() * 40);
+      for (let j = 0; j < len; j++) s += String.fromCharCode(Math.floor(Math.random() * 0x10000));
+      expect(fnv1a32(s)).toBe(viaTextEncoder(s));
+    }
+  });
+});

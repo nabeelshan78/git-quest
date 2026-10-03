@@ -12,24 +12,31 @@ import type {
   SessionSnapshot,
   TerminalEntry,
 } from '../shared/session';
-import type { LevelDefinition, DialogueLine, HubAction } from '../shared/level';
+import type { LevelDefinition, DialogueLine, HubAction, TeammateTrigger } from '../shared/level';
 import type { LevelResult } from '../shared/progress';
 import type { EditorRequest, MachineId, World } from '../shared/types';
 import type { GameEvent } from '../shared/events';
 import { runLine, completeLine as parserComplete } from '../parser';
 import { applyHubAction, reactToEvents } from '../hub/index';
+import { applyTeammatePush } from '../remote/index';
 import { resumeEditor } from '../engine';
 import { runSetup, substituteLevel } from './setup';
+import { buildSandboxWorld } from './sandboxPresets';
+import {
+  createBundle,
+  describeBundleError,
+  importBundle as importBundleIntoWorld,
+  parseBundle,
+  serializeBundle,
+} from '../classroom/bundle';
 import { evaluateGoals, allGoalsMet } from './goals';
 import type { GoalContext } from './goals';
 import { translateError } from './errors';
 import { computeStars, projectStars } from './scoring';
 import { worldChanged } from '../shared/compare';
 import { findRepo, currentBranch, headCommit } from '../engine/core/repo';
-import { MAIN_MACHINE_ID } from '../shared/constants';
 import { resolvePath, dirname } from '../engine/core/paths';
 import { writeFile as fsWriteFile, mkdirp } from '../engine/core/fs';
-import { createWorld } from '../engine/core/world';
 import { produce } from 'immer';
 
 // ---------------------------------------------------------------------------
@@ -96,6 +103,10 @@ export class GameSessionImpl implements GameSession {
   private disposed = false;
   private result: LevelResult | null = null;
   private predictUsed = false;
+  /** Teammate script ids that have already fired (each fires once). */
+  private firedTeammates = new Set<string>();
+  /** Every engine event so far, for teammate `on: "event"` triggers. */
+  private seenEvents: GameEvent[] = [];
 
   constructor(options: SessionOptions) {
     this.mode = options.mode;
@@ -140,16 +151,8 @@ export class GameSessionImpl implements GameSession {
       // Sandbox mode
       this.level = null;
       this.phase = 'play';
-      this.world = createWorld({
-        hubViewer: options.player.handle,
-        hubViewerName: options.player.name,
-      });
-      // Set player identity
-      this.world = produce(this.world, (draft) => {
-        const m = draft.machines[MAIN_MACHINE_ID];
-        m.globalConfig['user.name'] = options.player.name;
-        m.globalConfig['user.email'] = options.player.email;
-      });
+      this.world = buildSandboxWorld(options.sandboxPreset, options.player);
+      this.levelWorkdir = this.world.machines[this.world.activeMachine]?.cwd ?? '/home/intern';
       this.initialWorld = this.world;
     }
   }
@@ -323,6 +326,7 @@ export class GameSessionImpl implements GameSession {
       if (hubResult.events.length > 0) {
         this.lastEvents = [...this.lastEvents, ...hubResult.events];
       }
+      this.seenEvents.push(...result.events, ...hubResult.events);
     }
 
     // Check goals
@@ -525,6 +529,8 @@ export class GameSessionImpl implements GameSession {
     this.rewinds = 0;
     this.answeredQuestions.clear();
     this.commandsRun.clear();
+    this.firedTeammates.clear();
+    this.seenEvents = [];
     this.result = null;
     this.storyRead = false;
     if (this.level?.questions) {
@@ -573,6 +579,10 @@ export class GameSessionImpl implements GameSession {
     if (result.events.length > 0) {
       const hubResult = reactToEvents(this.world, result.events);
       this.world = hubResult.state;
+      if (hubResult.events.length > 0) {
+        this.lastEvents = [...this.lastEvents, ...hubResult.events];
+      }
+      this.seenEvents.push(...result.events, ...hubResult.events);
     }
 
     this.checkCompletion();
@@ -598,6 +608,10 @@ export class GameSessionImpl implements GameSession {
     if (this.phase === 'complete' || !this.level) return;
     if (this.phase !== 'play') return;
 
+    // Scripted teammates may act before goals are judged, and their work can
+    // itself complete or block a goal, so run them first and re-read the world.
+    this.runTeammateScripts();
+
     const goalCtx = this.makeGoalContext();
     if (allGoalsMet(this.level.goal.items, goalCtx)) {
       this.phase = 'complete';
@@ -622,6 +636,121 @@ export class GameSessionImpl implements GameSession {
         this.dialogue = [...this.dialogue, ...this.level.success];
       }
       this.onResult?.(this.result);
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // Classmate repo bundles (asynchronous, no backend)
+  // -----------------------------------------------------------------------
+
+  exportBundle(author: { name: string; handle: string }): string | null {
+    const made = createBundle(this.world, this.world.activeMachine, author, new Date(this.nowFn()).toISOString());
+    if (!made.ok) return null;
+    return serializeBundle(made.bundle);
+  }
+
+  importBundle(text: string): { ok: true; branch: string } | { ok: false; error: string } {
+    const parsed = parseBundle(text);
+    if (!parsed.ok) return { ok: false, error: describeBundleError(parsed.error) };
+
+    const prevWorld = this.world;
+    const landed = importBundleIntoWorld(this.world, this.world.activeMachine, parsed.bundle);
+    if (!landed.ok) {
+      return { ok: false, error: 'Open a repository first, then import a classmate bundle into it.' };
+    }
+
+    this.world = landed.world;
+    this.rewindStack.push(prevWorld);
+    this.addTranscript(
+      'system',
+      `Imported ${parsed.bundle.author.name}'s work as branch ${landed.branch}. Merge it with: git merge ${landed.branch}`,
+    );
+    this.eventSeq++;
+    this.checkCompletion();
+    this.notify();
+    return { ok: true, branch: landed.branch };
+  }
+
+  /**
+   * Fire scripted-teammate actions whose trigger has become true. Each script
+   * runs at most once. A teammate acting is what makes events like a rejected
+   * push happen for a real reason instead of a staged one.
+   */
+  private runTeammateScripts(): void {
+    const scripts = this.level?.teammates;
+    if (!scripts || scripts.length === 0) return;
+
+    for (const script of scripts) {
+      if (this.firedTeammates.has(script.id)) continue;
+      if (!this.teammateTriggerMet(script.when)) continue;
+      this.firedTeammates.add(script.id);
+
+      for (const action of script.actions) {
+        if (action.type === 'say') {
+          this.dialogue = [...this.dialogue, { speaker: action.speaker, text: action.text }];
+          this.addTranscript('system', `${action.speaker}: ${action.text}`);
+          continue;
+        }
+        const before = this.world;
+        let result;
+        if (action.type === 'push') {
+          result = applyTeammatePush(this.world, action);
+        } else if (action.type === 'hub') {
+          result = applyHubAction(this.world, action.action);
+        } else {
+          result = runLine(this.world, action.machine, action.line);
+        }
+        if (result.exitCode === 0) {
+          this.world = result.state;
+          if (result.events.length > 0) {
+            this.lastEvents = [...this.lastEvents, ...result.events];
+            this.eventSeq++;
+            // Let the hub react (e.g. a PR notices its branch moved).
+            const reacted = reactToEvents(this.world, result.events);
+            this.world = reacted.state;
+            if (reacted.events.length > 0) this.lastEvents = [...this.lastEvents, ...reacted.events];
+            this.seenEvents.push(...result.events, ...reacted.events);
+          }
+        } else {
+          this.world = before;
+        }
+      }
+    }
+  }
+
+  private teammateTriggerMet(when: TeammateTrigger): boolean {
+    switch (when.on) {
+      case 'start':
+        return true;
+      case 'commands':
+        return this.commandsUsed >= when.count;
+      case 'goal': {
+        if (!this.level) return false;
+        const items = this.level.goal.items;
+        if (when.item >= items.length) return false;
+        const states = evaluateGoals(items, this.makeGoalContext());
+        return states[when.item]?.done === true;
+      }
+      case 'event': {
+        const needed = when.count ?? 1;
+        let seen = 0;
+        for (const ev of this.seenEvents) {
+          if (ev.type !== when.event) continue;
+          if (when.where) {
+            const rec = ev as unknown as Record<string, unknown>;
+            let ok = true;
+            for (const [k, v] of Object.entries(when.where)) {
+              if (rec[k] !== v) { ok = false; break; }
+            }
+            if (!ok) continue;
+          }
+          seen++;
+          if (seen >= needed) return true;
+        }
+        return false;
+      }
+      default:
+        return false;
     }
   }
 

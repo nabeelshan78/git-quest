@@ -4,13 +4,30 @@
   "chapter": 7,
   "number": 2,
   "title": "Your first pull request",
-  "concept": "Push a branch, open a PR",
+  "concept": "Open a pull request; ask for a review",
   "story": [
     {
       "speaker": "Ada",
-      "text": "Now push your branch and open a Pull Request (PR)."
+      "text": "Your branch is online, but nobody has looked at it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "A **pull request** says: \"please look at my branch, then put it into main\"."
+    },
+    {
+      "speaker": "Ada",
+      "text": "It is a conversation attached to your changes. Teammates can read the diff and comment."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Open the Pull requests tab and make one. Compare `food-stalls`, into `main`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then open the Files changed tab and read your own diff before anyone else does."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -18,38 +35,60 @@
       },
       {
         "commit": {
-          "message": "Init",
+          "message": "Festival site so far",
           "files": {
-            "index.html": "Lantren\n"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
           }
         }
       },
       {
         "hosted": {
           "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds",
+            "priya-reviews"
+          ],
           "fromLocal": {
-            "remoteName": "origin",
             "setUpstream": true
           }
         }
       },
       {
-        "run": "git switch -c fix-typo"
+        "run": "git switch -c food-stalls"
       },
       {
         "commit": {
-          "message": "Fix typo",
+          "message": "Add food stalls page",
           "files": {
-            "index.html": "Lantern\n"
+            "food.html": "<h2>Food stalls</h2>\n<p>The samosa stall is vegetarian.</p>\n"
           }
         }
+      },
+      {
+        "run": "git push -u origin food-stalls"
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Push the branch and open a PR",
+        "text": "Open a pull request from food-stalls into main",
+        "checks": [
+          {
+            "type": "pullRequest",
+            "repo": "lantern-labs/festival-site",
+            "head": "food-stalls",
+            "base": "main",
+            "state": "open"
+          }
+        ]
+      },
+      {
+        "text": "Answer: what does a pull request contain?",
         "checks": [
           {
             "type": "answered",
@@ -59,38 +98,61 @@
       }
     ]
   },
-  "par": 1,
-  "allowedCommands": [
-    "git push"
-  ],
+  "par": null,
+  "allowedCommands": null,
   "hints": [
-    "A pull request asks others to review your branch before merging.",
-    "Push your branch, then open a PR on GitHub to propose the change.",
-    "Answer the question about pull requests."
+    "Use the website panel, not the terminal. Pull requests live on the website.",
+    "Open the Pull requests tab and press New pull request. Compare is your branch, base is main.",
+    "In the website panel: Pull requests → New pull request → compare `food-stalls`, base `main` → give it a title → Create pull request."
   ],
   "questions": [
     {
       "id": "q1",
-      "prompt": "What does a Pull Request do?",
+      "prompt": "What is in a pull request?",
       "choices": [
         {
-          "text": "Asks the team to review and merge your branch"
+          "text": "A copy of your files that replaces main straight away"
         },
         {
-          "text": "Pulls code to your laptop"
+          "text": "A request to merge a branch, plus the diff and a place to talk about it"
         }
       ],
-      "answer": 0,
-      "explanation": "A PR is a request to merge your branch into main."
+      "answer": 1,
+      "explanation": "Opening a pull request changes nothing yet. It asks for review and shows exactly what would change."
     }
   ],
-  "recap": "Push your branch and open a PR to get your code reviewed.",
+  "recap": "A pull request asks for a branch to be merged. It shows the diff and gives teammates a place to comment. Opening one changes nothing by itself.",
+  "glossary": [
+    "pull-request"
+  ],
+  "cheatSheet": [],
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site/pulls",
+    "focus": "hub"
+  },
   "solution": [
+    {
+      "hub": {
+        "type": "openPullRequest",
+        "repo": "lantern-labs/festival-site",
+        "head": "food-stalls",
+        "base": "main",
+        "title": "Add food stalls page",
+        "body": "Closes #1. Lists the stalls and notes the samosa stall is vegetarian.",
+        "reviewers": [
+          "priya-reviews"
+        ]
+      }
+    },
     {
       "answer": {
         "question": "q1",
-        "choice": 0
+        "choice": 1
       }
     }
   ]

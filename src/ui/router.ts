@@ -4,8 +4,8 @@
  */
 import { useEffect, useState } from 'react';
 
-export type SandboxPreset = 'empty' | 'festival' | 'festival-with-remote';
-export const SANDBOX_PRESETS: SandboxPreset[] = ['empty', 'festival', 'festival-with-remote'];
+export type SandboxPreset = 'empty' | 'festival' | 'festival-with-remote' | 'team-up';
+export const SANDBOX_PRESETS: SandboxPreset[] = ['empty', 'festival', 'festival-with-remote', 'team-up'];
 
 export type Route =
   | { name: 'home' }

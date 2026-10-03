@@ -25,7 +25,7 @@ import type { FlatTreeEntry } from '../core/objects';
 import {
   absOf, branchNames, configuredIdentity, createEmptyRepo, currentBranch,
   deleteRef, dwimRef, findRepo, getConfig, headCommit, listWorkTree,
-  NOT_A_REPO, normalizeConfigKey, readRef, remoteBranchNames,
+  NOT_A_REPO, normalizeConfigKey, readRef, remoteBranchNames, resolveReflogRev,
   setHead, signatureFor, updateRef,
 } from '../core/repo';
 import {
@@ -60,6 +60,9 @@ function resolveRev(repo: RepoState, name: string): Hash | null {
   if (name === 'HEAD' || name === '@') {
     return headCommit(repo);
   }
+  // HEAD@{N}, branch@{N}: where the ref pointed N moves ago.
+  const fromReflog = resolveReflogRev(repo, name);
+  if (fromReflog !== undefined) return fromReflog;
   // HEAD~N, branch~N, branch^N, tag~N etc.
   const ancestorMatch = /^(.+?)([~^])(\d*)$/.exec(name);
   if (ancestorMatch) {

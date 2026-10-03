@@ -29,14 +29,49 @@ export function canonicalJson(value: unknown): string {
   return `{${parts.join(',')}}`;
 }
 
-const encoder = new TextEncoder();
-
-/** FNV-1a 32-bit hash of the UTF-8 bytes of `text`, as 8 lower-case hex digits. */
+/**
+ * FNV-1a 32-bit hash of the UTF-8 bytes of `text`, as 8 lower-case hex digits.
+ *
+ * UTF-8 is encoded inline rather than with `TextEncoder` so this file stays
+ * usable from the pure-TypeScript core, which compiles without DOM or Node
+ * library types. The bytes are identical to `TextEncoder`, so checksums
+ * written by older builds still verify.
+ */
 export function fnv1a32(text: string): string {
   let hash = 0x811c9dc5;
-  for (const byte of encoder.encode(text)) {
+  const mix = (byte: number) => {
     hash ^= byte;
     hash = Math.imul(hash, 0x01000193) >>> 0;
+  };
+
+  for (let i = 0; i < text.length; i++) {
+    let code = text.charCodeAt(i);
+    if (code >= 0xd800 && code <= 0xdfff) {
+      // Combine a well-formed surrogate pair into one code point; an unpaired
+      // surrogate becomes U+FFFD, exactly as TextEncoder does.
+      const low = code <= 0xdbff && i + 1 < text.length ? text.charCodeAt(i + 1) : 0;
+      if (code <= 0xdbff && low >= 0xdc00 && low <= 0xdfff) {
+        code = (code - 0xd800) * 0x400 + (low - 0xdc00) + 0x10000;
+        i++;
+      } else {
+        code = 0xfffd;
+      }
+    }
+    if (code < 0x80) {
+      mix(code);
+    } else if (code < 0x800) {
+      mix(0xc0 | (code >> 6));
+      mix(0x80 | (code & 0x3f));
+    } else if (code < 0x10000) {
+      mix(0xe0 | (code >> 12));
+      mix(0x80 | ((code >> 6) & 0x3f));
+      mix(0x80 | (code & 0x3f));
+    } else {
+      mix(0xf0 | (code >> 18));
+      mix(0x80 | ((code >> 12) & 0x3f));
+      mix(0x80 | ((code >> 6) & 0x3f));
+      mix(0x80 | (code & 0x3f));
+    }
   }
   return hash.toString(16).padStart(8, '0');
 }

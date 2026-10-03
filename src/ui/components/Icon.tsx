@@ -30,7 +30,14 @@ export type IconName =
   | 'upload'
   | 'download'
   | 'warning'
-  | 'clock';
+  | 'clock'
+  | 'code'
+  | 'issue'
+  | 'pr'
+  | 'merge'
+  | 'alert'
+  | 'comment'
+  | 'arrow-left';
 
 const PATHS: Record<IconName, string> = {
   rewind: 'M11 6 4 12l7 6V6zm9 0-7 6 7 6V6z',
@@ -62,6 +69,13 @@ const PATHS: Record<IconName, string> = {
   download: 'M11 4h2v8.2l3.6-3.6L18 10l-6 6-6-6 1.4-1.4 3.6 3.6zm-6 15h14v2H5z',
   warning: 'M12 2 1 21h22zm-1 7h2v6h-2zm0 8h2v2h-2z',
   clock: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5v5.4l4 2.4-1 1.7-5-3V7z',
+  code: 'm9.4 7.4-1.4-1.4-6 6 6 6 1.4-1.4L4.8 12zm5.2 0 1.4-1.4 6 6-6 6-1.4-1.4 4.6-4.6z',
+  issue: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 2a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm-1 3h2v5h-2zm0 7h2v2h-2z',
+  pr: 'M6 3a3 3 0 0 1 1 5.9V15a3 3 0 0 0 3 3h2v-2.5l4 3.5-4 3.5V20h-2a5 5 0 0 1-5-5V8.9A3 3 0 0 1 6 3zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm12 10a3 3 0 1 1-1 5.8V21h-2v-2h2v-.2A3 3 0 0 1 18 15zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zM17 3h2v10h-2z',
+  merge: 'M6 3a3 3 0 0 1 1 5.9V11a4 4 0 0 0 4 4h3.1a3 3 0 1 1 0 2H11a6 6 0 0 1-4-1.5v3.6a3 3 0 1 1-2 0V8.9A3 3 0 0 1 6 3zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm0 14a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm11-5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z',
+  alert: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 2a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm-1 2h2v6h-2zm0 8h2v2h-2z',
+  comment: 'M3 4h18v12H8l-5 4V4zm2 2v9.9L7.3 14H19V6z',
+  'arrow-left': 'M10.8 5.4 9.4 4 1.4 12l8 8 1.4-1.4L4.2 12zM22 11H6v2h16z',
 };
 
 export function Icon({ name, size = 18, className }: { name: IconName; size?: number; className?: string }) {

@@ -18,5 +18,18 @@
     "definition": "The vault where git permanently stores your commits.",
     "chapter": 2,
     "command": "git commit"
+  },
+  {
+    "id": "diff",
+    "term": "Diff",
+    "definition": "A list of the lines that changed. Lines with + were added, lines with - were removed.",
+    "chapter": 2,
+    "command": "git diff"
+  },
+  {
+    "id": "working-directory",
+    "term": "Working directory",
+    "definition": "Another name for the working folder: the normal folder where you edit files.",
+    "chapter": 2
   }
 ]

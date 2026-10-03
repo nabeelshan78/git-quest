@@ -4,7 +4,7 @@
 import type { BaseGoalCheck, GoalCheck, GoalItem, ContentMatcher } from '../shared/level';
 import type { GoalItemStatus } from '../shared/session';
 import type { World, MachineId, RepoState, Hash } from '../shared/types';
-import { findRepo, headCommit, readRef, dwimRef, branchNames, currentBranch, getConfig } from '../engine/core/repo';
+import { findRepo, headCommit, readRef, dwimRef, branchNames, currentBranch, getConfig, resolveReflogRev } from '../engine/core/repo';
 import { fileExists, dirExists, readFile } from '../engine/core/fs';
 import { normalize, resolvePath, join } from '../engine/core/paths';
 import { getCommit, getObject, readCommitFiles, peel } from '../engine/core/objects';
@@ -143,6 +143,8 @@ function matchMessage(msg: string, check: {
 
 function resolveRev(repo: RepoState, name: string): Hash | null {
   if (name === 'HEAD' || name === '@') return headCommit(repo);
+  const fromReflog = resolveReflogRev(repo, name);
+  if (fromReflog !== undefined) return fromReflog;
   // HEAD~N, branch~N etc.
   const ancestorMatch = /^(.+?)([~^])(\d*)$/.exec(name);
   if (ancestorMatch) {

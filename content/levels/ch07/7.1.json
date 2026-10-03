@@ -3,14 +3,35 @@
   "id": "7.1",
   "chapter": 7,
   "number": 1,
-  "title": "Issues and one branch per task",
-  "concept": "Report a bug, assign it; one branch per task",
+  "title": "Pick up a task",
+  "concept": "Issues; one branch per task; push the branch",
   "story": [
     {
+      "speaker": "Priya",
+      "text": "I wrote down what still needs doing as **issues** on the website."
+    },
+    {
+      "speaker": "Priya",
+      "text": "An issue is just a note: a title, a description, and who is doing it."
+    },
+    {
+      "speaker": "Priya",
+      "text": "Issue #1 is yours. Open the Issues tab and read it."
+    },
+    {
       "speaker": "Ada",
-      "text": "We track work using Issues. Make a branch for issue #1: fix the typo."
+      "text": "Leave a comment so we know you started. That is normal team manners."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then make a branch just for this task. One task, one branch."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Push the branch with `-u` so it exists on the website too."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -18,10 +39,48 @@
       },
       {
         "commit": {
-          "message": "Init",
+          "message": "Festival site so far",
           "files": {
-            "index.html": "Lantren\n"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
           }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds",
+            "priya-reviews"
+          ],
+          "fromLocal": {
+            "setUpstream": true
+          },
+          "labels": [
+            {
+              "name": "content",
+              "color": "#0072B2",
+              "description": "Pages and words"
+            }
+          ]
+        }
+      },
+      {
+        "hub": {
+          "type": "createIssue",
+          "actor": "priya-reviews",
+          "repo": "lantern-labs/festival-site",
+          "title": "Add a food stalls page",
+          "body": "Visitors keep asking what food will be there.\n\nPlease add food.html listing the stalls. Mention that the samosa stall is vegetarian.",
+          "labels": [
+            "content"
+          ],
+          "assignees": [
+            "{{player.handle}}"
+          ]
         }
       }
     ]
@@ -29,50 +88,117 @@
   "goal": {
     "items": [
       {
-        "text": "Create and switch to a branch named 'fix-typo'",
+        "text": "Comment on issue #1 to say you started",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "issue",
+            "repo": "lantern-labs/festival-site",
+            "number": 1,
+            "commentBy": "{{player.handle}}"
+          }
+        ]
+      },
+      {
+        "text": "Make a branch for this task",
+        "checks": [
+          {
+            "type": "branchExists",
+            "name": "food-stalls"
+          },
+          {
+            "type": "currentBranch",
+            "name": "food-stalls"
+          }
+        ]
+      },
+      {
+        "text": "Commit food.html mentioning the vegetarian samosa stall",
+        "checks": [
+          {
+            "type": "fileContent",
+            "path": "food.html",
+            "contains": "samosa"
+          },
+          {
+            "type": "commitExists",
+            "changes": [
+              "food.html"
+            ]
+          },
+          {
+            "type": "clean"
+          }
+        ]
+      },
+      {
+        "text": "Push the branch to the website",
+        "checks": [
+          {
+            "type": "hostedBranch",
+            "repo": "lantern-labs/festival-site",
+            "branch": "food-stalls",
+            "equalsLocal": "food-stalls"
+          },
+          {
+            "type": "upstream",
+            "branch": "food-stalls",
+            "remote": "origin"
           }
         ]
       }
     ]
   },
-  "par": 1,
-  "allowedCommands": [
-    "git switch",
-    "git checkout"
-  ],
+  "par": 4,
+  "allowedCommands": null,
   "hints": [
-    "Each task should have its own branch.",
-    "Create a branch named after the task you are fixing.",
-    "Answer the question about branch naming."
+    "Four things: comment on the issue, branch, commit, push the branch.",
+    "Use the comment box on the issue page. Then `git switch -c food-stalls`, commit food.html, and `git push -u origin food-stalls`.",
+    "Comment on issue #1 in the website panel. Then `git switch -c food-stalls`, write food.html with the word samosa, `git add food.html`, `git commit -m \"Add food stalls page\"`, `git push -u origin food-stalls`."
   ],
-  "questions": [
+  "questions": [],
+  "recap": "An issue records a task. Make one branch per task, then push that branch so teammates can see it.",
+  "glossary": [
+    "issue",
+    "branch"
+  ],
+  "cheatSheet": [
     {
-      "id": "q1",
-      "prompt": "Why use a branch for a task?",
-      "choices": [
-        {
-          "text": "To keep main safe while you work"
-        },
-        {
-          "text": "To backup the code"
-        }
-      ],
-      "answer": 0,
-      "explanation": "Branches isolate your work."
+      "command": "git push -u origin <branch>",
+      "summary": "Send a new branch to the website and link it"
     }
   ],
-  "recap": "Always create a new branch for a specific task or issue.",
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site/issues/1",
+    "focus": "hub"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
+      "hub": {
+        "type": "commentIssue",
+        "repo": "lantern-labs/festival-site",
+        "number": 1,
+        "body": "Starting on this now."
       }
+    },
+    {
+      "run": "git switch -c food-stalls"
+    },
+    {
+      "run": "echo \"<h2>Food stalls</h2><p>The samosa stall is vegetarian.</p>\" > food.html"
+    },
+    {
+      "run": "git add food.html"
+    },
+    {
+      "run": "git commit -m \"Add food stalls page\""
+    },
+    {
+      "run": "git push -u origin food-stalls"
     }
   ]
 }

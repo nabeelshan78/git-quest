@@ -18,5 +18,11 @@
     "definition": "A command that stops a conflict resolution and puts your files back how they were before the merge.",
     "chapter": 5,
     "command": "git merge --abort"
+  },
+  {
+    "id": "conflict",
+    "term": "Conflict",
+    "definition": "Two branches changed the same line, so git stops and asks you to decide. Nothing is broken.",
+    "chapter": 5
   }
 ]

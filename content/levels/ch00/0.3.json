@@ -8,16 +8,7 @@
   "boss": false,
   "workdir": "~/festival",
   "setup": {
-    "steps": [
-      {
-        "mkdir": [
-          "festival"
-        ]
-      },
-      {
-        "run": "cd festival"
-      }
-    ]
+    "steps": []
   },
   "story": [
     {
@@ -30,9 +21,9 @@
     }
   ],
   "hints": [
-    "Use mkdir and touch.",
-    "mkdir css, then touch index.html.",
-    "Type `mkdir css`, then `touch index.html`."
+    "Two things to make: a folder and an empty file. They use different commands.",
+    "`mkdir <name>` makes a folder. `touch <name>` makes an empty file.",
+    "Run `mkdir css`, then `touch index.html`."
   ],
   "goal": {
     "items": [
@@ -82,10 +73,7 @@
       "run": "mkdir css"
     },
     {
-      "edit": {
-        "path": "index.html",
-        "content": ""
-      }
+      "run": "touch index.html"
     }
   ]
 }

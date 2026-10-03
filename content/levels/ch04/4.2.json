@@ -17,6 +17,18 @@
     {
       "speaker": "Ada",
       "text": "And `git switch -c <name>` makes a new branch and moves to it in one go."
+    },
+    {
+      "speaker": "Ada",
+      "text": "One more. You will see `git checkout -b <name>` in older guides everywhere."
+    },
+    {
+      "speaker": "Ada",
+      "text": "It does the same thing as `switch -c`. `switch` is just the newer, clearer name."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Try both, so neither one surprises you later."
     }
   ],
   "workdir": "~/festival",
@@ -54,27 +66,44 @@
         ]
       },
       {
-        "text": "Create and move to a schedule branch",
+        "text": "Create and move to a schedule branch with git switch -c",
         "checks": [
           {
-            "type": "currentBranch",
+            "type": "branchExists",
             "name": "schedule"
+          }
+        ]
+      },
+      {
+        "text": "Do the same with the older git checkout -b, for a food branch",
+        "checks": [
+          {
+            "type": "branchExists",
+            "name": "food"
+          },
+          {
+            "type": "currentBranch",
+            "name": "food"
+          },
+          {
+            "type": "ranCommand",
+            "command": "git checkout"
           }
         ]
       }
     ]
   },
-  "par": 2,
+  "par": 3,
   "allowedCommands": [
     "git switch",
     "git checkout"
   ],
   "hints": [
-    "You need to visit an existing branch, then create a new one.",
-    "`git switch <name>` moves to a branch. `git switch -c <name>` creates and moves.",
-    "Type `git switch map`, then `git switch -c schedule`."
+    "Visit the existing branch, then make two new ones: one with switch, one with checkout.",
+    "`git switch <name>` moves. `git switch -c <name>` creates and moves. `git checkout -b <name>` is the older way to create and move.",
+    "Run `git switch map`, then `git switch -c schedule`, then `git checkout -b food`."
   ],
-  "recap": "`git switch <branch>` moves you to a branch. `git switch -c <branch>` creates and moves in one go.",
+  "recap": "`git switch <branch>` moves to a branch. `git switch -c <branch>` creates and moves. Older guides write that as `git checkout -b <branch>`: same result.",
   "glossary": [],
   "cheatSheet": [
     {
@@ -83,7 +112,11 @@
     },
     {
       "command": "git switch -c <branch>",
-      "summary": "Create and move to a new branch"
+      "summary": "Create a branch and move to it"
+    },
+    {
+      "command": "git checkout -b <branch>",
+      "summary": "The older way to create and move"
     }
   ],
   "solution": [
@@ -92,6 +125,9 @@
     },
     {
       "run": "git switch -c schedule"
+    },
+    {
+      "run": "git checkout -b food"
     }
   ],
   "predict": null

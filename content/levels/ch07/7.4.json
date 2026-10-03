@@ -3,14 +3,27 @@
   "id": "7.4",
   "chapter": 7,
   "number": 4,
-  "title": "Update the PR",
-  "concept": "Push new commits to the same branch",
+  "title": "Update the pull request",
+  "concept": "Push more commits to the same branch; the PR updates itself",
   "story": [
     {
       "speaker": "Ada",
-      "text": "Add a commit to address Priya's feedback, then push again."
+      "text": "Now actually do what Priya asked. Add the opening hours to food.html."
+    },
+    {
+      "speaker": "Ada",
+      "text": "You do **not** make a new pull request. You add a commit to the same branch."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Commit it and push. Watch the pull request pick up the new commit on its own."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then tell Priya it is ready for another look."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -18,30 +31,70 @@
       },
       {
         "commit": {
-          "message": "Init",
+          "message": "Festival site so far",
           "files": {
-            "index.html": "Hello\n"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
           }
         }
       },
       {
         "hosted": {
           "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds",
+            "priya-reviews"
+          ],
           "fromLocal": {
-            "remoteName": "origin",
             "setUpstream": true
           }
         }
       },
       {
-        "run": "git switch -c feature"
+        "run": "git switch -c food-stalls"
       },
       {
         "commit": {
-          "message": "WIP feature",
+          "message": "Add food stalls page",
           "files": {
-            "index.html": "Hello World\n"
+            "food.html": "<h2>Food stalls</h2>\n<p>The samosa stall is vegetarian.</p>\n"
           }
+        }
+      },
+      {
+        "run": "git push -u origin food-stalls"
+      },
+      {
+        "hub": {
+          "type": "openPullRequest",
+          "repo": "lantern-labs/festival-site",
+          "head": "food-stalls",
+          "base": "main",
+          "title": "Add food stalls page",
+          "body": "Lists the stalls for visitors.",
+          "reviewers": [
+            "priya-reviews"
+          ]
+        }
+      },
+      {
+        "hub": {
+          "type": "reviewPullRequest",
+          "actor": "priya-reviews",
+          "repo": "lantern-labs/festival-site",
+          "number": 1,
+          "event": "request_changes",
+          "body": "Good start. One change needed before I can approve.",
+          "comments": [
+            {
+              "path": "food.html",
+              "line": 2,
+              "body": "Can you add the opening hours here?"
+            }
+          ]
         }
       }
     ]
@@ -49,48 +102,108 @@
   "goal": {
     "items": [
       {
-        "text": "Push the update",
+        "text": "Add the opening hours to food.html and commit",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "fileContent",
+            "path": "food.html",
+            "contains": "samosa"
+          },
+          {
+            "type": "fileContent",
+            "path": "food.html",
+            "matches": "[Oo]pen|[Hh]our|[0-9]\\s*[ap]m"
+          },
+          {
+            "type": "clean"
+          }
+        ]
+      },
+      {
+        "text": "Push to the same branch so the pull request updates",
+        "checks": [
+          {
+            "type": "hostedBranch",
+            "repo": "lantern-labs/festival-site",
+            "branch": "food-stalls",
+            "equalsLocal": "food-stalls"
+          },
+          {
+            "type": "pullRequest",
+            "repo": "lantern-labs/festival-site",
+            "number": 1,
+            "state": "open",
+            "minCommits": 2
+          }
+        ]
+      },
+      {
+        "text": "Tell Priya it is ready for another look",
+        "checks": [
+          {
+            "type": "pullRequest",
+            "repo": "lantern-labs/festival-site",
+            "number": 1,
+            "commentBy": "{{player.handle}}"
           }
         ]
       }
     ]
   },
-  "par": 1,
-  "allowedCommands": [
-    "git push"
-  ],
+  "par": 3,
+  "allowedCommands": null,
   "hints": [
-    "The reviewer asked for a change. Fix it and push again.",
-    "New commits on the same branch automatically update the pull request.",
-    "Answer the question about updating a PR."
+    "Edit the file, commit, push to the branch you are already on. No new pull request.",
+    "After pushing, add a comment on the pull request so the reviewer knows to look again.",
+    "Edit food.html to add \"Open 11am to 9pm\", then `git add food.html`, `git commit -m \"Add opening hours\"`, `git push`, then comment on the pull request in the website panel."
   ],
-  "questions": [
-    {
-      "id": "q1",
-      "prompt": "Does a new push update the existing PR?",
-      "choices": [
-        {
-          "text": "Yes"
-        },
-        {
-          "text": "No, you need a new PR"
-        }
-      ],
-      "answer": 0,
-      "explanation": "A PR tracks the branch, so pushing updates it automatically."
-    }
-  ],
-  "recap": "To update a PR, just add commits and push to the same branch.",
-  "predict": null,
+  "questions": [],
+  "recap": "Pushing more commits to the same branch updates the open pull request. You never need a second pull request for review fixes.",
+  "glossary": [],
+  "cheatSheet": [],
+  "predict": {
+    "trigger": "git push",
+    "question": "You pushed a new commit to food-stalls. What happens to pull request #1?",
+    "choices": [
+      {
+        "text": "It picks up the new commit automatically"
+      },
+      {
+        "text": "It stays frozen and you need a new pull request"
+      }
+    ],
+    "answer": 0,
+    "explanation": "A pull request points at a branch, not at a fixed snapshot. Whatever is on the branch is what it shows."
+  },
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site/pulls/1"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
+      "edit": {
+        "path": "food.html",
+        "content": "<h2>Food stalls</h2>\n<p>The samosa stall is vegetarian.</p>\n<p>Open 11am to 9pm.</p>\n"
+      }
+    },
+    {
+      "run": "git add food.html"
+    },
+    {
+      "run": "git commit -m \"Add opening hours\""
+    },
+    {
+      "run": "git push"
+    },
+    {
+      "hub": {
+        "type": "commentPullRequest",
+        "repo": "lantern-labs/festival-site",
+        "number": 1,
+        "body": "Added the opening hours. Ready for another look."
       }
     }
   ]

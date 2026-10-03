@@ -3,65 +3,213 @@
   "id": "7.5",
   "chapter": 7,
   "number": 5,
-  "title": "The merge button",
+  "title": "Merge it and tidy up",
   "concept": "Merge the pull request, delete the branch, update local main",
   "story": [
     {
+      "speaker": "Priya",
+      "text": "Approved. The hours were the last thing. Nice work."
+    },
+    {
       "speaker": "Ada",
-      "text": "Your PR is approved! Click the green Merge button on GitHub. Then delete the branch and pull main locally."
+      "text": "Press the green Merge pull request button. That puts your branch into main."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Real sites also offer \"Squash\" and \"Rebase\" merges. Same changes, different history shape."
+    },
+    {
+      "speaker": "Ada",
+      "text": "We use the plain merge here. One button is enough to learn."
+    },
+    {
+      "speaker": "Ada",
+      "text": "After merging, delete the branch. It is finished, and old branches pile up fast."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Last step, and people forget it constantly: your local main is still old. Switch to it and pull."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
         "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Festival site so far",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds",
+            "priya-reviews"
+          ],
+          "fromLocal": {
+            "setUpstream": true
+          }
+        }
+      },
+      {
+        "run": "git switch -c food-stalls"
+      },
+      {
+        "commit": {
+          "message": "Add food stalls page",
+          "files": {
+            "food.html": "<h2>Food stalls</h2>\n<p>The samosa stall is vegetarian.</p>\n<p>Open 11am to 9pm.</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git push -u origin food-stalls"
+      },
+      {
+        "hub": {
+          "type": "openPullRequest",
+          "repo": "lantern-labs/festival-site",
+          "head": "food-stalls",
+          "base": "main",
+          "title": "Add food stalls page",
+          "body": "Lists the stalls and the opening hours."
+        }
+      },
+      {
+        "hub": {
+          "type": "reviewPullRequest",
+          "actor": "priya-reviews",
+          "repo": "lantern-labs/festival-site",
+          "number": 1,
+          "event": "approve",
+          "body": "Approved. Thanks for adding the hours."
+        }
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Answer the question",
+        "text": "Merge pull request #1",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "pullRequest",
+            "repo": "lantern-labs/festival-site",
+            "number": 1,
+            "state": "merged"
+          },
+          {
+            "type": "hostedFile",
+            "repo": "lantern-labs/festival-site",
+            "branch": "main",
+            "path": "food.html"
+          }
+        ]
+      },
+      {
+        "text": "Delete the finished branch on the website",
+        "checks": [
+          {
+            "type": "hostedBranch",
+            "repo": "lantern-labs/festival-site",
+            "branch": "food-stalls",
+            "exists": false
+          }
+        ]
+      },
+      {
+        "text": "Update your local main",
+        "checks": [
+          {
+            "type": "currentBranch",
+            "name": "main"
+          },
+          {
+            "type": "fileExists",
+            "path": "food.html"
+          },
+          {
+            "type": "inSync",
+            "branch": "main"
           }
         ]
       }
     ]
   },
-  "par": null,
+  "par": 2,
   "allowedCommands": null,
   "hints": [
-    "Your PR is approved. Time to merge it.",
-    "The merge button combines your branch into main on GitHub.",
-    "Answer the question about merging a pull request."
+    "Three things: merge on the website, delete the branch there, then catch your own main up.",
+    "The Merge pull request button is on the pull request page. Afterwards use `git switch main` and `git pull`.",
+    "Press Merge pull request, then Delete branch. Then run `git switch main` and `git pull`."
   ],
-  "questions": [
+  "questions": [],
+  "recap": "Merging a pull request puts the branch into main on the website. Your local main does not move until you pull. Delete finished branches to keep the list clean.",
+  "glossary": [
+    "merge"
+  ],
+  "cheatSheet": [
     {
-      "id": "q1",
-      "prompt": "What do you do locally after merging a PR?",
-      "choices": [
-        {
-          "text": "Switch to main and pull"
-        },
-        {
-          "text": "Keep working on the old branch"
-        }
-      ],
-      "answer": 0,
-      "explanation": "Update main and delete the feature branch."
+      "command": "git switch main",
+      "summary": "Go back to the main branch"
+    },
+    {
+      "command": "git pull",
+      "summary": "Catch your local branch up with the website"
     }
   ],
-  "recap": "After merging a PR, switch to main and pull to get the new merge commit.",
-  "predict": null,
+  "predict": {
+    "trigger": "git switch main",
+    "question": "The pull request is merged on the website. Is food.html in your local main yet?",
+    "choices": [
+      {
+        "text": "Yes, merging updated my laptop too"
+      },
+      {
+        "text": "No, my laptop does not know until I pull"
+      }
+    ],
+    "answer": 1,
+    "explanation": "The merge happened on the website. Your laptop only learns about it when you fetch or pull."
+  },
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site/pulls/1"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
+      "hub": {
+        "type": "mergePullRequest",
+        "repo": "lantern-labs/festival-site",
+        "number": 1,
+        "method": "merge"
       }
+    },
+    {
+      "hub": {
+        "type": "deleteBranch",
+        "repo": "lantern-labs/festival-site",
+        "branch": "food-stalls"
+      }
+    },
+    {
+      "run": "git switch main"
+    },
+    {
+      "run": "git pull"
     }
   ]
 }

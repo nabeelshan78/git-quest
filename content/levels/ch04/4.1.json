@@ -8,15 +8,31 @@
   "story": [
     {
       "speaker": "Ada",
-      "text": "We need to add a map to the site, but we can't break the main page."
+      "text": "We need to add a map to the site, but we cannot break the main page."
     },
     {
       "speaker": "Ada",
-      "text": "A **branch** is a safe place to try an idea. `git branch` lists your branches."
+      "text": "A **branch** is a safe place to try an idea."
     },
     {
       "speaker": "Ada",
-      "text": "Type `git branch map` to make a new branch named map."
+      "text": "Here is the part everyone gets wrong at first."
+    },
+    {
+      "speaker": "Ada",
+      "text": "A branch is **not** a folder. It does not copy your files anywhere."
+    },
+    {
+      "speaker": "Ada",
+      "text": "A branch is just a label pointing at one commit. That is all it is."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Make one with `git branch map`, then run `git branch` to list them."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Watch the graph: a second label appears on the same commit. Nothing moved."
     }
   ],
   "workdir": "~/festival",
@@ -45,19 +61,50 @@
             "name": "map"
           }
         ]
+      },
+      {
+        "text": "List your branches",
+        "checks": [
+          {
+            "type": "ranCommand",
+            "command": "git branch"
+          }
+        ]
+      },
+      {
+        "text": "Answer: what did making the branch do?",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
+          }
+        ]
+      },
+      {
+        "text": "Answer: can you cd into a branch?",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q2"
+          }
+        ]
       }
     ]
   },
-  "par": 1,
+  "par": 2,
   "allowedCommands": [
-    "git branch"
+    "git branch",
+    "git log",
+    "ls",
+    "cd",
+    "git status"
   ],
   "hints": [
-    "Make a branch called map.",
-    "Use the `git branch` command with the name of the new branch.",
-    "Type `git branch map` and press Enter."
+    "Make the branch, then list your branches to see it.",
+    "`git branch <name>` creates a label. `git branch` on its own lists them.",
+    "Run `git branch map`, then `git branch`, then answer both questions."
   ],
-  "recap": "`git branch <name>` creates a new branch pointing to your current commit.",
+  "recap": "A branch is a label pointing at a commit, not a folder and not a copy of your files. `git branch <name>` makes one; `git branch` lists them.",
   "glossary": [
     "branch"
   ],
@@ -70,7 +117,55 @@
   "solution": [
     {
       "run": "git branch map"
+    },
+    {
+      "run": "git branch"
+    },
+    {
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
+    },
+    {
+      "answer": {
+        "question": "q2",
+        "choice": 1
+      }
     }
   ],
-  "predict": null
+  "predict": null,
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "You ran git branch map. What happened to your files?",
+      "choices": [
+        {
+          "text": "Git copied them into a new folder called map"
+        },
+        {
+          "text": "Nothing: a new label now points at the same commit"
+        },
+        {
+          "text": "They were moved onto the map branch"
+        }
+      ],
+      "answer": 1,
+      "explanation": "A branch is a label on a commit. Creating one writes a few bytes and touches none of your files."
+    },
+    {
+      "id": "q2",
+      "prompt": "The output of git branch looks like a folder listing. Can you run `cd map` to enter the branch?",
+      "choices": [
+        {
+          "text": "Yes, cd map opens the branch"
+        },
+        {
+          "text": "No: branches are not folders. You move between them with git switch"
+        }
+      ],
+      "answer": 1,
+      "explanation": "`cd` moves between folders. Branches are labels inside git, so you move between them with `git switch`."
+    }
+  ]
 }

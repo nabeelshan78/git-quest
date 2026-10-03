@@ -32,5 +32,43 @@
     "definition": "Download new commits from the remote repository and merge them into your local branch.",
     "chapter": 6,
     "command": "git pull"
+  },
+  {
+    "id": "readme",
+    "term": "README",
+    "definition": "A file named README.md that tells people what a project is. Hosting sites show it on the repo page.",
+    "chapter": 6
+  },
+  {
+    "id": "origin",
+    "term": "origin",
+    "definition": "The usual nickname for the main copy of a project online. It is a habit, not a rule.",
+    "chapter": 6
+  },
+  {
+    "id": "upstream",
+    "term": "Upstream branch",
+    "definition": "The branch online that your local branch is linked to. Set it once with git push -u.",
+    "chapter": 6,
+    "command": "git push -u"
+  },
+  {
+    "id": "fetch",
+    "term": "Fetch",
+    "definition": "Download new commits from online without changing your own files.",
+    "chapter": 6,
+    "command": "git fetch"
+  },
+  {
+    "id": "remote-tracking-branch",
+    "term": "origin/main",
+    "definition": "A pointer that remembers where main was online the last time you looked. Fetch moves it.",
+    "chapter": 6
+  },
+  {
+    "id": "push-rejected",
+    "term": "Rejected push",
+    "definition": "Git refuses a push when the copy online has commits you do not have. Pull first, then push again.",
+    "chapter": 6
   }
 ]

@@ -9,19 +9,31 @@
   "story": [
     {
       "speaker": "Ada",
-      "text": "We don't need `old.txt` anymore, and `main.html` should be `index.html`."
+      "text": "We do not need `old.txt` any more, and `main.html` should be called `index.html`."
     },
     {
       "speaker": "Ada",
-      "text": "Use `git rm old.txt` to delete it and stage the deletion."
+      "text": "`git rm old.txt` deletes the file **and** stages the deletion in one step."
     },
     {
       "speaker": "Ada",
-      "text": "Use `git mv main.html index.html` to rename the file and stage the rename."
+      "text": "`git mv main.html index.html` renames it and stages that too."
     },
     {
       "speaker": "Ada",
-      "text": "Then commit the changes."
+      "text": "One warning before you start, because this trips up almost everyone."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Not every command is a git command. `git` only handles version control."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Making a folder is a plain shell job: that is `mkdir`, never `git mkdir`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Make a folder called `archive` first, then do the delete and the rename."
     }
   ],
   "workdir": "~/festival",
@@ -44,33 +56,81 @@
   "goal": {
     "items": [
       {
-        "text": "Delete old.txt and rename main.html",
+        "text": "Make an archive folder (a shell job, not a git job)",
         "checks": [
           {
-            "type": "commit",
-            "messageContains": "Clean",
-            "changesExactly": [
-              "index.html",
-              "main.html",
-              "old.txt"
-            ]
+            "type": "dirExists",
+            "path": "archive"
+          }
+        ]
+      },
+      {
+        "text": "Delete old.txt with git",
+        "checks": [
+          {
+            "type": "fileMissing",
+            "path": "old.txt"
+          }
+        ]
+      },
+      {
+        "text": "Rename main.html to index.html with git",
+        "checks": [
+          {
+            "type": "fileExists",
+            "path": "index.html"
+          },
+          {
+            "type": "fileMissing",
+            "path": "main.html"
+          }
+        ]
+      },
+      {
+        "text": "Commit the clean-up",
+        "checks": [
+          {
+            "type": "fileInCommit",
+            "ref": "HEAD",
+            "path": "old.txt",
+            "absent": true
+          },
+          {
+            "type": "fileInCommit",
+            "ref": "HEAD",
+            "path": "index.html"
+          },
+          {
+            "type": "clean"
+          }
+        ]
+      },
+      {
+        "text": "Answer: which of these is not a git command?",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q1"
           }
         ]
       }
     ]
   },
   "hints": [
-    "How do you delete and rename files?",
-    "Use `git rm` and `git mv`.",
-    "Run `git rm old.txt`, `git mv main.html index.html`, then `git commit -m \"Clean\"`."
+    "One of these four steps is not a git command at all.",
+    "Folders are made with the shell command `mkdir`. The delete and rename use `git rm` and `git mv`.",
+    "Run `mkdir archive`, then `git rm old.txt`, `git mv main.html index.html`, and `git commit -m \"Clean up files\"`."
   ],
-  "par": 3,
+  "par": 4,
   "allowedCommands": [
     "git rm",
     "git mv",
-    "git commit"
+    "git commit",
+    "git status",
+    "mkdir",
+    "ls"
   ],
-  "recap": "`git rm` deletes a file and stages the deletion. `git mv` renames a file and stages the rename.",
+  "recap": "`git rm` deletes and stages in one step; `git mv` renames and stages. Plain file jobs like making a folder use the shell (`mkdir`), not git.",
   "cheatSheet": [
     {
       "command": "git rm <file>",
@@ -84,13 +144,41 @@
   "predict": null,
   "solution": [
     {
+      "run": "mkdir archive"
+    },
+    {
       "run": "git rm old.txt"
     },
     {
       "run": "git mv main.html index.html"
     },
     {
-      "run": "git commit -m \"Clean\""
+      "run": "git commit -m \"Clean up files\""
+    },
+    {
+      "answer": {
+        "question": "q1",
+        "choice": 1
+      }
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "prompt": "You need a new folder. Which command makes one?",
+      "choices": [
+        {
+          "text": "git mkdir archive"
+        },
+        {
+          "text": "mkdir archive"
+        },
+        {
+          "text": "git folder archive"
+        }
+      ],
+      "answer": 1,
+      "explanation": "`mkdir` is a shell command, not a git one. Git only manages versions of files; the shell manages the files and folders themselves."
     }
   ]
 }

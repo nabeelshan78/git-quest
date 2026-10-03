@@ -67,11 +67,13 @@ export function runSetup(level: LevelDefinition, player: PlayerProfile): SetupRe
     globalConfig: { ...(machineOpts.globalConfig ?? {}) },
   });
 
-  // Set player identity by default
+  // Set player identity by default. Fall back to a placeholder rather than an
+  // empty value: git refuses to commit without an identity, which would make
+  // every setup commit fail and leave the level silently unplayable.
   const identity = machineOpts.identity !== false;
   if (identity) {
-    machine.globalConfig['user.name'] = player.name;
-    machine.globalConfig['user.email'] = player.email;
+    machine.globalConfig['user.name'] = player.name.trim() || 'Student';
+    machine.globalConfig['user.email'] = player.email.trim() || 'student@example.com';
   }
 
   let world = createWorld({

@@ -87,7 +87,7 @@
   "hints": [
     "Run `git log --oneline` and look at the first line.",
     "You will see `(HEAD -> main)` next to the latest commit.",
-    "Select 'Add menu'."
+    "Choose the answer that says 'Add menu' and press it."
   ],
   "predict": null,
   "recap": "HEAD is a pointer that tells git where you are in the history. It usually points to the newest commit.",

@@ -83,7 +83,33 @@ test.describe('Level Solutions E2E', () => {
         }
       }
 
+      /**
+       * A predict card appears on its own when the trigger command is typed,
+       * and blocks further commands until it is answered. Clear it the way a
+       * player would: pick the right choice, then continue.
+       */
+      const clearPredictCard = async () => {
+        if (!level.predict) return;
+        const choice = page.getByTestId(TID.predictChoice(level.predict.answer));
+        if (!(await choice.isVisible().catch(() => false))) return;
+        await choice.click();
+        const cont = page.getByTestId(TID.predictContinue);
+        await expect(cont).toBeVisible({ timeout: 5000 });
+        await cont.click();
+        await page.waitForTimeout(400);
+      };
+
+      const alreadyWon = async () =>
+        (await page.getByTestId(TID.winScreen).isVisible().catch(() => false)) ||
+        (await page.getByTestId(TID.showResults).isVisible().catch(() => false));
+
       for (const step of level.solution) {
+        // A level can be satisfied before its last scripted step (for example
+        // when creating a file through the editor finishes the goal). Stop
+        // there, the way the headless solution player does, instead of
+        // clicking into the win dialog.
+        if (await alreadyWon()) break;
+
         if (step.run) {
           await page.evaluate((cmd) => {
             if ((window as unknown as Record<string, unknown>).__session) {
@@ -116,13 +142,10 @@ test.describe('Level Solutions E2E', () => {
           await fileItem.click();
           await page.waitForTimeout(300);
 
-          const cmContent = page.getByTestId(TID.editor).locator('.cm-content');
-          await cmContent.focus();
-          
-          await page.keyboard.press('Control+A');
-          await page.keyboard.press('Backspace');
-          await page.keyboard.insertText(step.edit.content);
-          
+          const textarea = page.getByTestId(TID.editorTextarea);
+          await expect(textarea).toBeVisible({ timeout: 5000 });
+          await textarea.fill(step.edit.content);
+
           await page.getByTestId(TID.editorSave).click();
           await page.waitForTimeout(500);
         } else if (step.editor) {
@@ -136,9 +159,29 @@ test.describe('Level Solutions E2E', () => {
             await page.getByTestId(TID.gitEditorAbort).click();
           }
           await page.waitForTimeout(500);
+        } else if (step.hub) {
+          // Hub actions go through the session, the same path the panel uses.
+          await page.evaluate((action) => {
+            const s = (window as unknown as Record<string, unknown>).__session as
+              | { hubAction: (a: unknown) => void }
+              | undefined;
+            s?.hubAction(action);
+          }, step.hub);
+          await page.waitForTimeout(400);
+        } else if (step.switchMachine) {
+          await page.evaluate((id) => {
+            const s = (window as unknown as Record<string, unknown>).__session as
+              | { switchMachine: (m: string) => void }
+              | undefined;
+            s?.switchMachine(id);
+          }, step.switchMachine);
+          await page.waitForTimeout(300);
         } else if (step.story === 'read') {
           // just wait for the loop at the end to catch it
         }
+
+        // A command may have raised the predict card, which blocks the next one.
+        await clearPredictCard();
       }
 
       // Wait for level complete and handle success dialogue

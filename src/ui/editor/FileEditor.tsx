@@ -154,6 +154,7 @@ export function FileEditor({ session, snapshot }: FileEditorProps) {
               )}
               <textarea
                 className="gq-file-editor-textarea"
+                data-testid={TID.editorTextarea}
                 value={editContent}
                 onChange={(e) => { setEditContent(e.target.value); setDirty(true); }}
                 onKeyDown={onKeyDown}

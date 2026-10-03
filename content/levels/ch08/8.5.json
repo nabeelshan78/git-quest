@@ -4,65 +4,183 @@
   "chapter": 8,
   "number": 5,
   "title": "Boss: the site is down at midnight",
-  "concept": "Rescue the festival site with every tool",
+  "concept": "Rescue the festival site: stash, revert, push",
   "boss": true,
   "story": [
     {
+      "speaker": "Sam",
+      "text": "The festival site is showing a blank page. The festival opens in nine hours."
+    },
+    {
       "speaker": "Ada",
-      "text": "The site is down! Use everything you've learned to fix it and push."
+      "text": "Deep breath. Nothing is lost. Let us look at what happened."
+    },
+    {
+      "speaker": "Ada",
+      "text": "The last commit on main is \"Rebuild homepage\" and it emptied index.html."
+    },
+    {
+      "speaker": "Ada",
+      "text": "You also have half-finished work in your folder. Do not throw it away."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Park your unfinished work first, then undo the bad commit, then push the fix."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Undo it with `git revert`, not by deleting history. Other people already pulled that commit."
+    },
+    {
+      "speaker": "Ada",
+      "text": "When the site is back up, bring your parked work out again."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
         "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n<p>Saturday at Riverside Park.</p>\n"
+          }
+        }
+      },
+      {
+        "commit": {
+          "message": "Rebuild homepage",
+          "author": "Sam Lee <sam@lanternlabs.example>",
+          "files": {
+            "index.html": ""
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds"
+          ],
+          "fromLocal": {
+            "setUpstream": true
+          }
+        }
+      },
+      {
+        "files": {
+          "sponsors.html": "<h2>Sponsors</h2>\n<p>DRAFT - do not publish\n"
+        }
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Answer the question",
+        "text": "Do not lose your draft sponsors page",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "fileExists",
+            "path": "sponsors.html"
+          },
+          {
+            "type": "fileContent",
+            "path": "sponsors.html",
+            "contains": "DRAFT"
+          }
+        ]
+      },
+      {
+        "text": "The homepage works again",
+        "checks": [
+          {
+            "type": "fileContent",
+            "path": "index.html",
+            "contains": "Lantern Festival"
+          }
+        ]
+      },
+      {
+        "text": "History was undone safely, not rewritten",
+        "checks": [
+          {
+            "type": "commitExists",
+            "messageContains": "Rebuild homepage"
+          },
+          {
+            "type": "commitExists",
+            "messageContains": "Revert"
+          }
+        ]
+      },
+      {
+        "text": "The live site is fixed",
+        "checks": [
+          {
+            "type": "hostedFile",
+            "repo": "lantern-labs/festival-site",
+            "branch": "main",
+            "path": "index.html",
+            "contains": "Lantern Festival"
+          },
+          {
+            "type": "inSync",
+            "branch": "main"
           }
         ]
       }
     ]
   },
-  "par": null,
+  "par": 5,
   "allowedCommands": null,
   "hints": [
-    "The site is broken. Use your git skills to find and fix the problem.",
-    "Stash, amend, reset, and reflog are all tools in your belt now.",
-    "Answer the question using what you learned in this chapter."
+    "Park the draft, undo the bad commit in a way that keeps history, push, then unpark.",
+    "`git stash` parks work. `git revert <commit>` undoes a commit by adding a new one. `git stash pop` brings the work back.",
+    "`git stash`, then `git revert HEAD` (save the message), then `git push`, then `git stash pop`."
   ],
-  "questions": [
-    {
-      "id": "q1",
-      "prompt": "If a commit broke the site, what's a safe way to undo it?",
-      "choices": [
-        {
-          "text": "git revert <commit>"
-        },
-        {
-          "text": "git reset --hard"
-        }
-      ],
-      "answer": 0,
-      "explanation": "Revert creates a new commit that undoes the changes, which is safe to push."
-    }
-  ],
-  "recap": "You are ready to handle real-world git emergencies.",
-  "predict": null,
+  "questions": [],
+  "recap": "A real rescue: stash the unfinished work, revert the bad commit so history stays honest, push the fix, then pop your work back.",
+  "glossary": [],
+  "cheatSheet": [],
+  "predict": {
+    "trigger": "git revert",
+    "question": "Why revert the bad commit instead of deleting it from history?",
+    "choices": [
+      {
+        "text": "Because teammates already pulled it, so removing it would break their copies"
+      },
+      {
+        "text": "Because revert is faster to type"
+      }
+    ],
+    "answer": 0,
+    "explanation": "Revert adds a new commit that undoes the old one. History stays the same for everyone who already pulled."
+  },
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
-      }
+      "run": "git stash"
+    },
+    {
+      "run": "git revert HEAD --no-edit"
+    },
+    {
+      "run": "git push"
+    },
+    {
+      "run": "git stash pop"
     }
   ]
 }

@@ -63,4 +63,60 @@ describe('git reflog', () => {
       ],
     });
   });
+
+  // `<ref>@{n}` is the syntax the reflog rescue lesson depends on, so it is
+  // checked against real git rather than trusted.
+  it('resolves HEAD@{1} after a reset, recovering the lost commit', () => {
+    run({
+      name: 'reflog-at-syntax-reset',
+      compare: { reflog: true, origHead: true },
+      steps: [
+        { git: ['init'] },
+        { write: { 'a.txt': 'v1\n' } },
+        { git: ['add', 'a.txt'] },
+        { git: ['commit', '-m', 'first'] },
+        { write: { 'b.txt': 'second\n' } },
+        { git: ['add', 'b.txt'] },
+        { git: ['commit', '-m', 'second'] },
+        { git: ['reset', '--hard', 'HEAD~1'] },
+        { check: true },
+        { git: ['reset', '--hard', 'HEAD@{1}'] },
+      ],
+    });
+  });
+
+  it('resolves HEAD@{0} as the current commit', () => {
+    run({
+      name: 'reflog-at-zero',
+      compare: { reflog: true },
+      steps: [
+        { git: ['init'] },
+        { write: { 'a.txt': 'v1\n' } },
+        { git: ['add', 'a.txt'] },
+        { git: ['commit', '-m', 'first'] },
+        // --no-decorate so both sides agree: the engine decorates by default
+        // (it models an interactive terminal), real git piped does not.
+        { git: ['log', '--oneline', '--no-decorate', 'HEAD@{0}'], output: true },
+      ],
+    });
+  });
+
+  it('resolves HEAD@{n} across branch switches', () => {
+    run({
+      name: 'reflog-at-switch',
+      compare: { reflog: true },
+      steps: [
+        { git: ['init'] },
+        { write: { 'a.txt': 'v1\n' } },
+        { git: ['add', 'a.txt'] },
+        { git: ['commit', '-m', 'first'] },
+        { git: ['switch', '-c', 'feature'] },
+        { write: { 'b.txt': 'feature\n' } },
+        { git: ['add', 'b.txt'] },
+        { git: ['commit', '-m', 'feature commit'] },
+        { git: ['switch', 'main'] },
+        { git: ['log', '--oneline', '--no-decorate', 'HEAD@{1}'], output: true },
+      ],
+    });
+  });
 });

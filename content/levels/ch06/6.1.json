@@ -4,29 +4,57 @@
   "chapter": 6,
   "number": 1,
   "title": "Git is not GitHub",
-  "concept": "Local tool vs hosting website; your first GitHub repo and README",
+  "concept": "git vs GitHub; make the first repository page and a README",
   "story": [
     {
       "speaker": "Ada",
-      "text": "Git is on your computer. GitHub is a website that hosts git repositories. Let's make a README and create a repo."
+      "text": "So far everything lived on your laptop only. Nobody else can see it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Git is the program on your computer. It saves versions."
+    },
+    {
+      "speaker": "Ada",
+      "text": "A website like CodeHub stores a copy online so teammates can get it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Look at the website panel. I already made an empty page for our festival project."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Every project needs a README. It tells people what the project is."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Write README.md on your laptop, then commit it. We will send it online next level."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
         "run": "git init"
       },
       {
-        "files": {
-          "README.md": "# Lantern Festival\n"
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n"
+          }
         }
       },
       {
-        "commit": {
-          "message": "Add README",
-          "files": {
-            "README.md": "# Lantern Festival\n"
-          }
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "description": "The Lantern Labs festival website",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds"
+          ]
         }
       }
     ]
@@ -34,49 +62,98 @@
   "goal": {
     "items": [
       {
-        "text": "Check the status",
+        "text": "Answer: what does the website add that git alone does not?",
         "checks": [
           {
             "type": "answered",
             "question": "q1"
           }
         ]
+      },
+      {
+        "text": "Create README.md describing the project",
+        "checks": [
+          {
+            "type": "fileExists",
+            "path": "README.md"
+          },
+          {
+            "type": "fileContent",
+            "path": "README.md",
+            "contains": "festival"
+          }
+        ]
+      },
+      {
+        "text": "Commit the README",
+        "checks": [
+          {
+            "type": "commitExists",
+            "changes": [
+              "README.md"
+            ]
+          },
+          {
+            "type": "clean"
+          }
+        ]
       }
     ]
   },
-  "par": null,
-  "allowedCommands": [
-    "git status"
-  ],
+  "par": 3,
+  "allowedCommands": null,
   "hints": [
-    "Think about what git does by itself, without the internet.",
-    "Git tracks files on your computer. GitHub is a website for sharing.",
-    "Answer the question based on the story you just read."
+    "Make a file called README.md, then stage and commit it like any other file.",
+    "The editor panel can create files. Or use `echo` to write one line into README.md.",
+    "Run `echo \"The Lantern Labs festival website\" > README.md`, then `git add README.md`, then `git commit -m \"Add README\"`."
   ],
   "questions": [
     {
       "id": "q1",
-      "prompt": "Is this local repository connected to GitHub yet?",
+      "prompt": "You have been committing for five chapters. What can git on your laptop NOT do by itself?",
       "choices": [
         {
-          "text": "Yes"
+          "text": "Save versions of your files"
         },
         {
-          "text": "No"
+          "text": "Let a teammate on another computer get your work"
+        },
+        {
+          "text": "Show you what changed"
         }
       ],
       "answer": 1,
-      "explanation": "We haven't connected it to any remote server yet."
+      "explanation": "Git saves history locally. A hosting website is what makes that history reachable by other people."
     }
   ],
-  "recap": "Git lives on your computer. GitHub is a website where you can host a copy of your project.",
+  "recap": "Git runs on your computer. A site like CodeHub keeps a copy online so other people can get your work.",
+  "glossary": [
+    "github",
+    "readme"
+  ],
+  "cheatSheet": [],
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": true
+    },
+    "hubPage": "lantern-labs/festival-site"
+  },
   "solution": [
     {
       "answer": {
         "question": "q1",
         "choice": 1
       }
+    },
+    {
+      "run": "echo \"The Lantern Labs festival website\" > README.md"
+    },
+    {
+      "run": "git add README.md"
+    },
+    {
+      "run": "git commit -m \"Add README\""
     }
   ]
 }

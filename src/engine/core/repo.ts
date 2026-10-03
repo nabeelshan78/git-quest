@@ -110,6 +110,31 @@ export function headCommit(repo: RepoState): Hash | null {
   return readRef(repo, repo.head.ref);
 }
 
+/**
+ * Resolve git's reflog revision syntax `<ref>@{n}`: where `<ref>` pointed n
+ * moves ago. Returns undefined when `name` is not that syntax, so callers can
+ * fall through to their other rules; returns null when it is but cannot
+ * resolve.
+ *
+ * Reflogs are stored oldest-first, so `@{0}` is the newest entry's new value
+ * and `@{n}` is the old value of the entry n from the end — matching real git.
+ */
+export function resolveReflogRev(repo: RepoState, name: string): Hash | null | undefined {
+  const m = /^(.*)@\{(\d+)\}$/.exec(name);
+  if (!m) return undefined;
+  const refName = m[1] === '' || m[1] === '@' ? 'HEAD' : m[1];
+  const n = Number.parseInt(m[2], 10);
+
+  const full = refName === 'HEAD' ? 'HEAD' : (dwimRef(repo, refName) ?? `refs/heads/${refName}`);
+  const log = repo.reflog[full] ?? (full === 'HEAD' ? repo.reflog.HEAD : undefined);
+  if (!log || log.length === 0) return null;
+
+  if (n === 0) return log[log.length - 1].new;
+  const entry = log[log.length - n];
+  if (!entry) return null;
+  return entry.old === ZERO_HASH ? null : entry.old;
+}
+
 /** Read a full ref name, following symrefs. */
 export function readRef(repo: RepoState, ref: string): Hash | null {
   let r = ref;

@@ -3,14 +3,27 @@
   "id": "6.3",
   "chapter": 6,
   "number": 3,
-  "title": "Upload",
-  "concept": "git push -u origin main",
+  "title": "Send your work online",
+  "concept": "git push -u origin main; the website page fills up",
   "story": [
     {
       "speaker": "Ada",
-      "text": "Now push your code up to GitHub."
+      "text": "Now send your commits to the website. That is called a **push**."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Use `git push -u origin main` the first time."
+    },
+    {
+      "speaker": "Ada",
+      "text": "`-u` links your `main` to the remote `main`, so later you can just type `git push`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Watch the website panel. Your files should appear there."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -18,15 +31,23 @@
       },
       {
         "commit": {
-          "message": "Initial commit",
+          "message": "Add homepage",
           "files": {
-            "README.md": "# Festival\n"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
           }
         }
       },
       {
         "hosted": {
-          "id": "lantern-labs/festival-site"
+          "id": "lantern-labs/festival-site",
+          "description": "The Lantern Labs festival website",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds"
+          ]
         }
       },
       {
@@ -37,11 +58,29 @@
   "goal": {
     "items": [
       {
-        "text": "Push to origin main",
+        "text": "Push main to the website",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "hostedBranch",
+            "repo": "lantern-labs/festival-site",
+            "branch": "main",
+            "equalsLocal": "main"
+          },
+          {
+            "type": "hostedFile",
+            "repo": "lantern-labs/festival-site",
+            "path": "README.md"
+          }
+        ]
+      },
+      {
+        "text": "Link main to origin/main so plain git push works later",
+        "checks": [
+          {
+            "type": "upstream",
+            "branch": "main",
+            "remote": "origin",
+            "remoteBranch": "main"
           }
         ]
       }
@@ -49,37 +88,55 @@
   },
   "par": 1,
   "allowedCommands": [
-    "git push"
+    "git push",
+    "git status",
+    "git remote"
   ],
   "hints": [
-    "Push sends your commits from your computer to GitHub.",
-    "`git push -u origin main` uploads your main branch to GitHub.",
-    "Answer the question about pushing to origin."
+    "Send your branch to the remote you added, and link the two together.",
+    "`git push -u <remote> <branch>` uploads the branch and remembers the pairing.",
+    "Run `git push -u origin main`."
   ],
-  "questions": [
+  "questions": [],
+  "recap": "`git push -u origin main` sends your commits online and links your branch to origin/main. After that, plain `git push` is enough.",
+  "glossary": [
+    "push",
+    "upstream"
+  ],
+  "cheatSheet": [
     {
-      "id": "q1",
-      "prompt": "What does -u do?",
-      "choices": [
-        {
-          "text": "Uploads"
-        },
-        {
-          "text": "Sets upstream tracking"
-        }
-      ],
-      "answer": 1,
-      "explanation": "It remembers where to push next time."
+      "command": "git push -u origin main",
+      "summary": "Send main to origin and link them (first time)"
+    },
+    {
+      "command": "git push",
+      "summary": "Send new commits once the link exists"
     }
   ],
-  "recap": "git push -u origin main sends your commits to GitHub.",
-  "predict": null,
+  "predict": {
+    "trigger": "git push",
+    "question": "After the push, where do your commits exist?",
+    "choices": [
+      {
+        "text": "Only on the website now"
+      },
+      {
+        "text": "On your laptop and on the website"
+      }
+    ],
+    "answer": 1,
+    "explanation": "Push copies commits. Nothing leaves your laptop. Both copies now have the same history."
+  },
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 1
-      }
+      "run": "git push -u origin main"
     }
   ]
 }

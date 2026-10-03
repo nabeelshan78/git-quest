@@ -3,36 +3,99 @@
   "id": "6.4",
   "chapter": 6,
   "number": 4,
-  "title": "Download a project",
+  "title": "Copy a project to a new computer",
   "concept": "git clone",
   "story": [
     {
+      "speaker": "Sam",
+      "text": "I am on the lab computer today. There is no festival folder here at all."
+    },
+    {
       "speaker": "Ada",
-      "text": "You lost your laptop! Luckily it's on GitHub. Clone it to your new computer."
+      "text": "Then **clone** it. Cloning downloads the whole project, with all its history."
+    },
+    {
+      "speaker": "Ada",
+      "text": "You are on the lab computer now. Look at the prompt: it says `lab`, not `laptop`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Clone into your home folder. Git makes the folder for you and names it after the project."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Clone also sets up `origin` for you. You never type `git remote add` after a clone."
     }
   ],
+  "workdir": "~",
   "setup": {
     "steps": [
       {
         "hosted": {
           "id": "lantern-labs/festival-site",
+          "description": "The Lantern Labs festival website",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds"
+          ],
           "initialFiles": {
-            "README.md": "# Festival\n"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
           },
-          "initialMessage": "Init",
-          "initialAuthor": "Ada"
+          "initialMessage": "Add homepage and README",
+          "initialAuthor": "Ada Okafor <ada@lanternlabs.example>"
         }
+      },
+      {
+        "machineAdd": {
+          "id": "lab",
+          "label": "Lab computer",
+          "host": "lab"
+        }
+      },
+      {
+        "switchMachine": "lab"
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Clone the repository",
+        "text": "Clone the festival site onto the lab computer",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "repoExists",
+            "machine": "lab",
+            "repoPath": "~/festival-site"
+          },
+          {
+            "type": "fileExists",
+            "machine": "lab",
+            "path": "~/festival-site/README.md"
+          }
+        ]
+      },
+      {
+        "text": "The clone has the project history",
+        "checks": [
+          {
+            "type": "commitExists",
+            "machine": "lab",
+            "repoPath": "~/festival-site",
+            "messageContains": "homepage"
+          }
+        ]
+      },
+      {
+        "text": "Clone set up origin automatically",
+        "checks": [
+          {
+            "type": "remoteExists",
+            "machine": "lab",
+            "repoPath": "~/festival-site",
+            "name": "origin"
           }
         ]
       }
@@ -40,37 +103,52 @@
   },
   "par": 1,
   "allowedCommands": [
-    "git clone"
+    "git clone",
+    "ls",
+    "cd",
+    "git remote",
+    "git log"
   ],
   "hints": [
-    "How do you get a copy of someone else's project?",
-    "`git clone <url>` downloads a full copy of a repo to your computer.",
-    "Answer the question about cloning."
+    "There is nothing here to work with yet. You need to download the project first.",
+    "`git clone <address>` downloads a whole project and its history into a new folder.",
+    "Run `git clone https://github.com/lantern-labs/festival-site.git`."
   ],
-  "questions": [
+  "questions": [],
+  "recap": "`git clone <address>` downloads a project with its full history and sets up `origin` for you.",
+  "glossary": [
+    "clone"
+  ],
+  "cheatSheet": [
     {
-      "id": "q1",
-      "prompt": "What happens when you clone?",
-      "choices": [
-        {
-          "text": "Downloads the files and the entire git history"
-        },
-        {
-          "text": "Just downloads the files"
-        }
-      ],
-      "answer": 0,
-      "explanation": "Clone gives you a full local repository."
+      "command": "git clone <url>",
+      "summary": "Download a whole project with its history"
     }
   ],
-  "recap": "git clone downloads a full repository from GitHub.",
-  "predict": null,
+  "predict": {
+    "trigger": "git clone",
+    "question": "How much of the project history does a clone download?",
+    "choices": [
+      {
+        "text": "Only the newest version of each file"
+      },
+      {
+        "text": "Every commit, the whole history"
+      }
+    ],
+    "answer": 1,
+    "explanation": "A clone is a full copy. You get every commit, so you can read the whole history offline."
+  },
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
-      }
+      "run": "git clone https://github.com/lantern-labs/festival-site.git"
     }
   ]
 }

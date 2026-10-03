@@ -39,7 +39,7 @@
   "goal": {
     "items": [
       {
-        "text": "Add contact.html to main",
+        "text": "Get contact.html committed on main",
         "checks": [
           {
             "type": "currentBranch",
@@ -50,13 +50,14 @@
             "path": "contact.html"
           },
           {
-            "type": "commitExists",
-            "messageContains": "contact"
+            "type": "fileInCommit",
+            "ref": "HEAD",
+            "path": "contact.html"
           }
         ]
       },
       {
-        "text": "Add faq.html to main",
+        "text": "Get faq.html committed on main",
         "checks": [
           {
             "type": "currentBranch",
@@ -67,14 +68,25 @@
             "path": "faq.html"
           },
           {
-            "type": "commitExists",
-            "messageContains": "faq"
+            "type": "fileInCommit",
+            "ref": "HEAD",
+            "path": "faq.html"
           }
         ]
       },
       {
-        "text": "Clean up your branches",
+        "text": "Delete both branches once their work is merged",
         "checks": [
+          {
+            "type": "fileInCommit",
+            "ref": "HEAD",
+            "path": "contact.html"
+          },
+          {
+            "type": "fileInCommit",
+            "ref": "HEAD",
+            "path": "faq.html"
+          },
           {
             "type": "branchMissing",
             "name": "contact"

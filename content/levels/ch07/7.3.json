@@ -4,24 +4,120 @@
   "chapter": 7,
   "number": 3,
   "title": "Code review",
-  "concept": "Read Priya's comments, reply, request changes",
+  "concept": "Read a real review comment on a line and reply to it",
   "story": [
     {
       "speaker": "Priya",
-      "text": "I reviewed your PR. I left a comment."
+      "text": "I read your pull request. I left one comment and asked for a change."
+    },
+    {
+      "speaker": "Priya",
+      "text": "Do not take it personally. Review is how we catch things, not a complaint about you."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Open the pull request. You will see Priya's review marked \"requested changes\"."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Her comment is pinned to a line. Click Files changed to see exactly where."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Reply to her comment first. Answering before you edit is good manners."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
         "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Festival site so far",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds",
+            "priya-reviews"
+          ],
+          "fromLocal": {
+            "setUpstream": true
+          }
+        }
+      },
+      {
+        "run": "git switch -c food-stalls"
+      },
+      {
+        "commit": {
+          "message": "Add food stalls page",
+          "files": {
+            "food.html": "<h2>Food stalls</h2>\n<p>The samosa stall is vegetarian.</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git push -u origin food-stalls"
+      },
+      {
+        "hub": {
+          "type": "openPullRequest",
+          "repo": "lantern-labs/festival-site",
+          "head": "food-stalls",
+          "base": "main",
+          "title": "Add food stalls page",
+          "body": "Lists the stalls for visitors.",
+          "reviewers": [
+            "priya-reviews"
+          ]
+        }
+      },
+      {
+        "hub": {
+          "type": "reviewPullRequest",
+          "actor": "priya-reviews",
+          "repo": "lantern-labs/festival-site",
+          "number": 1,
+          "event": "request_changes",
+          "body": "Good start. One change needed before I can approve.",
+          "comments": [
+            {
+              "path": "food.html",
+              "line": 2,
+              "body": "Can you add the opening hours here? Visitors ask that even more than the menu."
+            }
+          ]
+        }
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Read the comment and answer",
+        "text": "Reply to Priya's comment on the line",
+        "checks": [
+          {
+            "type": "pullRequest",
+            "repo": "lantern-labs/festival-site",
+            "number": 1,
+            "repliedToReview": true
+          }
+        ]
+      },
+      {
+        "text": "Answer: what should you do when changes are requested?",
         "checks": [
           {
             "type": "answered",
@@ -34,33 +130,56 @@
   "par": null,
   "allowedCommands": null,
   "hints": [
-    "Someone left feedback on your code.",
-    "Code review means a teammate reads your changes and suggests fixes.",
-    "Read the review comment and answer the question."
+    "Priya's comment has a reply box under it in the website panel.",
+    "Open the pull request, find her comment, and type a reply in the box beneath it.",
+    "In the website panel open pull request #1, find Priya's comment on food.html, type a reply such as \"Good idea, adding them now\" and press Reply."
   ],
   "questions": [
     {
       "id": "q1",
-      "prompt": "What should you do when changes are requested?",
+      "prompt": "A reviewer requested changes. What do you do next?",
       "choices": [
         {
-          "text": "Make the changes and push to the same branch"
+          "text": "Close the pull request and open a new one"
         },
         {
-          "text": "Close the PR and give up"
+          "text": "Add more commits to the same branch and push them"
+        },
+        {
+          "text": "Delete the branch and start again"
         }
       ],
-      "answer": 0,
-      "explanation": "Just add more commits to the branch."
+      "answer": 1,
+      "explanation": "The pull request follows your branch. New commits pushed to that branch show up in the same pull request automatically."
     }
   ],
-  "recap": "Code review is a normal part of working in a team.",
+  "recap": "A review can approve, comment, or request changes. Comments are pinned to lines. Reply to them, then fix the code on the same branch.",
+  "glossary": [
+    "code-review"
+  ],
+  "cheatSheet": [],
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site/pulls/1",
+    "focus": "hub"
+  },
   "solution": [
+    {
+      "hub": {
+        "type": "replyReviewComment",
+        "repo": "lantern-labs/festival-site",
+        "number": 1,
+        "body": "Good idea. Adding the opening hours now."
+      }
+    },
     {
       "answer": {
         "question": "q1",
-        "choice": 0
+        "choice": 1
       }
     }
   ]

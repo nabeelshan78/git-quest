@@ -88,3 +88,70 @@ Every other assumption made while building is listed here.
     i18n; extra themes. `git clean`, `cat-file`, `ls-files`, `rev-parse`
     and `check-ignore` are also out of scope as commands (the engine
     still parses revisions internally).
+
+## Curriculum rebuild (2026-10)
+
+An audit found the engine was far ahead of the curriculum: 24 of 58
+levels were pure multiple-choice quizzes, students typed only 79 git
+commands across the whole game, and Chapters 6 and 7 — the entire
+GitHub and teamwork half — required no commands at all because the
+simulated-GitHub panel had never been implemented beyond a stub.
+Nine in-scope commands (`diff`, `checkout`, `remote`, `clone`, `fetch`,
+`pull`, `push`, `reset`, `reflog`) were never typed by a student.
+
+21. **The simulated site is built, not stubbed.** `src/ui/hub/` renders
+    the repo page (branch picker, file list, README), issues with
+    comments, and pull requests with a real computed diff, review
+    threads anchored to lines, replies, the merge button and branch
+    deletion. Every action dispatches through `session.hubAction`, the
+    same engine path scripted teammates use, so nothing is faked in the
+    UI layer.
+22. **Generic branding.** The site is called "CodeHub" and uses its own
+    icons. The GitHub name, logo and Octocat appear nowhere; a test
+    asserts the panel's text never matches /github/i or /octocat/i.
+23. **Chapters 6 and 7 are hands-on.** Both chapters now drive real
+    commands and real site actions. Only three levels in the game remain
+    deliberately quiz-shaped: 0.1 (why version control, before any tool
+    exists), 6.7 (sign-in, which is automatic here by design) and the
+    concept questions inside otherwise hands-on levels.
+24. **Scripted teammates actually run.** The `teammates` array in the
+    level schema was never wired into the runner, so no level could use
+    it. `GameSessionImpl.runTeammateScripts` now fires `start`,
+    `commands`, `goal` and `event` triggers, each script once, with
+    `say`, `push`, `hub` and `run` actions. Level 6.6's rejected push
+    happens because a teammate really pushed first, not because the
+    level staged it.
+25. **`<ref>@{n}` is implemented** in `engine/core/repo.ts` and shared by
+    all three revision resolvers, because the reflog rescue lesson (8.4)
+    depends on `HEAD@{1}`. It is covered by differential tests against
+    real git rather than trusted.
+26. **Classmate repo bundles (`src/classroom/bundle.ts`).** A student
+    exports their repository as one JSON file; a classmate imports it and
+    the incoming commits land on a `classmate/<handle>` branch, which the
+    importer merges themselves. Chosen over live multiplayer deliberately:
+    it is asynchronous and one-way, so nobody is ever blocked by a partner
+    who is slow, absent or on another timezone, and it needs no backend,
+    no accounts and no personal data. CRDTs were rejected outright —
+    they exist to make conflicts disappear, which would delete the lesson.
+27. **The `team-up` sandbox preset writes its base commits with a fixed
+    identity** (`Lantern Labs <team@lanternlabs.example>`) and the fixed
+    clock, so every student's starting commit has the same hash. Without
+    that shared ancestor, exchanged bundles fail with "refusing to merge
+    unrelated histories".
+28. **The sandbox runs the real engine.** It previously used the
+    development mock session; it now uses `createSession` with a
+    `sandboxPreset`, so sandbox behaviour matches levels exactly.
+29. **Documented misconceptions are targeted directly** (Isomöttönen &
+    Cochez, *Challenges and Confusions in Learning Version Control with
+    Git*): 2.1 makes the student `git add` a file that already existed to
+    break the "add creates the file" reading and asks what `add` did;
+    2.3 compares `git diff` with `git diff --staged` on genuinely
+    different states; 5.1 has the student cause a conflict on purpose;
+    7.6 states that re-cloning to escape a conflict is the wrong move,
+    which the paper found was students' actual coping strategy.
+30. **Profile before play.** Levels and the sandbox build their world
+    from the player's identity at mount time. The profile dialog used to
+    render over a already-mounted level, baking in an empty `user.name`
+    and making every setup commit fail silently. Session-creating routes
+    now wait for a name, and `runSetup` falls back to a placeholder
+    identity rather than committing with an empty one.

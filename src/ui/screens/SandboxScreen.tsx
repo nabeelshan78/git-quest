@@ -11,11 +11,15 @@ import { TerminalPanel } from '../terminal/Terminal';
 import { WorldView } from '../world/WorldView';
 import { FileEditor, GitEditor } from '../editor/FileEditor';
 import { HubPanel } from '../hub/index';
-import { navigate, routeHref } from '../router';
+import { navigate, routeHref, SANDBOX_PRESETS } from '../router';
 import type { SandboxPreset } from '../router';
+import { useAppEnv } from '../env';
 import { useAppStatus } from '../state/appStatus';
 import { useProgress } from '../state/progress';
-import { createMockSession } from '../dev/mockSession';
+import { createSession } from '../../levels';
+import { bundleFileName } from '../../classroom/bundle';
+import { downloadText } from '../../classroom/download';
+import { localDate } from '../../classroom/progressFile';
 
 export function SandboxScreen({ preset }: { preset: SandboxPreset | null }) {
   if (!preset) return <SandboxPicker />;
@@ -29,7 +33,7 @@ function SandboxPicker() {
       <h1>{STRINGS.sandbox.title}</h1>
       <p className="gq-muted">{STRINGS.sandbox.intro}</p>
       <div className="gq-sandbox-presets" style={{ marginTop: 16 }}>
-        {(['empty', 'festival', 'festival-with-remote'] as const).map((p) => (
+        {SANDBOX_PRESETS.map((p) => (
           <button
             key={p}
             type="button"
@@ -54,16 +58,21 @@ function SandboxPicker() {
 function SandboxPlay({ preset }: { preset: SandboxPreset }) {
   const progress = useProgress();
   const appStatus = useAppStatus();
+  const appEnv = useAppEnv();
   const sessionRef = useRef<GameSession | null>(null);
   const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
   const [viewTab, setViewTab] = useState<'world' | 'hub'>('world');
 
+  // Wait for a player name: the sandbox world is built from the identity, and
+  // git cannot commit without one.
+  const identityReady = appEnv.testMode || progress.player.name.trim() !== '';
+
   useEffect(() => {
     let disposed = false;
-    const variant = preset === 'empty' ? 'chapter0' : 'full';
-    const session = createMockSession({
-      variant: variant === 'chapter0' ? 'sandbox' : 'full',
+    if (!identityReady) return;
+    const session = createSession({
       mode: 'sandbox',
+      sandboxPreset: preset,
       player: {
         ...progress.player,
         id: progress.player.id || 'player',
@@ -76,7 +85,7 @@ function SandboxPlay({ preset }: { preset: SandboxPreset }) {
     appStatus.set({ phase: 'play', ready: true, level: null });
     return () => { disposed = true; unsub(); session.dispose(); appStatus.clear(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preset]);
+  }, [preset, identityReady]);
 
   if (!snapshot || !sessionRef.current) {
     return <div style={{ padding: 24 }}>{STRINGS.common.loading}</div>;
@@ -126,6 +135,7 @@ function SandboxPlay({ preset }: { preset: SandboxPreset }) {
           )}
         </div>
         <div className="gq-play-files" style={{ gridColumn: '2 / 3' }}>
+          {preset === 'team-up' && <TeamUpPanel session={session} />}
           <FileEditor session={session} snapshot={snapshot} />
         </div>
         <div className="gq-play-terminal" style={{ gridColumn: '1 / -1' }}>
@@ -133,5 +143,80 @@ function SandboxPlay({ preset }: { preset: SandboxPreset }) {
         </div>
       </div>
     </>
+  );
+}
+
+/**
+ * Asynchronous classmate exchange. One-way and never blocking: a partner is a
+ * bonus, not a dependency, so an absent classmate costs nothing.
+ */
+function TeamUpPanel({ session }: { session: GameSession }) {
+  const progress = useProgress();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [status, setStatus] = useState('');
+  const [isError, setIsError] = useState(false);
+
+  const onExport = () => {
+    const text = session.exportBundle({
+      name: progress.player.name || 'Student',
+      handle: progress.player.handle || 'student',
+    });
+    if (!text) {
+      setStatus(STRINGS.sandbox.exportRepoEmpty);
+      setIsError(true);
+      return;
+    }
+    const name = bundleFileName({ handle: progress.player.handle || 'student' }, localDate(new Date()));
+    downloadText(name, text, 'application/json');
+    setStatus(STRINGS.sandbox.exportRepoDone);
+    setIsError(false);
+  };
+
+  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = session.importBundle(String(reader.result));
+      if (result.ok) {
+        setStatus(fmt(STRINGS.sandbox.importRepoOk, { name: file.name, branch: result.branch }));
+        setIsError(false);
+      } else {
+        setStatus(fmt(STRINGS.sandbox.importRepoFailed, { error: result.error }));
+        setIsError(true);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <section className="gq-teamup" data-testid={TID.teamUpPanel}>
+      <h3>{STRINGS.sandbox.teamTitle}</h3>
+      <p className="gq-small gq-muted">{STRINGS.sandbox.teamHelp}</p>
+      <ol className="gq-small gq-teamup-steps">
+        <li>{STRINGS.sandbox.teamStep1}</li>
+        <li>{STRINGS.sandbox.teamStep2}</li>
+        <li>{STRINGS.sandbox.teamStep3}</li>
+      </ol>
+      <div className="gq-teamup-actions">
+        <button type="button" className="gq-btn gq-btn-sm" onClick={onExport} data-testid={TID.teamUpExport}>
+          <Icon name="download" size={14} /> {STRINGS.sandbox.exportRepo}
+        </button>
+        <button type="button" className="gq-btn gq-btn-sm" onClick={() => fileInput.current?.click()} data-testid={TID.teamUpImport}>
+          <Icon name="upload" size={14} /> {STRINGS.sandbox.importRepo}
+        </button>
+        <input
+          ref={fileInput} type="file" accept=".json,.gitbundle.json" onChange={onFile}
+          style={{ display: 'none' }} data-testid={TID.teamUpFileInput}
+        />
+      </div>
+      {status && (
+        <p className={`gq-small ${isError ? 'gq-settings-status-error' : ''}`} data-testid={TID.teamUpStatus}>
+          {status}
+        </p>
+      )}
+      <p className="gq-small gq-muted">{STRINGS.sandbox.noPartnerNote}</p>
+    </section>
   );
 }

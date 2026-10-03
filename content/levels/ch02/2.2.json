@@ -50,7 +50,6 @@
         "checks": [
           {
             "type": "commit",
-            "messageContains": "Add",
             "changesExactly": [
               "map.html",
               "menu.html",

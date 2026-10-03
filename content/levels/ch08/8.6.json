@@ -4,62 +4,205 @@
   "chapter": 8,
   "number": 6,
   "title": "Leaving the simulator",
-  "concept": "Install git; same commands in a real terminal; the final project",
+  "concept": "Install real git; rehearse day one on your own machine",
   "story": [
     {
       "speaker": "Ada",
-      "text": "You've finished Git Quest! Now install git on your real computer."
+      "text": "You have finished. Everything you typed here is real git syntax."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Let me be straight with you about what was pretend."
+    },
+    {
+      "speaker": "Ada",
+      "text": "The website was pretend. Sam and Priya were pretend. Sign-in was pretend."
+    },
+    {
+      "speaker": "Ada",
+      "text": "The commands, the messages and the three boxes were not. Those are the real thing."
+    },
+    {
+      "speaker": "Ada",
+      "text": "On a real computer: install git from git-scm.com, then open a terminal."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Your very first two commands on any new machine set your name and email."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Let us rehearse that exact sequence one last time, then you are done."
     }
   ],
+  "workdir": "~",
   "setup": {
     "steps": [
       {
-        "run": "git init"
+        "machineAdd": {
+          "id": "yourmachine",
+          "label": "Your real computer",
+          "host": "yourmachine",
+          "identity": false
+        }
+      },
+      {
+        "switchMachine": "yourmachine"
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Graduate",
+        "text": "Set your name and email, like on a fresh machine",
+        "checks": [
+          {
+            "type": "configValue",
+            "machine": "yourmachine",
+            "key": "user.name",
+            "scope": "global",
+            "exists": true
+          },
+          {
+            "type": "configValue",
+            "machine": "yourmachine",
+            "key": "user.email",
+            "scope": "global",
+            "exists": true
+          }
+        ]
+      },
+      {
+        "text": "Make a folder, start a repository in it, and make the first commit",
+        "checks": [
+          {
+            "type": "repoExists",
+            "machine": "yourmachine",
+            "repoPath": "~/my-project"
+          },
+          {
+            "type": "commitCount",
+            "machine": "yourmachine",
+            "repoPath": "~/my-project",
+            "min": 1
+          }
+        ]
+      },
+      {
+        "text": "Answer: what carries over to a real terminal?",
         "checks": [
           {
             "type": "answered",
             "question": "q1"
           }
         ]
+      },
+      {
+        "text": "Answer: what is the one thing to do differently out there?",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q2"
+          }
+        ]
       }
     ]
   },
-  "par": null,
+  "par": 6,
   "allowedCommands": null,
   "hints": [
-    "You have learned everything this simulator teaches.",
-    "Install git on your real computer. The commands are exactly the same.",
-    "Answer the question to graduate from Git Quest."
+    "Do what you would do on a brand new computer: identity, folder, repository, first commit.",
+    "`git config --global user.name`, `git config --global user.email`, `mkdir`, `cd`, `git init`, then add and commit a file.",
+    "`git config --global user.name \"Your Name\"`, `git config --global user.email \"you@example.com\"`, `mkdir my-project`, `cd my-project`, `echo \"hello\" > README.md`, `git add README.md`, `git commit -m \"My first commit\"`."
   ],
   "questions": [
     {
       "id": "q1",
-      "prompt": "Will the commands you learned here work in a real terminal?",
+      "prompt": "Which of these works exactly the same in a real terminal?",
       "choices": [
         {
-          "text": "Yes"
+          "text": "Only the simple commands like git status"
         },
         {
-          "text": "No"
+          "text": "Every git command you typed here, and the messages git printed back"
+        },
+        {
+          "text": "Nothing: this was only a game"
+        }
+      ],
+      "answer": 1,
+      "explanation": "The commands and git's wording were matched to real git on purpose. The pretend parts were the website, the teammates and the sign-in."
+    },
+    {
+      "id": "q2",
+      "prompt": "What is genuinely different on a real computer?",
+      "choices": [
+        {
+          "text": "You sign in to the hosting site once in your browser, and there is no Rewind button"
+        },
+        {
+          "text": "Commits work differently"
+        },
+        {
+          "text": "Branches have different names"
         }
       ],
       "answer": 0,
-      "explanation": "Git Quest uses the exact same commands as real git!"
+      "explanation": "Real git has no rewind. That is why `git status` before acting, and small commits, matter so much."
     }
   ],
-  "recap": "Congratulations! You are now ready to use real git.",
+  "recap": "Real git is the same commands you already know. Install it, set user.name and user.email once, and remember there is no Rewind button out there: check git status before you act.",
+  "glossary": [],
+  "cheatSheet": [
+    {
+      "command": "git config --global user.name \"Your Name\"",
+      "summary": "First thing to run on any new computer"
+    },
+    {
+      "command": "git config --global user.email \"you@example.com\"",
+      "summary": "The second thing to run"
+    }
+  ],
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": false
+    }
+  },
   "solution": [
+    {
+      "run": "git config --global user.name \"Test Player\""
+    },
+    {
+      "run": "git config --global user.email \"player@example.com\""
+    },
+    {
+      "run": "mkdir my-project"
+    },
+    {
+      "run": "cd my-project"
+    },
+    {
+      "run": "git init"
+    },
+    {
+      "run": "echo \"My first real project\" > README.md"
+    },
+    {
+      "run": "git add README.md"
+    },
+    {
+      "run": "git commit -m \"My first commit\""
+    },
     {
       "answer": {
         "question": "q1",
+        "choice": 1
+      }
+    },
+    {
+      "answer": {
+        "question": "q2",
         "choice": 0
       }
     }

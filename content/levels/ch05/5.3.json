@@ -8,7 +8,7 @@
   "story": [
     {
       "speaker": "Ada",
-      "text": "To fix a conflict, just edit the file to look exactly how you want it, remove git's markers, then add and commit."
+      "text": "To fix a conflict, edit the file so it says exactly what you want. Then delete all three marker lines."
     }
   ],
   "setup": {

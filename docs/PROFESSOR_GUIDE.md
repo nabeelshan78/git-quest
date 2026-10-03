@@ -48,6 +48,40 @@ ends with a boss level.
 | 5 | 7 Teamwork on GitHub (7) | Pairs walk each other through a pull request in the game: issue, branch, PR, review, merge button. | Finish the Chapter 7 boss (7.7). |
 | 6 | 8 Rescue and graduation (6) | "Break it and rescue it" with `stash`, `commit --amend` and `reflog`. Install git and form final-project teams. | Finish the Chapter 8 boss (8.5) and level 8.6. Start the final project. |
 
+## Pairing students without a server (the Team up sandbox)
+
+Chapters 6 and 7 teach collaboration against scripted teammates, so **every
+level is completable alone**. If you also want students to collide with a
+real classmate, use the Team up sandbox at `#/sandbox/team-up`.
+
+How it works:
+
+1. Both students open Team up. They get the same first commit, byte for
+   byte, so their histories share an ancestor and can be merged.
+2. Each does a little work and presses **Export my repo**, which downloads
+   one small `.gitbundle.json` file.
+3. They swap files any way you like — chat, email, the LMS, a shared drive.
+4. Importing a classmate's file puts their commits on a
+   `classmate/<handle>` branch. Nothing of the importer's own work moves;
+   they run `git merge classmate/<handle>` themselves.
+
+A 20-minute version that reliably produces a conflict: tell everyone to
+edit **the same line** of `notes.txt`, swap files, then merge. Each student
+resolves a conflict they did not write, which is the part a single-player
+tutorial cannot stage.
+
+Why it is deliberately asynchronous and one-way:
+
+- Nobody is ever blocked by a partner who is absent, slow, or in another
+  timezone, and an odd number of students is not a problem.
+- There is no server, no accounts and no student data leaving the browser,
+  so there is nothing to provision and nothing to take down afterwards.
+- Students cannot damage each other's work: an import only adds a branch.
+
+Grading note: this is practice, not assessment. Progress files record level
+results only, so assess the Chapter 7 boss (7.7), which covers the same
+cycle solo.
+
 ## How students export and submit progress
 
 1. In the game the student presses **Export my progress**.

@@ -9,19 +9,31 @@
   "story": [
     {
       "speaker": "Ada",
-      "text": "Before we start saving, you need to know how git organizes things."
+      "text": "Git keeps your work in three places. Look at the three boxes in the panel."
     },
     {
       "speaker": "Ada",
-      "text": "It uses three areas, like boxes. The first is your **working folder**, where you edit files normally."
+      "text": "The first is your **working folder**: the real files you edit."
     },
     {
       "speaker": "Ada",
-      "text": "The third is the **repository**, where your permanent commits live."
+      "text": "The third is the **repository**, where your saved commits live for good."
     },
     {
       "speaker": "Ada",
-      "text": "In between is the **staging area**. It's like a loading dock where you prepare your next commit."
+      "text": "In between is the **staging area**: a loading dock where you prepare the next commit."
+    },
+    {
+      "speaker": "Ada",
+      "text": "`git status` tells you which box everything is in. Run it and watch the boxes."
+    },
+    {
+      "speaker": "Ada",
+      "text": "There is a file here called notes.txt that I made earlier. Move it to the loading dock."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Important: `git add` does not create files. notes.txt already exists. Add only moves it between boxes."
     }
   ],
   "workdir": "~/festival",
@@ -31,17 +43,16 @@
         "run": "git init"
       },
       {
-        "files": {
-          "index.html": "<h1>Lantern Festival</h1>\n",
-          "notes.txt": "Idea: more lights\n"
-        }
-      },
-      {
         "commit": {
           "message": "First commit",
           "files": {
             "index.html": "<h1>Lantern Festival</h1>\n"
           }
+        }
+      },
+      {
+        "files": {
+          "notes.txt": "Idea: more lights along the river\n"
         }
       }
     ]
@@ -49,11 +60,38 @@
   "goal": {
     "items": [
       {
-        "text": "Understand the three boxes",
+        "text": "Run git status to see which box things are in",
+        "checks": [
+          {
+            "type": "ranCommand",
+            "command": "git status"
+          }
+        ]
+      },
+      {
+        "text": "Answer: which box is notes.txt in?",
         "checks": [
           {
             "type": "answered",
             "question": "q1"
+          }
+        ]
+      },
+      {
+        "text": "Move the file I already made into the staging area",
+        "checks": [
+          {
+            "type": "staged",
+            "path": "notes.txt"
+          }
+        ]
+      },
+      {
+        "text": "Answer: what did git add actually do?",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q2"
           }
         ]
       }
@@ -62,42 +100,82 @@
   "questions": [
     {
       "id": "q1",
-      "prompt": "Which area holds the commit you are currently preparing?",
+      "prompt": "You ran git status. Which box is notes.txt in right now?",
       "choices": [
         {
-          "text": "The repository"
+          "text": "The working folder only: git calls it untracked"
         },
         {
           "text": "The staging area"
         },
         {
-          "text": "The working folder"
+          "text": "The repository"
+        }
+      ],
+      "answer": 0,
+      "explanation": "An untracked file sits in your working folder. Git has never been told to look after it."
+    },
+    {
+      "id": "q2",
+      "prompt": "You ran git add notes.txt. What did it do?",
+      "choices": [
+        {
+          "text": "It created the file notes.txt"
+        },
+        {
+          "text": "It copied the existing file into the staging area"
+        },
+        {
+          "text": "It saved a permanent commit"
         }
       ],
       "answer": 1,
-      "explanation": "The staging area is where you pick and choose files for the next commit."
+      "explanation": "The file already existed. `add` does not create and does not commit. It only puts a copy on the loading dock."
     }
   ],
-  "par": null,
-  "recap": "Git has three areas: the working folder (your desk), the staging area (the loading dock), and the repository (the vault).",
+  "par": 2,
+  "recap": "Three boxes: working folder, staging area, repository. `git status` says which box each file is in. `git add` moves an existing file to the staging area.",
   "glossary": [
-    "working-folder",
+    "working-directory",
     "staging-area",
     "repository"
   ],
+  "cheatSheet": [
+    {
+      "command": "git status",
+      "summary": "See which box each file is in"
+    }
+  ],
   "predict": null,
+  "allowedCommands": [
+    "git status",
+    "git add",
+    "ls",
+    "cat"
+  ],
+  "hints": [
+    "First look with git status. Then move the file Ada already made onto the loading dock.",
+    "`git status` lists untracked and staged files. `git add <file>` moves one into the staging area.",
+    "Run `git status`, answer the first question, run `git add notes.txt`, then answer the second."
+  ],
   "solution": [
+    {
+      "run": "git status"
+    },
     {
       "answer": {
         "question": "q1",
+        "choice": 0
+      }
+    },
+    {
+      "run": "git add notes.txt"
+    },
+    {
+      "answer": {
+        "question": "q2",
         "choice": 1
       }
     }
-  ],
-  "hints": [
-    "Think about where your files go after each step in the git workflow.",
-    "Git has three areas: your working folder (files you edit), the staging area (files ready to save), and the repository (saved history).",
-    "Answer the question based on the story: the staging area is like a packing box for your next save."
-  ],
-  "allowedCommands": null
+  ]
 }

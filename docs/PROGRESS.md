@@ -93,6 +93,39 @@ committed code works; not extended).
   - Updated README with full instructions.
   - Fixed all 19 strict typecheck errors (unused vars, missing imports,
     readonly tuple casts, window cast, PlayerProfile unused import).
+- Curriculum rebuild (2026-10-02). Audit found the engine was far ahead of
+  the content: 24/58 levels were pure quizzes, students typed 79 commands in
+  the whole game, and Chapters 6-7 (the GitHub half) required none because
+  the hub panel was an 18-line stub. Nine in-scope commands were never typed.
+  - Built the simulated site (`src/ui/hub/`): repo page with branch picker,
+    file list and README; issues with comments; pull requests with a real
+    computed diff, line-anchored review threads, replies, merge and branch
+    delete. Generic "CodeHub" branding; a test asserts no GitHub/Octocat text.
+  - Rewrote Chapters 6 and 7 (15 levels) as hands-on: remote add, push -u,
+    clone to a second machine, fetch vs pull, a genuinely rejected push,
+    issues, pull requests, review replies, merge, tidy-up, and a PR conflict.
+  - Rewrote 2.1, 2.3, 5.1, 5.2, 8.3, 8.4, 8.5, 8.6 and extended 4.2.
+  - Wired the `teammates` scripting system into the runner (it existed in the
+    schema but no level could use it): start/commands/goal/event triggers.
+  - Implemented `<ref>@{n}` revisions in the engine core + 3 differential
+    tests against real git; needed by the reflog rescue level.
+  - Added classmate repo bundles (`src/classroom/bundle.ts`) and the
+    `team-up` sandbox preset with a fixed-identity shared base so two
+    students' histories can actually merge. Async and backend-free.
+  - Sandbox now runs the real engine instead of the development mock.
+  - Fixed: levels rendered under the profile dialog with an empty
+    `user.name`, so every setup commit failed silently in the browser.
+  - Fixed: `fnv1a32` no longer needs `TextEncoder` (core has no DOM lib);
+    verified byte-identical on 20k random strings incl. lone surrogates.
+  - Fixed ch0 levels 0.3/0.4: same `workdir` + `mkdir`/`cd` double-nesting
+    bug as ch4, and 0.3/0.5 now use `touch` as their story says.
+  - Fixed the e2e runner, which had never actually passed: its exit code was
+    being masked by a pipe. It used a CodeMirror selector for what is a plain
+    textarea (so every `edit` level failed), never dismissed predict cards,
+    and did not stop once a level was already won.
+  - Result: 2/58 quiz-only levels, 152 commands typed, all 24 in-scope git
+    commands and all 7 shell commands exercised.
+    431 unit + 89 differential tests pass; full Playwright suite green.
   - Fixed infinite loop in findRepo when machine.cwd was not absolute
     (caused all ch1 tests to hang). Root cause: createMachine did not
     resolve ~ in cwd option; dirname of relative path never reaches /.

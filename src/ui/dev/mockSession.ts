@@ -23,6 +23,13 @@ import type { CommandResult } from '../../shared/result';
 import type { CompletionResult, GameSession, GoalItemStatus, LevelPhase, PendingPredict, QuestionStatus, SessionMode, SessionSnapshot, TerminalEntry } from '../../shared/session';
 import type { GameEvent } from '../../shared/events';
 import type { MachineId, World } from '../../shared/types';
+import {
+  createBundle,
+  describeBundleError,
+  importBundle as importBundleIntoWorld,
+  parseBundle,
+  serializeBundle,
+} from '../../classroom/bundle';
 import { finishCommitFromEditor, promptFor, runMockLine } from './mockCommands';
 import { MOCK_REPO_ROOT, createMockWorld } from './mockWorld';
 import type { MockVariant } from './mockWorld';
@@ -475,6 +482,31 @@ export function createMockSession(options: MockSessionOptions = {}): MockGameSes
       calls.push({ method: 'hubAction', args: [action] });
       state = { ...state, transcript: [...state.transcript, entry({ kind: 'system', text: `GitHub: ${action.type}` })], eventSeq: state.eventSeq + 1, lastEvents: [] };
       emit();
+    },
+    exportBundle(author: { name: string; handle: string }) {
+      calls.push({ method: 'exportBundle', args: [author] });
+      const made = createBundle(state.world, state.world.activeMachine, author, new Date().toISOString());
+      return made.ok ? serializeBundle(made.bundle) : null;
+    },
+    importBundle(text: string) {
+      calls.push({ method: 'importBundle', args: [text] });
+      const parsed = parseBundle(text);
+      if (!parsed.ok) return { ok: false as const, error: describeBundleError(parsed.error) };
+      const landed = importBundleIntoWorld(state.world, state.world.activeMachine, parsed.bundle);
+      if (!landed.ok) {
+        return { ok: false as const, error: 'Open a repository first, then import a classmate bundle into it.' };
+      }
+      state = {
+        ...state,
+        world: landed.world,
+        transcript: [...state.transcript, entry({
+          kind: 'system',
+          text: `Imported ${parsed.bundle.author.name}'s work as branch ${landed.branch}. Merge it with: git merge ${landed.branch}`,
+        })],
+        eventSeq: state.eventSeq + 1,
+      };
+      emit();
+      return { ok: true as const, branch: landed.branch };
     },
     switchMachine(id: MachineId) {
       calls.push({ method: 'switchMachine', args: [id] });

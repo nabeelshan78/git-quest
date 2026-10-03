@@ -51,7 +51,6 @@
         "checks": [
           {
             "type": "commitExists",
-            "messageContains": "map",
             "changesExactly": [
               "map.html"
             ]
@@ -63,7 +62,6 @@
         "checks": [
           {
             "type": "commitExists",
-            "messageContains": "menu",
             "changesExactly": [
               "menu.html"
             ]
@@ -71,11 +69,10 @@
         ]
       },
       {
-        "text": "Ignore the poster",
+        "text": "Ignore the poster and commit .gitignore",
         "checks": [
           {
             "type": "commitExists",
-            "messageContains": "ignore",
             "changesExactly": [
               ".gitignore"
             ]

@@ -175,7 +175,7 @@
         {
           "id": "4.2",
           "title": "Move between branches",
-          "concept": "git switch, git switch -c (and git checkout -b)"
+          "concept": "git switch, git switch -c (and checkout -b)"
         },
         {
           "id": "4.3",
@@ -214,7 +214,7 @@
         {
           "id": "5.1",
           "title": "Why conflicts happen",
-          "concept": "Two edits to the same lines"
+          "concept": "Two edits to the same lines; cause a real conflict"
         },
         {
           "id": "5.2",
@@ -248,42 +248,42 @@
         {
           "id": "6.1",
           "title": "Git is not GitHub",
-          "concept": "Local tool vs hosting website; your first GitHub repo and README"
+          "concept": "git vs GitHub; make the first repository page and a README"
         },
         {
           "id": "6.2",
-          "title": "Connect the two",
+          "title": "Point your repo at the website",
           "concept": "git remote add origin, git remote -v"
         },
         {
           "id": "6.3",
-          "title": "Upload",
-          "concept": "git push -u origin main"
+          "title": "Send your work online",
+          "concept": "git push -u origin main; the website page fills up"
         },
         {
           "id": "6.4",
-          "title": "Download a project",
+          "title": "Copy a project to a new computer",
           "concept": "git clone"
         },
         {
           "id": "6.5",
-          "title": "Check vs bring in",
-          "concept": "git fetch vs git pull; what origin/main is"
+          "title": "Fetch is not pull",
+          "concept": "git fetch, origin/main, then merge; fetch vs pull"
         },
         {
           "id": "6.6",
-          "title": "Push rejected!",
-          "concept": "Why, then pull and push again"
+          "title": "Push rejected",
+          "concept": "Rejected push because the remote moved; pull then push"
         },
         {
           "id": "6.7",
-          "title": "Proving it is you",
-          "concept": "Signing in to GitHub, explained (automatic in the game)"
+          "title": "How the website knows it is you",
+          "concept": "Sign-in explained in plain words; automatic in the game"
         },
         {
           "id": "6.8",
-          "title": "Boss: set up a second laptop",
-          "concept": "Clone, change, push, sync the first",
+          "title": "Boss: the new laptop",
+          "concept": "Clone, commit, push, handle a rejection, end in sync",
           "boss": true
         }
       ]
@@ -296,38 +296,38 @@
       "levels": [
         {
           "id": "7.1",
-          "title": "Issues and one branch per task",
-          "concept": "Report a bug, assign it; one branch per task"
+          "title": "Pick up a task",
+          "concept": "Issues; one branch per task; push the branch"
         },
         {
           "id": "7.2",
           "title": "Your first pull request",
-          "concept": "Push a branch, open a PR"
+          "concept": "Open a pull request; ask for a review"
         },
         {
           "id": "7.3",
           "title": "Code review",
-          "concept": "Read Priya's comments, reply, request changes"
+          "concept": "Read a real review comment on a line and reply to it"
         },
         {
           "id": "7.4",
-          "title": "Update the PR",
-          "concept": "Push new commits to the same branch"
+          "title": "Update the pull request",
+          "concept": "Push more commits to the same branch; the PR updates itself"
         },
         {
           "id": "7.5",
-          "title": "The merge button",
+          "title": "Merge it and tidy up",
           "concept": "Merge the pull request, delete the branch, update local main"
         },
         {
           "id": "7.6",
-          "title": "Conflicts in a PR",
-          "concept": "Bring main into your branch and resolve"
+          "title": "A conflict inside a pull request",
+          "concept": "main moved under your branch; merge main in, resolve, push"
         },
         {
           "id": "7.7",
-          "title": "Boss: festival launch sprint",
-          "concept": "Several PRs, one conflict, one review",
+          "title": "Boss: ship a task end to end",
+          "concept": "Issue to merged pull request, with a review and a tidy finish",
           "boss": true
         }
       ]
@@ -361,13 +361,13 @@
         {
           "id": "8.5",
           "title": "Boss: the site is down at midnight",
-          "concept": "Rescue the festival site with every tool",
+          "concept": "Rescue the festival site: stash, revert, push",
           "boss": true
         },
         {
           "id": "8.6",
           "title": "Leaving the simulator",
-          "concept": "Install git; same commands in a real terminal; the final project"
+          "concept": "Install real git; rehearse day one on your own machine"
         }
       ]
     }

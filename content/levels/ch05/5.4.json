@@ -77,7 +77,7 @@
   "hints": [
     "There is a flag for git merge to abort.",
     "It stops the merge and puts everything back.",
-    "git merge --abort"
+    "Type `git merge --abort` to cancel the merge and go back to how things were."
   ],
   "recap": "git merge --abort stops a conflict resolution and puts your files back how they were.",
   "predict": null,

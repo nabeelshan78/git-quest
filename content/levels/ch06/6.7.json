@@ -3,29 +3,68 @@
   "id": "6.7",
   "chapter": 6,
   "number": 7,
-  "title": "Proving it is you",
-  "concept": "Signing in to GitHub, explained (automatic in the game)",
+  "title": "How the website knows it is you",
+  "concept": "Sign-in explained in plain words; automatic in the game",
   "story": [
     {
       "speaker": "Ada",
-      "text": "In reality, GitHub will ask you to sign in via your browser so it knows who you are. In this game, you're already signed in!"
+      "text": "One question people always ask: how does the website know you are allowed to push?"
+    },
+    {
+      "speaker": "Ada",
+      "text": "On a real computer you sign in once. A window opens in your browser and you approve it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "After that your computer remembers, and push and pull just work."
+    },
+    {
+      "speaker": "Ada",
+      "text": "In this game sign-in is automatic. There is nothing to set up."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Two quick checks, then we do the chapter boss."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
         "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "fromLocal": {
+            "setUpstream": true
+          }
+        }
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Read the story and answer",
+        "text": "Answer both questions",
         "checks": [
           {
             "type": "answered",
             "question": "q1"
+          },
+          {
+            "type": "answered",
+            "question": "q2"
           }
         ]
       }
@@ -34,33 +73,61 @@
   "par": null,
   "allowedCommands": null,
   "hints": [
-    "GitHub needs to know who you are.",
-    "Signing in proves you have permission to push to the repo.",
-    "Read the explanation and answer the question."
+    "These are reading questions. Look back at what Ada said.",
+    "Sign-in happens once per computer, in the browser, and then git remembers.",
+    "Pick \"Once, in the browser\" and \"Nothing: it is automatic in this game\"."
   ],
   "questions": [
     {
       "id": "q1",
-      "prompt": "Do you need to configure SSH keys or tokens in this game?",
+      "prompt": "On a real computer, how often do you sign in to the website for git?",
       "choices": [
         {
-          "text": "Yes"
+          "text": "Every single push"
         },
         {
-          "text": "No, sign-in is automatic"
+          "text": "Once, in the browser, then the computer remembers"
         }
       ],
       "answer": 1,
-      "explanation": "We keep it simple here."
+      "explanation": "You approve it once per computer. After that git reuses what was saved."
+    },
+    {
+      "id": "q2",
+      "prompt": "What do you have to set up for sign-in in this game?",
+      "choices": [
+        {
+          "text": "Nothing: it is automatic here"
+        },
+        {
+          "text": "A password file in the repo"
+        }
+      ],
+      "answer": 0,
+      "explanation": "The game signs you in for you so you can focus on git itself. Never put a password in a repository."
     }
   ],
-  "recap": "On a real computer, GitHub uses your browser to sign you in.",
+  "recap": "On a real computer you sign in to the hosting site once, through your browser. In this game it is automatic.",
+  "glossary": [],
+  "cheatSheet": [],
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": true
+    },
+    "hubPage": "lantern-labs/festival-site"
+  },
   "solution": [
     {
       "answer": {
         "question": "q1",
         "choice": 1
+      }
+    },
+    {
+      "answer": {
+        "question": "q2",
+        "choice": 0
       }
     }
   ]

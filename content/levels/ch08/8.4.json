@@ -7,63 +7,149 @@
   "concept": "git reflog brings back a lost commit",
   "story": [
     {
+      "speaker": "Sam",
+      "text": "I think I deleted a whole afternoon of work. The sponsors page is gone."
+    },
+    {
       "speaker": "Ada",
-      "text": "A commit seems lost! Use git reflog to find its hash, then cherry-pick it or reset to it."
+      "text": "Probably not gone. Git keeps a private diary of everywhere HEAD has been."
+    },
+    {
+      "speaker": "Ada",
+      "text": "It is called the **reflog**. Run `git reflog` and read it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Every line has a short code like `abc1234`. That is a commit you can go back to."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Find the commit that added the sponsors page, then bring the branch back to it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "`git reset --hard <code>` is the normal rescue here. It is safe because we are moving *forward* to work we lost."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
         "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Add homepage",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n"
+          }
+        }
+      },
+      {
+        "commit": {
+          "message": "Add sponsors page",
+          "files": {
+            "sponsors.html": "<h2>Our sponsors</h2>\n<p>Riverside Council and Lantern Labs.</p>\n"
+          }
+        }
+      },
+      {
+        "run": "git reset --hard HEAD~1"
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Find the lost commit",
+        "text": "Read git's diary",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "ranCommand",
+            "command": "git reflog"
+          }
+        ]
+      },
+      {
+        "text": "Bring the sponsors page back",
+        "checks": [
+          {
+            "type": "fileExists",
+            "path": "sponsors.html"
+          },
+          {
+            "type": "fileContent",
+            "path": "sponsors.html",
+            "contains": "sponsors"
+          },
+          {
+            "type": "commitExists",
+            "messageContains": "sponsors"
+          }
+        ]
+      },
+      {
+        "text": "Finish with nothing half-done",
+        "checks": [
+          {
+            "type": "clean"
+          },
+          {
+            "type": "commitCount",
+            "equals": 2
           }
         ]
       }
     ]
   },
-  "par": null,
+  "par": 2,
   "allowedCommands": [
-    "git reflog"
+    "git reflog",
+    "git reset",
+    "git log",
+    "git status",
+    "ls",
+    "cat"
   ],
   "hints": [
-    "A commit seems to have vanished. Where can you find it?",
-    "`git reflog` shows every place HEAD has been, even after a reset.",
-    "Answer the question about using reflog to recover work."
+    "The commit still exists, it just has no branch pointing at it. Find it in the reflog.",
+    "`git reflog` lists where HEAD has been, newest first. Find the line mentioning the sponsors page and copy its code.",
+    "Run `git reflog`, find the line for \"Add sponsors page\", then run `git reset --hard HEAD@{1}`."
   ],
-  "questions": [
+  "questions": [],
+  "recap": "`git reflog` lists everywhere HEAD has been, so a commit with no branch on it can still be found and recovered.",
+  "glossary": [
+    "reflog"
+  ],
+  "cheatSheet": [
     {
-      "id": "q1",
-      "prompt": "What does reflog record?",
-      "choices": [
-        {
-          "text": "Every time HEAD moves"
-        },
-        {
-          "text": "Only commits you push"
-        }
-      ],
-      "answer": 0,
-      "explanation": "Reflog is a diary of everywhere you've been."
+      "command": "git reflog",
+      "summary": "List everywhere HEAD has been"
+    },
+    {
+      "command": "git reset --hard <code>",
+      "summary": "Move the branch back to that commit"
     }
   ],
-  "recap": "git reflog shows everywhere HEAD has been, so you can recover lost commits.",
-  "predict": null,
+  "predict": {
+    "trigger": "git reflog",
+    "question": "The commit has no branch pointing at it. Is it really gone?",
+    "choices": [
+      {
+        "text": "Yes, with no branch it is deleted immediately"
+      },
+      {
+        "text": "No, it is still stored and the reflog remembers it"
+      }
+    ],
+    "answer": 1,
+    "explanation": "Git keeps commits for weeks even with no branch on them. The reflog is how you find them again."
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
-      }
+      "run": "git reflog"
+    },
+    {
+      "run": "git reset --hard HEAD@{1}"
     }
   ]
 }

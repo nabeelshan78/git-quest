@@ -3,14 +3,27 @@
   "id": "6.2",
   "chapter": 6,
   "number": 2,
-  "title": "Connect the two",
+  "title": "Point your repo at the website",
   "concept": "git remote add origin, git remote -v",
   "story": [
     {
       "speaker": "Ada",
-      "text": "We need to connect your local folder to GitHub. We'll add a 'remote' server named 'origin'."
+      "text": "Your laptop does not know that website page exists yet."
+    },
+    {
+      "speaker": "Ada",
+      "text": "A **remote** is a nickname for a copy of the project somewhere else."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Almost everyone names the main remote `origin`. It is just a habit, not a rule."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Add it, then run `git remote -v` to check it. The `-v` means verbose, so it prints the full address."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -18,15 +31,23 @@
       },
       {
         "commit": {
-          "message": "Initial commit",
+          "message": "Add homepage",
           "files": {
-            "README.md": "# Festival\n"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
           }
         }
       },
       {
         "hosted": {
-          "id": "lantern-labs/festival-site"
+          "id": "lantern-labs/festival-site",
+          "description": "The Lantern Labs festival website",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds"
+          ]
         }
       }
     ]
@@ -34,49 +55,65 @@
   "goal": {
     "items": [
       {
-        "text": "Add a remote named origin",
+        "text": "Add a remote called origin pointing at the festival site",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "remoteExists",
+            "name": "origin",
+            "urlMatches": "lantern-labs/festival-site"
+          }
+        ]
+      },
+      {
+        "text": "Check it with git remote -v",
+        "checks": [
+          {
+            "type": "ranCommand",
+            "command": "git remote"
           }
         ]
       }
     ]
   },
-  "par": 1,
+  "par": 2,
   "allowedCommands": [
-    "git remote"
+    "git remote",
+    "git status"
   ],
   "hints": [
-    "Your local repo needs to know where the online copy lives.",
-    "A remote is a link to another copy of your repo, usually on GitHub.",
-    "Answer the question about `git remote add origin <url>`."
+    "You need to tell git the web address of the copy online, and give it a nickname.",
+    "`git remote add <nickname> <address>` saves it. The address is https://github.com/lantern-labs/festival-site.git",
+    "Run `git remote add origin https://github.com/lantern-labs/festival-site.git`, then `git remote -v`."
   ],
-  "questions": [
+  "questions": [],
+  "recap": "`git remote add origin <address>` saves a nickname for the copy online. `git remote -v` lists your remotes.",
+  "glossary": [
+    "remote",
+    "origin"
+  ],
+  "cheatSheet": [
     {
-      "id": "q1",
-      "prompt": "What command checks your remotes?",
-      "choices": [
-        {
-          "text": "git remote -v"
-        },
-        {
-          "text": "git check remote"
-        }
-      ],
-      "answer": 0,
-      "explanation": "git remote -v shows the URL of the remote."
+      "command": "git remote add origin <url>",
+      "summary": "Save the address of the copy online under the name origin"
+    },
+    {
+      "command": "git remote -v",
+      "summary": "List the remotes and their addresses"
     }
   ],
-  "recap": "git remote add origin <url> connects your local git repo to GitHub.",
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": true
+    },
+    "hubPage": "lantern-labs/festival-site"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
-      }
+      "run": "git remote add origin https://github.com/lantern-labs/festival-site.git"
+    },
+    {
+      "run": "git remote -v"
     }
   ]
 }

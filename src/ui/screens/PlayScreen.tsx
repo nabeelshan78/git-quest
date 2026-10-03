@@ -18,6 +18,7 @@ import { WorldView } from '../world/WorldView';
 import { FileEditor, GitEditor } from '../editor/FileEditor';
 import { HubPanel } from '../hub/index';
 import { routeHref, navigate } from '../router';
+import { useAppEnv } from '../env';
 import { useAppStatus } from '../state/appStatus';
 import { useProgressApi, useProgress } from '../state/progress';
 import { createSession, getLevel } from '../../levels';
@@ -30,14 +31,24 @@ export function PlayScreen({ levelId }: PlayScreenProps) {
   const progressApi = useProgressApi();
   const progress = useProgress();
   const appStatus = useAppStatus();
+  const appEnv = useAppEnv();
 
   // Create session
   const sessionRef = useRef<GameSession | null>(null);
   const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * The level's world is built from the player's identity when the session is
+   * created. Starting before the profile dialog is answered would bake in an
+   * empty user.name, and git refuses to commit without one, so every setup
+   * commit would fail and the level would look broken. Wait for a name.
+   */
+  const identityReady = appEnv.testMode || progress.player.name.trim() !== '';
+
   useEffect(() => {
     let disposed = false;
+    if (!identityReady) return;
 
     // Try to load level and create real session
     try {
@@ -77,7 +88,7 @@ export function PlayScreen({ levelId }: PlayScreenProps) {
       return () => { disposed = true; };
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [levelId]);
+  }, [levelId, identityReady]);
 
   // Update app status
   useEffect(() => {
@@ -103,7 +114,13 @@ export function PlayScreen({ levelId }: PlayScreenProps) {
 }
 
 function PlayScreenInner({ session, snapshot, levelId }: { session: GameSession; snapshot: SessionSnapshot; levelId: string }) {
-  const [viewTab, setViewTab] = useState<'world' | 'hub'>('world');
+  const [viewTab, setViewTab] = useState<'world' | 'hub' | 'both'>('world');
+
+  /**
+   * Only offer the side-by-side view once there is a website to look at,
+   * otherwise half the split would be an empty-state panel.
+   */
+  const showHub = Object.keys(snapshot.world.hosted).length > 0;
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -153,11 +170,27 @@ function PlayScreenInner({ session, snapshot, levelId }: { session: GameSession;
             <button type="button" role="tab" className="gq-tab" aria-selected={viewTab === 'hub'} onClick={() => setViewTab('hub')} data-testid={TID.hubTab}>
               {STRINGS.world.tabHub}
             </button>
+            {showHub && (
+              <button type="button" role="tab" className="gq-tab" aria-selected={viewTab === 'both'} onClick={() => setViewTab('both')} data-testid={TID.bothTab}>
+                {STRINGS.world.tabBoth}
+              </button>
+            )}
           </div>
-          {viewTab === 'world' ? (
-            <WorldView session={session} snapshot={snapshot} />
-          ) : (
+          {viewTab === 'world' && <WorldView session={session} snapshot={snapshot} />}
+          {viewTab === 'hub' && (
             <HubPanel session={session} snapshot={snapshot} initialPage={snapshot.level?.ui?.hubPage} />
+          )}
+          {viewTab === 'both' && (
+            /* Side by side so a push can be watched leaving the laptop and
+               landing on the website in the same glance. */
+            <div className="gq-play-split" data-testid={TID.splitView}>
+              <div className="gq-play-split-pane">
+                <WorldView session={session} snapshot={snapshot} />
+              </div>
+              <div className="gq-play-split-pane">
+                <HubPanel session={session} snapshot={snapshot} initialPage={snapshot.level?.ui?.hubPage} />
+              </div>
+            </div>
           )}
         </div>
 

@@ -3,14 +3,35 @@
   "id": "6.5",
   "chapter": 6,
   "number": 5,
-  "title": "Check vs bring in",
-  "concept": "git fetch vs git pull; what origin/main is",
+  "title": "Fetch is not pull",
+  "concept": "git fetch, origin/main, then merge; fetch vs pull",
   "story": [
     {
+      "speaker": "Sam",
+      "text": "I pushed the schedule page this morning. Did you get it?"
+    },
+    {
       "speaker": "Ada",
-      "text": "Sam pushed an update. Let's pull it."
+      "text": "Not yet. Your laptop does not check the website on its own."
+    },
+    {
+      "speaker": "Ada",
+      "text": "`git fetch` downloads new commits but does **not** change your files."
+    },
+    {
+      "speaker": "Ada",
+      "text": "It updates a pointer called `origin/main`. That means \"where main was online when I last looked\"."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Fetch first, look with `git log`, then `git merge origin/main` to actually get the files."
+    },
+    {
+      "speaker": "Ada",
+      "text": "`git pull` is just those two steps in one. Doing them apart once shows you what pull hides."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -18,17 +39,23 @@
       },
       {
         "commit": {
-          "message": "Init",
+          "message": "Add homepage and README",
           "files": {
-            "index.html": "Hello\n"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
           }
         }
       },
       {
         "hosted": {
           "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds"
+          ],
           "fromLocal": {
-            "remoteName": "origin",
             "setUpstream": true
           }
         }
@@ -36,12 +63,12 @@
       {
         "teammate": {
           "type": "push",
-          "actor": "Sam",
+          "actor": "sam-builds",
           "repo": "lantern-labs/festival-site",
           "branch": "main",
-          "message": "Update",
+          "message": "Add the schedule page",
           "files": {
-            "index.html": "Hello Sam\n"
+            "schedule.html": "<h2>Saturday</h2>\n<p>Lantern parade at 8pm</p>\n"
           }
         }
       }
@@ -50,50 +77,105 @@
   "goal": {
     "items": [
       {
-        "text": "Pull the changes",
+        "text": "Fetch to see what is new online",
+        "checks": [
+          {
+            "type": "trackingUpToDate",
+            "remote": "origin",
+            "branch": "main"
+          }
+        ]
+      },
+      {
+        "text": "Answer: what did fetch change?",
         "checks": [
           {
             "type": "answered",
             "question": "q1"
           }
         ]
+      },
+      {
+        "text": "Bring Sam's work into your files",
+        "checks": [
+          {
+            "type": "fileExists",
+            "path": "schedule.html"
+          },
+          {
+            "type": "refsEqual",
+            "a": "main",
+            "b": "origin/main"
+          }
+        ]
       }
     ]
   },
-  "par": 1,
+  "par": 2,
   "allowedCommands": [
-    "git pull",
-    "git fetch"
+    "git fetch",
+    "git merge",
+    "git log",
+    "git status",
+    "ls"
   ],
   "hints": [
-    "Someone changed the project online. How do you get those changes?",
-    "`git fetch` checks for changes. `git pull` fetches and merges them in.",
-    "Answer the question about fetch vs pull."
+    "Two steps: first download, then join the downloaded work into your branch.",
+    "`git fetch` downloads. `git merge origin/main` moves your branch up to match.",
+    "Run `git fetch`, answer the question, then run `git merge origin/main`."
   ],
   "questions": [
     {
       "id": "q1",
-      "prompt": "What is the difference between fetch and pull?",
+      "prompt": "You ran git fetch. Is schedule.html in your folder yet?",
       "choices": [
         {
-          "text": "Fetch downloads, pull downloads and merges"
+          "text": "Yes, fetch copies files into my folder"
         },
         {
-          "text": "There is no difference"
+          "text": "No, fetch only downloaded the commits and moved origin/main"
         }
       ],
-      "answer": 0,
-      "explanation": "Pull does a fetch and then merges."
+      "answer": 1,
+      "explanation": "Fetch never touches your files. It downloads commits and updates origin/main. A merge is what changes your folder."
     }
   ],
-  "recap": "git pull brings down updates and merges them.",
+  "recap": "`git fetch` downloads commits and moves `origin/main`, but leaves your files alone. `git merge origin/main` brings them in. `git pull` does both at once.",
+  "glossary": [
+    "fetch",
+    "pull",
+    "remote-tracking-branch"
+  ],
+  "cheatSheet": [
+    {
+      "command": "git fetch",
+      "summary": "Download new commits without changing your files"
+    },
+    {
+      "command": "git merge origin/main",
+      "summary": "Join the downloaded commits into your branch"
+    }
+  ],
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site"
+  },
   "solution": [
+    {
+      "run": "git fetch"
+    },
     {
       "answer": {
         "question": "q1",
-        "choice": 0
+        "choice": 1
       }
+    },
+    {
+      "run": "git merge origin/main"
     }
   ]
 }

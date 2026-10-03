@@ -3,73 +3,198 @@
   "id": "6.8",
   "chapter": 6,
   "number": 8,
-  "title": "Boss: set up a second laptop",
-  "concept": "Clone, change, push, sync the first",
+  "title": "Boss: the new laptop",
+  "concept": "Clone, commit, push, handle a rejection, end in sync",
   "boss": true,
   "story": [
     {
+      "speaker": "Sam",
+      "text": "My old laptop died. I have a new one and nothing on it."
+    },
+    {
       "speaker": "Ada",
-      "text": "You're at the cafe on your second laptop. Clone the repo, make a commit, push, then switch back to your first laptop and sync it."
+      "text": "You are on the new laptop now. Do the whole round trip yourself."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Get the project, add the contact page, and get it online."
+    },
+    {
+      "speaker": "Ada",
+      "text": "I am editing the README at the same time, so expect a bump."
+    },
+    {
+      "speaker": "Ada",
+      "text": "No hints on the steps this time. You have done every piece already."
     }
   ],
+  "workdir": "~",
   "setup": {
     "steps": [
       {
         "hosted": {
           "id": "lantern-labs/festival-site",
+          "description": "The Lantern Labs festival website",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds"
+          ],
           "initialFiles": {
-            "README.md": "Festival"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n",
+            "schedule.html": "<h2>Saturday</h2>\n"
           },
-          "initialMessage": "Init",
-          "initialAuthor": "Sam"
+          "initialMessage": "Festival site so far",
+          "initialAuthor": "Ada Okafor <ada@lanternlabs.example>"
         }
+      },
+      {
+        "machineAdd": {
+          "id": "newlaptop",
+          "label": "New laptop",
+          "host": "newlaptop"
+        }
+      },
+      {
+        "switchMachine": "newlaptop"
       }
     ]
   },
+  "teammates": [
+    {
+      "id": "ada-edits-readme",
+      "when": {
+        "on": "commands",
+        "count": 3
+      },
+      "actions": [
+        {
+          "type": "say",
+          "speaker": "Ada",
+          "text": "Heads up, I just pushed a line to the README."
+        },
+        {
+          "type": "push",
+          "actor": "ada-okafor",
+          "repo": "lantern-labs/festival-site",
+          "branch": "main",
+          "message": "Mention the parade in the README",
+          "files": {
+            "README.md": "The Lantern Labs festival website\nSaturday night lantern parade.\n"
+          }
+        }
+      ]
+    }
+  ],
   "goal": {
     "items": [
       {
-        "text": "Complete the sync loop",
+        "text": "Get the project onto the new laptop",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "repoExists",
+            "machine": "newlaptop",
+            "repoPath": "~/festival-site"
+          }
+        ]
+      },
+      {
+        "text": "Commit a contact page",
+        "checks": [
+          {
+            "type": "fileExists",
+            "machine": "newlaptop",
+            "path": "~/festival-site/contact.html"
+          },
+          {
+            "type": "commitExists",
+            "changes": [
+              "contact.html"
+            ],
+            "machine": "newlaptop",
+            "repoPath": "~/festival-site"
+          }
+        ]
+      },
+      {
+        "text": "Keep Ada's README change too",
+        "checks": [
+          {
+            "type": "fileContent",
+            "machine": "newlaptop",
+            "path": "~/festival-site/README.md",
+            "contains": "parade"
+          }
+        ]
+      },
+      {
+        "text": "The website has everything and you are in sync",
+        "checks": [
+          {
+            "type": "hostedFile",
+            "repo": "lantern-labs/festival-site",
+            "path": "contact.html"
+          },
+          {
+            "type": "inSync",
+            "machine": "newlaptop",
+            "repoPath": "~/festival-site",
+            "branch": "main"
+          },
+          {
+            "type": "clean",
+            "machine": "newlaptop",
+            "repoPath": "~/festival-site"
           }
         ]
       }
     ]
   },
-  "par": 4,
+  "par": 6,
   "allowedCommands": null,
   "hints": [
-    "Clone the repo.",
-    "Make a commit.",
-    "Push it."
+    "There is nothing on this computer yet. Start by getting the project, then work normally.",
+    "Clone, cd into the folder, create and commit contact.html, then push. If the push is refused, pull and push again.",
+    "`git clone https://github.com/lantern-labs/festival-site.git`, `cd festival-site`, make contact.html, `git add contact.html`, `git commit -m \"Add contact page\"`, `git push`, then `git pull` and `git push`."
   ],
-  "questions": [
-    {
-      "id": "q1",
-      "prompt": "How do you sync the first laptop?",
-      "choices": [
-        {
-          "text": "git fetch"
-        },
-        {
-          "text": "git pull"
-        }
-      ],
-      "answer": 1,
-      "explanation": "git pull brings the changes into your local branch."
-    }
-  ],
-  "recap": "Clone, edit, push on laptop B. Pull on laptop A.",
+  "questions": [],
+  "recap": "You did the full round trip: clone, commit, push, and recover from a rejected push with pull. That is the everyday loop of working with other people.",
+  "glossary": [],
+  "cheatSheet": [],
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 1
-      }
+      "run": "git clone https://github.com/lantern-labs/festival-site.git"
+    },
+    {
+      "run": "cd festival-site"
+    },
+    {
+      "run": "echo \"<p>Email hello@lanternlabs.example</p>\" > contact.html"
+    },
+    {
+      "run": "git add contact.html"
+    },
+    {
+      "run": "git commit -m \"Add contact page\""
+    },
+    {
+      "run": "git push"
+    },
+    {
+      "run": "git pull"
+    },
+    {
+      "run": "git push"
     }
   ]
 }

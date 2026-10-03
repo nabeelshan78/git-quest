@@ -54,7 +54,7 @@
       }
     ]
   },
-  "par": 4,
+  "par": 3,
   "allowedCommands": null,
   "recap": "You used the terminal to navigate, read files, and create new folders and files.",
   "cheatSheet": [],
@@ -62,13 +62,13 @@
   "predict": null,
   "solution": [
     {
+      "run": "cat messy_dir/clue.txt"
+    },
+    {
       "run": "mkdir festival"
     },
     {
-      "edit": {
-        "path": "festival/plan.txt",
-        "content": "plan"
-      }
+      "run": "touch festival/plan.txt"
     }
   ]
 }

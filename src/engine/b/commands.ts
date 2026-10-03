@@ -21,7 +21,7 @@ import {
 import type { FlatTreeEntry } from '../core/objects';
 import {
   absOf, configuredIdentity, currentBranch,
-  dwimRef, headCommit, listWorkTree, readRef,
+  dwimRef, headCommit, listWorkTree, readRef, resolveReflogRev,
   signatureFor, updateRef, appendReflog,
 } from '../core/repo';
 import {
@@ -44,6 +44,8 @@ function resolveRev(repo: RepoState, name: string): Hash | null {
   if (name === 'HEAD' || name === '@') {
     return headCommit(repo);
   }
+  const fromReflog = resolveReflogRev(repo, name);
+  if (fromReflog !== undefined) return fromReflog;
   const ancestorMatch = /^(.+?)([~^])(\d*)$/.exec(name);
   if (ancestorMatch) {
     const baseName = ancestorMatch[1];

@@ -3,14 +3,19 @@
   "id": "6.6",
   "chapter": 6,
   "number": 6,
-  "title": "Push rejected!",
-  "concept": "Why, then pull and push again",
+  "title": "Push rejected",
+  "concept": "Rejected push because the remote moved; pull then push",
   "story": [
     {
       "speaker": "Ada",
-      "text": "Your push was rejected because Sam pushed first. You need to pull their changes, merge, and then push."
+      "text": "Add the ticket price to the README, commit it, and push."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Fair warning: Sam is working at the same time. This may not go smoothly."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -18,90 +23,171 @@
       },
       {
         "commit": {
-          "message": "Init",
+          "message": "Add homepage and README",
           "files": {
-            "index.html": "Hello\n"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n"
           }
         }
       },
       {
         "hosted": {
           "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds"
+          ],
           "fromLocal": {
-            "remoteName": "origin",
             "setUpstream": true
-          }
-        }
-      },
-      {
-        "teammate": {
-          "type": "push",
-          "actor": "Sam",
-          "repo": "lantern-labs/festival-site",
-          "branch": "main",
-          "message": "Sam's update",
-          "files": {
-            "menu.html": "Menu\n"
-          }
-        }
-      },
-      {
-        "commit": {
-          "message": "My update",
-          "files": {
-            "map.html": "Map\n"
           }
         }
       }
     ]
   },
+  "teammates": [
+    {
+      "id": "sam-pushes-first",
+      "when": {
+        "on": "commands",
+        "count": 2
+      },
+      "actions": [
+        {
+          "type": "say",
+          "speaker": "Sam",
+          "text": "Just pushed the map link to main. Sorry, did not see you were working!"
+        },
+        {
+          "type": "push",
+          "actor": "sam-builds",
+          "repo": "lantern-labs/festival-site",
+          "branch": "main",
+          "message": "Add map link",
+          "files": {
+            "map.html": "<p>Find us at Riverside Park</p>\n"
+          }
+        }
+      ]
+    }
+  ],
   "goal": {
     "items": [
       {
-        "text": "Pull, then push",
+        "text": "Commit the ticket price in README.md",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "fileContent",
+            "path": "README.md",
+            "contains": "10"
+          },
+          {
+            "type": "commitExists",
+            "changesExactly": [
+              "README.md"
+            ]
+          }
+        ]
+      },
+      {
+        "text": "Get Sam's commit and keep yours",
+        "checks": [
+          {
+            "type": "fileExists",
+            "path": "map.html"
+          },
+          {
+            "type": "commitExists",
+            "messageContains": "map link"
+          }
+        ]
+      },
+      {
+        "text": "Push so the website has both",
+        "checks": [
+          {
+            "type": "inSync",
+            "branch": "main"
+          },
+          {
+            "type": "hostedFile",
+            "repo": "lantern-labs/festival-site",
+            "path": "README.md",
+            "contains": "10"
           }
         ]
       }
     ]
   },
-  "par": 2,
+  "par": 5,
   "allowedCommands": [
+    "git add",
+    "git commit",
+    "git push",
     "git pull",
-    "git push"
+    "git fetch",
+    "git merge",
+    "git status",
+    "git log",
+    "echo",
+    "cat"
   ],
   "hints": [
-    "Your push was rejected. Why?",
-    "Someone else pushed first. You need to pull their changes before pushing.",
-    "Answer the question. The fix is: pull first, then push again."
+    "A push is refused when the website has commits you do not have yet. You must get them first.",
+    "`git pull` downloads and joins their work. Then your push has somewhere to land.",
+    "Edit README.md and commit. When the push is rejected, run `git pull`, then `git push`."
   ],
-  "questions": [
+  "questions": [],
+  "recap": "A push is rejected when the remote has commits you do not have. Run `git pull` to join them, then push again. Never panic: nothing was lost.",
+  "glossary": [
+    "push-rejected"
+  ],
+  "cheatSheet": [
     {
-      "id": "q1",
-      "prompt": "Why was the push rejected initially?",
-      "choices": [
-        {
-          "text": "GitHub was down"
-        },
-        {
-          "text": "The remote has commits you don't have"
-        }
-      ],
-      "answer": 1,
-      "explanation": "You can't push if it would overwrite someone else's work."
+      "command": "git pull",
+      "summary": "Fetch and merge in one step"
     }
   ],
-  "recap": "If a push is rejected, pull the latest changes, merge, and push again.",
-  "predict": null,
+  "predict": {
+    "trigger": "git push",
+    "question": "Sam pushed while you were working. What will your push do?",
+    "choices": [
+      {
+        "text": "It will be rejected, because the website has a commit you do not have"
+      },
+      {
+        "text": "It will overwrite Sam's commit"
+      }
+    ],
+    "answer": 0,
+    "explanation": "Git refuses the push instead of throwing away Sam's work. This is a safety feature, not an error you caused."
+  },
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 1
-      }
+      "run": "echo \"The Lantern Labs festival website. Tickets cost 10 dollars.\" > README.md"
+    },
+    {
+      "run": "git add README.md"
+    },
+    {
+      "run": "git commit -m \"Add ticket price\""
+    },
+    {
+      "run": "git push"
+    },
+    {
+      "run": "git pull"
+    },
+    {
+      "run": "git push"
     }
   ]
 }

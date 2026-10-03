@@ -137,6 +137,17 @@ export interface GameSession {
   hubAction(action: HubAction): void;
   switchMachine(id: MachineId): void;
 
+  /**
+   * Export the current repository as a shareable bundle for a classmate.
+   * Returns null when there is no repository or it has no commits.
+   */
+  exportBundle(author: { name: string; handle: string }): string | null;
+  /**
+   * Land a classmate's bundle on its own `classmate/<handle>` branch. Nothing
+   * of the player's own work moves; merging is left to them.
+   */
+  importBundle(text: string): { ok: true; branch: string } | { ok: false; error: string };
+
   /** Stop timers and report an abandoned attempt if not completed. */
   dispose(): void;
 }
@@ -146,8 +157,12 @@ export interface SessionOptions {
   /** Required unless mode === 'sandbox'. */
   level?: LevelDefinition;
   player: PlayerProfile;
-  /** Sandbox only: start with a sample project and a simulated GitHub repo. */
-  sandboxPreset?: 'empty' | 'festival' | 'festival-with-remote';
+  /**
+   * Sandbox only: start with a sample project. `team-up` builds a shared base
+   * whose commits are byte-identical for every student, so repo bundles
+   * exchanged between classmates can actually merge.
+   */
+  sandboxPreset?: 'empty' | 'festival' | 'festival-with-remote' | 'team-up';
   /** Called once when the level is completed or the attempt is abandoned. */
   onResult?: (result: LevelResult) => void;
   /** Wall-clock source (tests inject a fake). Defaults to Date.now. */

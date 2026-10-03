@@ -7,10 +7,31 @@
   "concept": "git reset --soft HEAD~1 keeps your changes",
   "story": [
     {
+      "speaker": "Sam",
+      "text": "I committed too early. The message says \"WIP\" and it is only half done."
+    },
+    {
       "speaker": "Ada",
-      "text": "You committed too early! Let's undo the commit but keep the file changes."
+      "text": "Undo the commit but keep the work. That is `git reset --soft HEAD~1`."
+    },
+    {
+      "speaker": "Ada",
+      "text": "`HEAD~1` means \"one commit before where I am now\"."
+    },
+    {
+      "speaker": "Ada",
+      "text": "`--soft` is the gentle one. The commit goes away, your file changes stay staged."
+    },
+    {
+      "speaker": "Ada",
+      "text": "There is also `git reset --hard`. That throws your changes away for real. We will not practise it."
+    },
+    {
+      "speaker": "Ada",
+      "text": "After the reset, commit again with a proper message."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -18,9 +39,9 @@
       },
       {
         "commit": {
-          "message": "Init",
+          "message": "Add homepage",
           "files": {
-            "index.html": "Hello\n"
+            "index.html": "<h1>Lantern Festival</h1>\n"
           }
         }
       },
@@ -28,7 +49,7 @@
         "commit": {
           "message": "WIP",
           "files": {
-            "index.html": "Hello World\n"
+            "index.html": "<h1>Lantern Festival</h1>\n<p>Saturday at Riverside Park.</p>\n"
           }
         }
       }
@@ -37,49 +58,88 @@
   "goal": {
     "items": [
       {
-        "text": "Undo the commit softly",
+        "text": "The WIP commit is gone and the work is not lost",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "noCommitMatching",
+            "messageContains": "WIP"
+          },
+          {
+            "type": "fileContent",
+            "path": "index.html",
+            "contains": "Riverside"
+          }
+        ]
+      },
+      {
+        "text": "Commit again with a real message",
+        "checks": [
+          {
+            "type": "noCommitMatching",
+            "messageContains": "WIP"
+          },
+          {
+            "type": "fileInCommit",
+            "ref": "HEAD",
+            "path": "index.html",
+            "contains": "Riverside"
+          },
+          {
+            "type": "commitCount",
+            "equals": 2
+          },
+          {
+            "type": "clean"
           }
         ]
       }
     ]
   },
-  "par": 1,
+  "par": 2,
   "allowedCommands": [
-    "git reset"
+    "git reset",
+    "git commit",
+    "git status",
+    "git log",
+    "cat"
   ],
   "hints": [
-    "You want to undo the last commit but keep your files.",
-    "`git reset --soft HEAD~1` removes the commit but keeps changes staged.",
-    "Answer the question about soft reset."
+    "Undo the commit without losing the work, then commit it properly.",
+    "`git reset --soft HEAD~1` removes the last commit and leaves the changes staged.",
+    "Run `git reset --soft HEAD~1`, then `git commit -m \"Add Riverside Park location\"`."
   ],
-  "questions": [
+  "questions": [],
+  "recap": "`git reset --soft HEAD~1` undoes the last commit and keeps your changes staged, ready to commit again properly.",
+  "glossary": [
+    "reset",
+    "head"
+  ],
+  "cheatSheet": [
     {
-      "id": "q1",
-      "prompt": "What does --soft do?",
-      "choices": [
-        {
-          "text": "Keeps your file changes"
-        },
-        {
-          "text": "Deletes your file changes"
-        }
-      ],
-      "answer": 0,
-      "explanation": "Soft reset removes the commit but leaves the files in the staging area."
+      "command": "git reset --soft HEAD~1",
+      "summary": "Undo the last commit, keep the changes staged"
     }
   ],
-  "recap": "git reset --soft HEAD~1 undoes the last commit but keeps your edits safe.",
-  "predict": null,
+  "predict": {
+    "trigger": "git reset",
+    "question": "What happens to your text after `git reset --soft HEAD~1`?",
+    "choices": [
+      {
+        "text": "It is deleted along with the commit"
+      },
+      {
+        "text": "It stays, sitting in the staging area"
+      }
+    ],
+    "answer": 1,
+    "explanation": "`--soft` only moves the branch pointer back. Your files and the staging area are untouched."
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
-      }
+      "run": "git reset --soft HEAD~1"
+    },
+    {
+      "run": "git commit -m \"Add Riverside Park location\""
     }
   ]
 }

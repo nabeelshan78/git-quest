@@ -10,17 +10,9 @@
   "setup": {
     "steps": [
       {
-        "mkdir": [
-          "festival"
-        ]
-      },
-      {
         "files": {
-          "festival/notes.txt": "Launch time: 21:00\n"
+          "notes.txt": "Launch time: 21:00\n"
         }
-      },
-      {
-        "run": "cd festival"
       }
     ]
   },
@@ -35,7 +27,7 @@
     }
   ],
   "hints": [
-    "Use cat and echo.",
+    "You need to read a file, and you need to write a line into one. Two different commands.",
     "cat notes.txt, then echo.",
     "Type `cat notes.txt`, then `echo \"<h1>Festival</h1>\" > index.html`."
   ],

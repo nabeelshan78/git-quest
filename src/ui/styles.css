@@ -973,9 +973,130 @@ button.gq-commit, [role="button"].gq-commit { cursor: pointer; }
 .gq-not-found { max-width: 500px; margin: 60px auto; padding: 24px 16px; text-align: center; }
 
 /* ================================================================
+   Simulated code-hosting site ("CodeHub") — generic design, no
+   GitHub name, logo or Octocat.
+   ================================================================ */
+.gq-hub { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; background: var(--bg-raised); }
+.gq-hub-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 32px 16px; text-align: center; color: var(--text-muted); height: 100%; }
+.gq-hub-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--bg-surface); }
+.gq-hub-brand { display: flex; align-items: center; gap: 5px; color: var(--text-muted); }
+.gq-hub-site { font-weight: 600; font-size: 0.9em; }
+.gq-hub-repo { font-size: 0.95em; display: flex; align-items: center; gap: 4px; }
+.gq-hub-repo-select, .gq-hub-branch {
+  font: inherit; font-size: 0.85em; padding: 2px 6px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--bg); color: var(--text);
+}
+.gq-hub-chip {
+  font-size: 0.7em; padding: 1px 6px; border: 1px solid var(--border-strong);
+  border-radius: 999px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.gq-hub-nav, .gq-hub-subnav { display: flex; gap: 2px; padding: 0 8px; border-bottom: 1px solid var(--border); background: var(--bg-surface); }
+.gq-hub-subnav { background: transparent; margin: 8px 0; }
+.gq-hub-tab {
+  display: flex; align-items: center; gap: 5px; padding: 7px 10px; font: inherit; font-size: 0.88em;
+  background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); cursor: pointer;
+}
+.gq-hub-tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+.gq-hub-tab:hover { color: var(--text); }
+.gq-hub-count { font-size: 0.75em; padding: 0 5px; border-radius: 999px; background: var(--border); color: var(--text); }
+.gq-hub-body { flex: 1; min-height: 0; overflow-y: auto; padding: 12px; }
+.gq-hub-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.gq-hub-toolbar .gq-btn { margin-left: auto; }
+
+.gq-hub-tipcommit { padding: 6px 8px; background: var(--bg-surface); border-radius: var(--radius-sm); margin-bottom: 8px; }
+.gq-hub-filelist { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.gq-hub-filelist li { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+.gq-hub-filelist li:last-child { border-bottom: none; }
+.gq-hub-filename { font-family: var(--font-mono); font-size: 0.88em; color: var(--text); }
+.gq-hub-readme { margin-top: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.gq-hub-readme-head { padding: 6px 10px; background: var(--bg-surface); border-bottom: 1px solid var(--border); font-size: 0.85em; font-weight: 600; }
+.gq-hub-readme pre { margin: 0; padding: 10px; white-space: pre-wrap; word-break: break-word; font-family: var(--font-mono); font-size: 0.85em; }
+
+.gq-hub-rows { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.gq-hub-rows > li { border-bottom: 1px solid var(--border); }
+.gq-hub-rows > li:last-child { border-bottom: none; }
+.gq-hub-row {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px;
+  font: inherit; text-align: left; background: none; border: none; color: var(--text); cursor: pointer;
+}
+.gq-hub-row:hover { background: var(--bg-surface); }
+.gq-hub-row-title { flex: 1; font-weight: 500; }
+.gq-hub-state { font-size: 0.75em; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+.gq-hub-state-open { background: var(--success-bg); color: var(--success); }
+.gq-hub-state-closed { background: var(--danger-bg); color: var(--danger); }
+.gq-hub-state-merged { background: var(--accent-bg); color: var(--accent); }
+
+.gq-hub-detail h3 { margin: 10px 0 4px; }
+.gq-hub-meta { margin-bottom: 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.gq-hub-comment { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
+.gq-hub-comment-head { padding: 5px 8px; background: var(--bg-surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 4px; }
+.gq-hub-comment pre { margin: 0; padding: 8px; white-space: pre-wrap; word-break: break-word; font-family: inherit; font-size: 0.9em; }
+.gq-hub-review { border: 1px solid var(--border); border-left: 3px solid var(--border-strong); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
+.gq-hub-review pre { margin: 0; padding: 8px; white-space: pre-wrap; font-family: inherit; font-size: 0.9em; }
+.gq-hub-review-approved { border-left-color: var(--success); }
+.gq-hub-review-changes_requested { border-left-color: var(--warning); }
+.gq-hub-review-commented { border-left-color: var(--accent); }
+.gq-hub-review-comment { border-left: 3px solid var(--accent); }
+.gq-hub-reply { margin: 0 8px 8px 20px; border-left: 2px solid var(--border); padding-left: 8px; }
+.gq-hub-reply pre { margin: 0; padding: 4px 0; white-space: pre-wrap; font-family: inherit; font-size: 0.9em; }
+
+.gq-hub-form { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.gq-hub-form input, .gq-hub-form textarea, .gq-hub-form select {
+  font: inherit; font-size: 0.9em; padding: 6px 8px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--bg); color: var(--text); width: 100%;
+}
+.gq-hub-form textarea { resize: vertical; font-family: inherit; }
+.gq-hub-form .gq-btn { align-self: flex-start; }
+.gq-hub-form-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.gq-hub-merge { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+
+.gq-hub-diff-file { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; overflow: hidden; }
+.gq-hub-diff-head { padding: 6px 10px; background: var(--bg-surface); border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.82em; font-weight: 600; }
+.gq-hub-diff-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.82em; }
+.gq-hub-diff-num { width: 1%; padding: 1px 8px; text-align: right; color: var(--text-faint); user-select: none; vertical-align: top; }
+.gq-hub-diff-sign { width: 1%; padding: 1px 2px; text-align: center; user-select: none; vertical-align: top; }
+.gq-hub-diff-text { padding: 1px 8px 1px 2px; white-space: pre-wrap; word-break: break-word; }
+.gq-hub-diff-table tr.gq-diff-add { background: var(--success-bg); }
+.gq-hub-diff-table tr.gq-diff-del { background: var(--danger-bg); }
+/* Classmate repo bundle exchange */
+.gq-teamup {
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px;
+  margin-bottom: 10px; background: var(--bg-surface);
+}
+.gq-teamup h3 { margin: 0 0 4px; font-size: 1em; }
+.gq-teamup-steps { margin: 6px 0; padding-left: 20px; color: var(--text-muted); }
+.gq-teamup-actions { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 4px; }
+
+.gq-hub-inline-comment {
+  margin: 4px 0; padding: 6px 8px; background: var(--bg-raised); border: 1px solid var(--accent);
+  border-radius: var(--radius-sm); font-family: var(--font); font-size: 1.05em; white-space: normal;
+}
+
+/* ================================================================
    Responsive: small screens
    ================================================================ */
 @media (max-width: 600px) {
   .gq-home { padding: 16px; }
   .gq-topbar { padding: 6px 10px; }
+}
+
+/* Side-by-side World view + website, so a push can be watched leaving the
+   laptop and landing online in one glance. */
+.gq-play-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.gq-play-split-pane {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+@media (max-width: 1100px) {
+  .gq-play-split { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
 }

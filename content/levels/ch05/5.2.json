@@ -5,12 +5,34 @@
   "number": 2,
   "title": "Reading the markers",
   "concept": "<<<<<<<, =======, >>>>>>>",
+  "boss": false,
   "story": [
     {
       "speaker": "Ada",
-      "text": "When there's a conflict, git adds markers to the file to show you both versions. Let's look at index.html."
+      "text": "The merge is still paused. Git wrote both versions into index.html."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Run `git status` to see which file needs you. Git calls it \"both modified\"."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Then `cat index.html` to read it. You will see three strange lines."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Between `<<<<<<<` and `=======` is **your** version, the branch you are on."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Between `=======` and `>>>>>>>` is **their** version, the branch coming in."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Those marker lines are not code. They are notes from git, and they must all go."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -56,50 +78,112 @@
   "goal": {
     "items": [
       {
-        "text": "Open index.html and answer the question",
+        "text": "Find which file is conflicted",
+        "checks": [
+          {
+            "type": "ranCommand",
+            "command": "git status"
+          }
+        ]
+      },
+      {
+        "text": "Read the conflicted file",
+        "checks": [
+          {
+            "type": "ranCommand",
+            "command": "cat"
+          }
+        ]
+      },
+      {
+        "text": "Answer: which side is yours?",
         "checks": [
           {
             "type": "answered",
             "question": "q1"
           }
         ]
+      },
+      {
+        "text": "Answer: what happens to the marker lines?",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q2"
+          }
+        ]
       }
     ]
   },
-  "par": null,
-  "allowedCommands": [
-    "cat"
-  ],
-  "hints": [
-    "Look at the contents of the file.",
-    "Use the cat command to read index.html.",
-    "cat index.html"
-  ],
   "questions": [
     {
       "id": "q1",
-      "prompt": "What separates the two conflicting versions in the file?",
+      "prompt": "You are on main. Which version sits between <<<<<<< and =======?",
       "choices": [
         {
-          "text": "A blank line"
+          "text": "Sam's \"Riverside Lantern Festival\", because main is where I am"
         },
         {
-          "text": "======="
+          "text": "The feature branch version, \"Lantern Festival 2026\""
+        }
+      ],
+      "answer": 0,
+      "explanation": "The top half is always the branch you are standing on. You are on main, so the top half is main's version."
+    },
+    {
+      "id": "q2",
+      "prompt": "What should you do with the <<<<<<<, ======= and >>>>>>> lines?",
+      "choices": [
+        {
+          "text": "Leave them: git needs them"
         },
         {
-          "text": "-------"
+          "text": "Delete all of them while choosing what the file should say"
         }
       ],
       "answer": 1,
-      "explanation": "The ======= line separates your version (above it) from the branch you are merging in (below it)."
+      "explanation": "They are temporary notes. If you leave them in, they end up in your real file as broken text."
     }
   ],
-  "recap": "Git marks conflicts with <<<<<<< HEAD, =======, and >>>>>>> branch-name.",
+  "par": 2,
+  "recap": "In a conflict, the top half (after <<<<<<<) is the branch you are on and the bottom half is the branch coming in. All three marker lines must be deleted.",
+  "glossary": [
+    "conflict-markers"
+  ],
+  "cheatSheet": [
+    {
+      "command": "git status",
+      "summary": "See which files are conflicted"
+    }
+  ],
   "predict": null,
+  "allowedCommands": [
+    "git status",
+    "cat",
+    "git diff",
+    "ls"
+  ],
+  "hints": [
+    "Ask git which file needs attention, then read that file.",
+    "`git status` names the conflicted file. `cat <file>` prints it so you can see the markers.",
+    "Run `git status`, then `cat index.html`, then answer both questions."
+  ],
   "solution": [
+    {
+      "run": "git status"
+    },
+    {
+      "run": "cat index.html"
+    },
     {
       "answer": {
         "question": "q1",
+        "choice": 0
+      }
+    },
+    {
+      "answer": {
+        "question": "q2",
         "choice": 1
       }
     }

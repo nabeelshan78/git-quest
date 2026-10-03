@@ -63,7 +63,9 @@
           },
           {
             "type": "commitExists",
-            "messageContains": "map"
+            "changes": [
+              "map.html"
+            ]
           }
         ]
       }

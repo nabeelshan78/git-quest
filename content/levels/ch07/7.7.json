@@ -3,66 +3,247 @@
   "id": "7.7",
   "chapter": 7,
   "number": 7,
-  "title": "Boss: festival launch sprint",
-  "concept": "Several PRs, one conflict, one review",
+  "title": "Boss: ship a task end to end",
+  "concept": "Issue to merged pull request, with a review and a tidy finish",
   "boss": true,
   "story": [
     {
+      "speaker": "Priya",
+      "text": "Last one before the festival. Issue #1 is the accessibility note for the site."
+    },
+    {
       "speaker": "Ada",
-      "text": "It's launch day! Handle a PR, fix a conflict, and merge."
+      "text": "Do the whole cycle on your own this time. You know every step."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Task, branch, commit, push, pull request, handle the review, merge, tidy up."
+    },
+    {
+      "speaker": "Ada",
+      "text": "I will review it as soon as the pull request appears."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
         "run": "git init"
+      },
+      {
+        "commit": {
+          "message": "Festival site so far",
+          "files": {
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\n",
+            "food.html": "<h2>Food stalls</h2>\n"
+          }
+        }
+      },
+      {
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds",
+            "priya-reviews"
+          ],
+          "fromLocal": {
+            "setUpstream": true
+          },
+          "labels": [
+            {
+              "name": "accessibility",
+              "color": "#009E73"
+            }
+          ]
+        }
+      },
+      {
+        "hub": {
+          "type": "createIssue",
+          "actor": "priya-reviews",
+          "repo": "lantern-labs/festival-site",
+          "title": "Add an access.html page",
+          "body": "Please add access.html. It must say the site is wheelchair accessible and that there is a step-free route.",
+          "labels": [
+            "accessibility"
+          ],
+          "assignees": [
+            "{{player.handle}}"
+          ]
+        }
       }
     ]
   },
+  "teammates": [
+    {
+      "id": "ada-approves",
+      "when": {
+        "on": "event",
+        "event": "hub.pr.open"
+      },
+      "actions": [
+        {
+          "type": "say",
+          "speaker": "Ada",
+          "text": "Reading it now... looks right. Approved, go ahead and merge."
+        },
+        {
+          "type": "hub",
+          "action": {
+            "type": "reviewPullRequest",
+            "actor": "ada-okafor",
+            "repo": "lantern-labs/festival-site",
+            "number": 2,
+            "event": "approve",
+            "body": "Clear and complete. Approved."
+          }
+        }
+      ]
+    }
+  ],
   "goal": {
     "items": [
       {
-        "text": "Finish the sprint",
+        "text": "Commit the work on a branch, not straight on main",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "branchExists",
+            "name": "access-note"
+          },
+          {
+            "type": "commitExists",
+            "on": "--all",
+            "changes": [
+              "access.html"
+            ]
+          }
+        ]
+      },
+      {
+        "text": "access.html mentions wheelchair access and a step-free route",
+        "checks": [
+          {
+            "type": "hostedFile",
+            "repo": "lantern-labs/festival-site",
+            "branch": "main",
+            "path": "access.html",
+            "contains": "wheelchair"
+          },
+          {
+            "type": "hostedFile",
+            "repo": "lantern-labs/festival-site",
+            "branch": "main",
+            "path": "access.html",
+            "contains": "step-free"
+          }
+        ]
+      },
+      {
+        "text": "A pull request was opened, approved and merged",
+        "checks": [
+          {
+            "type": "pullRequest",
+            "repo": "lantern-labs/festival-site",
+            "head": "access-note",
+            "state": "merged",
+            "approved": true
+          }
+        ]
+      },
+      {
+        "text": "Tidy finish: branch gone, local main up to date",
+        "checks": [
+          {
+            "type": "hostedBranch",
+            "repo": "lantern-labs/festival-site",
+            "branch": "access-note",
+            "exists": false
+          },
+          {
+            "type": "currentBranch",
+            "name": "main"
+          },
+          {
+            "type": "fileExists",
+            "path": "access.html"
+          },
+          {
+            "type": "inSync",
+            "branch": "main"
           }
         ]
       }
     ]
   },
-  "par": null,
+  "par": 6,
   "allowedCommands": null,
   "hints": [
-    "This is the boss level. Use everything you learned about PRs.",
-    "Create branches, push, open PRs, handle reviews and conflicts.",
-    "Answer the question to complete the sprint."
+    "Follow the same order as the whole chapter: branch, commit, push, pull request, merge, delete, pull.",
+    "Name the branch `access-note`. After merging on the website, delete the branch and pull into your local main.",
+    "`git switch -c access-note`, write access.html with \"wheelchair\" and \"step-free\", `git add access.html`, `git commit -m \"Add access note\"`, `git push -u origin access-note`, open a pull request in the panel, merge it, delete the branch, then `git switch main` and `git pull`."
   ],
-  "questions": [
-    {
-      "id": "q1",
-      "prompt": "What is the best way to handle multiple tasks?",
-      "choices": [
-        {
-          "text": "One branch per task, one PR per task"
-        },
-        {
-          "text": "One giant branch for everything"
-        }
-      ],
-      "answer": 0,
-      "explanation": "Keep tasks separate."
-    }
-  ],
-  "recap": "One branch, one task, one PR.",
+  "questions": [],
+  "recap": "You took a task from an issue all the way to merged main: branch, commit, push, pull request, review, merge, clean up, and pull. That is the real loop of team work.",
+  "glossary": [],
+  "cheatSheet": [],
   "predict": null,
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true
+    },
+    "hubPage": "lantern-labs/festival-site/issues/1"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
+      "run": "git switch -c access-note"
+    },
+    {
+      "run": "echo \"<h2>Access</h2><p>The site is wheelchair accessible. There is a step-free route from the main gate.</p>\" > access.html"
+    },
+    {
+      "run": "git add access.html"
+    },
+    {
+      "run": "git commit -m \"Add access note\""
+    },
+    {
+      "run": "git push -u origin access-note"
+    },
+    {
+      "hub": {
+        "type": "openPullRequest",
+        "repo": "lantern-labs/festival-site",
+        "head": "access-note",
+        "base": "main",
+        "title": "Add access note",
+        "body": "Closes #1."
       }
+    },
+    {
+      "hub": {
+        "type": "mergePullRequest",
+        "repo": "lantern-labs/festival-site",
+        "number": 2,
+        "method": "merge"
+      }
+    },
+    {
+      "hub": {
+        "type": "deleteBranch",
+        "repo": "lantern-labs/festival-site",
+        "branch": "access-note"
+      }
+    },
+    {
+      "run": "git switch main"
+    },
+    {
+      "run": "git pull"
     }
   ]
 }

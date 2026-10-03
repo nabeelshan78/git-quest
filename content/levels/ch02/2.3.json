@@ -9,15 +9,23 @@
   "story": [
     {
       "speaker": "Ada",
-      "text": "I can't remember what I just typed in the menu."
+      "text": "I cannot remember what I typed in the schedule earlier. Can you check?"
     },
     {
       "speaker": "Ada",
-      "text": "Use `git diff` to see what changed in your working folder since the last commit."
+      "text": "`git diff` shows changes that are **not** staged yet."
     },
     {
       "speaker": "Ada",
-      "text": "If a file is already staged, use `git diff --staged` to see it."
+      "text": "`git diff --staged` shows changes that **are** staged, waiting for the next commit."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Two different questions, two different commands. Run both and compare."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Lines starting with `+` were added. Lines starting with `-` were removed."
     }
   ],
   "workdir": "~/festival",
@@ -46,17 +54,43 @@
         "files": {
           "menu.html": "Food stalls:\n- Noodles\n"
         }
+      },
+      {
+        "run": "git add menu.html"
+      },
+      {
+        "files": {
+          "menu.html": "Food stalls:\n- Noodles\n- Dumplings\n"
+        }
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Check what changed",
+        "text": "Look at the unstaged changes with git diff",
+        "checks": [
+          {
+            "type": "ranCommand",
+            "command": "git diff"
+          }
+        ]
+      },
+      {
+        "text": "Answer: which line is only in the working folder?",
         "checks": [
           {
             "type": "answered",
             "question": "q1"
+          }
+        ]
+      },
+      {
+        "text": "Answer: which change is already staged?",
+        "checks": [
+          {
+            "type": "answered",
+            "question": "q2"
           }
         ]
       }
@@ -65,47 +99,80 @@
   "questions": [
     {
       "id": "q1",
-      "prompt": "What did we add to the menu?",
+      "prompt": "Run `git diff`. Which line does it show as added?",
       "choices": [
         {
-          "text": "Burgers"
+          "text": "- Dumplings"
         },
         {
-          "text": "Noodles"
+          "text": "- Noodles"
         },
         {
-          "text": "Pizza"
+          "text": "Closing times: 10pm"
+        }
+      ],
+      "answer": 0,
+      "explanation": "Dumplings was typed after `git add`, so it is unstaged. `git diff` shows exactly that."
+    },
+    {
+      "id": "q2",
+      "prompt": "Now run `git diff --staged`. What is waiting to be committed?",
+      "choices": [
+        {
+          "text": "Nothing is staged"
+        },
+        {
+          "text": "The closing time, and the first version of the menu"
         }
       ],
       "answer": 1,
-      "explanation": "`git diff` shows you added Noodles."
+      "explanation": "You staged the closing time and the Noodles line earlier. `--staged` shows what the next commit would contain."
     }
   ],
-  "par": null,
-  "recap": "`git diff` shows working folder changes. `git diff --staged` shows what is ready to be committed.",
+  "par": 2,
+  "recap": "`git diff` shows what is not staged yet. `git diff --staged` shows what is staged for the next commit.",
+  "glossary": [
+    "diff"
+  ],
   "cheatSheet": [
     {
       "command": "git diff",
-      "summary": "See changes in the working folder"
+      "summary": "See changes you have not staged"
     },
     {
       "command": "git diff --staged",
-      "summary": "See changes in the staging area"
+      "summary": "See changes that are staged for the next commit"
     }
   ],
   "predict": null,
+  "allowedCommands": [
+    "git diff",
+    "git status",
+    "cat"
+  ],
+  "hints": [
+    "There are two diffs to look at: one for unstaged changes, one for staged changes.",
+    "`git diff` shows unstaged work. `git diff --staged` shows what you already added.",
+    "Run `git diff`, then run `git diff --staged`, then answer both questions."
+  ],
   "solution": [
+    {
+      "run": "git diff"
+    },
     {
       "answer": {
         "question": "q1",
+        "choice": 0
+      }
+    },
+    {
+      "run": "git diff --staged"
+    },
+    {
+      "answer": {
+        "question": "q2",
         "choice": 1
       }
     }
-  ],
-  "hints": [
-    "Try running git diff to see what changed in your working folder.",
-    "git diff shows unstaged changes. git diff --staged shows what you have already staged for the next commit.",
-    "Run git diff to see the unstaged changes, then run git diff --staged to see the staged ones."
-  ],
-  "allowedCommands": null
+  ]
 }

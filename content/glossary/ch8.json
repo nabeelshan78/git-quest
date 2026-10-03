@@ -26,5 +26,12 @@
     "definition": "Git's secret diary of everywhere HEAD has been. Useful for finding lost commits.",
     "chapter": 8,
     "command": "git reflog"
+  },
+  {
+    "id": "reset",
+    "term": "Reset",
+    "definition": "Move your branch to a different commit. --soft keeps your changes, --hard throws them away.",
+    "chapter": 8,
+    "command": "git reset"
   }
 ]

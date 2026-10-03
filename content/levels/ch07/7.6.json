@@ -3,14 +3,35 @@
   "id": "7.6",
   "chapter": 7,
   "number": 6,
-  "title": "Conflicts in a PR",
-  "concept": "Bring main into your branch and resolve",
+  "title": "A conflict inside a pull request",
+  "concept": "main moved under your branch; merge main in, resolve, push",
   "story": [
     {
+      "speaker": "Sam",
+      "text": "Bad timing. I changed the same README line you did, and mine is already in main."
+    },
+    {
       "speaker": "Ada",
-      "text": "Your PR has a conflict with main! Switch to your branch, merge main into it, and resolve."
+      "text": "So your pull request cannot merge cleanly. The website says it has a conflict."
+    },
+    {
+      "speaker": "Ada",
+      "text": "The fix happens on your laptop, not on the website."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Bring main into your branch: `git pull origin main`. That is where the conflict appears."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Fix the file so it keeps both facts, commit, and push. The pull request goes green."
+    },
+    {
+      "speaker": "Ada",
+      "text": "Never clone the project again to escape a conflict. That loses your work."
     }
   ],
+  "workdir": "~/festival",
   "setup": {
     "steps": [
       {
@@ -18,85 +39,182 @@
       },
       {
         "commit": {
-          "message": "Init",
+          "message": "Festival site so far",
           "files": {
-            "index.html": "A\n"
+            "index.html": "<h1>Lantern Festival</h1>\n",
+            "README.md": "The Lantern Labs festival website\nTickets cost 10 dollars.\n"
           }
         }
       },
       {
-        "run": "git switch -c feature"
+        "hosted": {
+          "id": "lantern-labs/festival-site",
+          "visibility": "public",
+          "defaultBranch": "main",
+          "collaborators": [
+            "ada-okafor",
+            "sam-builds",
+            "priya-reviews"
+          ],
+          "fromLocal": {
+            "setUpstream": true
+          }
+        }
+      },
+      {
+        "run": "git switch -c ticket-note"
       },
       {
         "commit": {
-          "message": "My feature",
+          "message": "Say tickets are cheaper for students",
           "files": {
-            "index.html": "A\nB\n"
+            "README.md": "The Lantern Labs festival website\nTickets cost 10 dollars, or 6 for students.\n"
           }
         }
       },
       {
-        "run": "git switch main"
+        "run": "git push -u origin ticket-note"
       },
       {
-        "commit": {
-          "message": "Someone else's edit",
-          "files": {
-            "index.html": "A\nC\n"
-          }
+        "hub": {
+          "type": "openPullRequest",
+          "repo": "lantern-labs/festival-site",
+          "head": "ticket-note",
+          "base": "main",
+          "title": "Mention the student ticket price",
+          "body": "Students keep asking."
         }
       },
       {
-        "run": "git switch feature"
+        "teammate": {
+          "type": "push",
+          "actor": "sam-builds",
+          "repo": "lantern-labs/festival-site",
+          "branch": "main",
+          "message": "Tickets are free for children",
+          "files": {
+            "README.md": "The Lantern Labs festival website\nTickets cost 10 dollars. Children go free.\n"
+          }
+        }
       }
     ]
   },
   "goal": {
     "items": [
       {
-        "text": "Merge main into feature and resolve",
+        "text": "Bring main's change into your branch and solve the conflict",
         "checks": [
           {
-            "type": "answered",
-            "question": "q1"
+            "type": "fileContent",
+            "path": "README.md",
+            "contains": "hildren"
+          },
+          {
+            "type": "noConflicts"
+          },
+          {
+            "type": "noConflictMarkers"
+          },
+          {
+            "type": "noOperationInProgress"
+          }
+        ]
+      },
+      {
+        "text": "Keep your own student price too",
+        "checks": [
+          {
+            "type": "fileContent",
+            "path": "README.md",
+            "contains": "students"
+          }
+        ]
+      },
+      {
+        "text": "Push the merged file so the pull request can merge",
+        "checks": [
+          {
+            "type": "currentBranch",
+            "name": "ticket-note"
+          },
+          {
+            "type": "hostedBranch",
+            "repo": "lantern-labs/festival-site",
+            "branch": "ticket-note",
+            "equalsLocal": "ticket-note"
+          },
+          {
+            "type": "hostedFile",
+            "repo": "lantern-labs/festival-site",
+            "branch": "ticket-note",
+            "path": "README.md",
+            "contains": "hildren"
+          },
+          {
+            "type": "clean"
           }
         ]
       }
     ]
   },
-  "par": 1,
-  "allowedCommands": [
-    "git merge"
-  ],
+  "par": 4,
+  "allowedCommands": null,
   "hints": [
-    "Two people changed the same line. Git cannot pick one automatically.",
-    "Pull main into your branch, then fix the conflict markers by hand.",
-    "Answer the question about resolving merge conflicts in a PR."
+    "The conflict is between main and your branch. Pull main into your branch to see it.",
+    "Run `git pull origin main`. Git stops with a conflict in README.md. Edit it to keep both sentences, then add and commit.",
+    "`git pull origin main`, edit README.md so it mentions students and children, remove the <<<<<<< ======= >>>>>>> lines, then `git add README.md`, `git commit`, `git push`."
   ],
-  "questions": [
+  "questions": [],
+  "recap": "When main moves under your branch, pull main into your branch, fix the conflict there, and push. The pull request updates itself. Never re-clone to escape a conflict.",
+  "glossary": [
+    "conflict"
+  ],
+  "cheatSheet": [
     {
-      "id": "q1",
-      "prompt": "Why merge main into feature?",
-      "choices": [
-        {
-          "text": "To resolve the conflict locally before pushing"
-        },
-        {
-          "text": "To break main"
-        }
-      ],
-      "answer": 0,
-      "explanation": "Resolve conflicts locally so the PR can be merged cleanly."
+      "command": "git pull origin main",
+      "summary": "Bring the latest main into the branch you are on"
     }
   ],
-  "recap": "If a PR conflicts with main, merge main into your branch and resolve.",
-  "predict": null,
+  "predict": {
+    "trigger": "git pull",
+    "question": "Where does the conflict have to be fixed?",
+    "choices": [
+      {
+        "text": "On the website, in the pull request"
+      },
+      {
+        "text": "On your laptop, then pushed up"
+      }
+    ],
+    "answer": 1,
+    "explanation": "Git needs a human to decide what the file should say. You do that on your laptop and push the answer."
+  },
+  "ui": {
+    "panels": {
+      "hub": true,
+      "remote": true,
+      "editor": true
+    },
+    "hubPage": "lantern-labs/festival-site/pulls/1"
+  },
   "solution": [
     {
-      "answer": {
-        "question": "q1",
-        "choice": 0
+      "run": "git pull origin main"
+    },
+    {
+      "edit": {
+        "path": "README.md",
+        "content": "The Lantern Labs festival website\nTickets cost 10 dollars, or 6 for students. Children go free.\n"
       }
+    },
+    {
+      "run": "git add README.md"
+    },
+    {
+      "run": "git commit -m \"Keep both ticket notes\""
+    },
+    {
+      "run": "git push"
     }
   ]
 }
