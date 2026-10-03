@@ -11,12 +11,15 @@ permissions:
   pages: write
   id-token: write
 
+# A newer push makes an older run pointless; stop it and save the wait.
 concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
+  # Fast, reliable gate: ~2-3 minutes. This is what decides whether the site
+  # is allowed to publish.
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,23 +35,58 @@ jobs:
           git config --global init.defaultBranch main
       - run: npm run typecheck
       - run: npm run lint
+      # 440 unit tests + 89 differential tests against real git.
       - run: npm test
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: playwright-report
-          path: playwright-report
-          retention-days: 7
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
+  # Browser playthrough of all 58 levels. Runs beside the gate, not in front
+  # of it: it reports problems without holding the site hostage. Deliberately
+  # NOT a dependency of `deploy`.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Configure git
+        run: |
+          git config --global user.name "CI"
+          git config --global user.email "ci@example.com"
+          git config --global init.defaultBranch main
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browser
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install system deps when the browser came from cache
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
   deploy:
+    # Publishes as soon as the fast checks pass. The browser suite keeps
+    # running in parallel and reports separately.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: test
+    needs: checks
     runs-on: ubuntu-latest
     environment:
       name: github-pages
